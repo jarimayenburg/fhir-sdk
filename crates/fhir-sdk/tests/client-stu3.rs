@@ -1,5 +1,6 @@
 #![cfg(all(feature = "stu3", feature = "builders", feature = "client"))]
 #![allow(clippy::expect_used, clippy::unwrap_used, clippy::print_stdout)]
+#![recursion_limit = "1024"]
 
 mod common;
 
@@ -262,7 +263,7 @@ async fn transaction_inner() -> Result<()> {
 					.build()
 					.unwrap(),
 			)
-			.subject(Reference::builder().reference(patient_ref.clone()).build().unwrap())
+			.subject(Reference::builder().reference(patient_ref.clone()).build().unwrap().into())
 			.build()
 			.unwrap(),
 	);
@@ -290,6 +291,7 @@ async fn transaction_inner() -> Result<()> {
 		.subject
 		.as_ref()
 		.expect("Encounter.subject")
+		.reference
 		.reference
 		.as_ref()
 		.expect("Encounter.subject.reference");
@@ -361,7 +363,7 @@ async fn operation_encounter_everything_inner() -> Result<()> {
 				.build()
 				.unwrap(),
 		)
-		.subject(reference_to(&patient).expect("Patient reference"))
+		.subject(reference_to(&patient).expect("Patient reference").into())
 		.build()
 		.unwrap();
 	encounter.create(&client).await?;

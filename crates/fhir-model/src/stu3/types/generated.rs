@@ -5,6 +5,7 @@ use serde::{Serialize, Deserialize};
 #[cfg(feature = "builders")]
 use derive_builder::Builder;
 use super::super::codes;
+use super::super::resources::*;
 #[allow(unused_imports)]
 use crate::{Base64Binary, Date, DateTime, Instant, Time, Integer64};
 /** Base StructureDefinition for Address Type
@@ -5461,7 +5462,7 @@ Where the system is known, a type is unnecessary because the type is always part
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "assigner")]
-    pub assigner: Option<Reference>,
+    pub assigner: Option<IdentifierAssignerReference>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_assigner")]
@@ -5497,6 +5498,21 @@ impl Identifier {
     #[must_use]
     pub fn builder() -> IdentifierBuilder {
         IdentifierBuilder::default()
+    }
+}
+/// Reference wrapper type of the assigner field in Identifier
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct IdentifierAssignerReference {
+    /// The resource that is being referred to. When doing searches, the client will fill this field if possible.
+    #[serde(skip)]
+    pub target: Option<Box<Organization>>,
+    /// The FHIR Reference field
+    #[serde(flatten)]
+    pub reference: Reference,
+}
+impl From<Reference> for IdentifierAssignerReference {
+    fn from(reference: Reference) -> Self {
+        Self { target: None, reference }
     }
 }
 /** Base StructureDefinition for Meta Type
@@ -6026,7 +6042,7 @@ pub struct ParameterDefinitionInner {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "profile")]
-    pub profile: Option<Reference>,
+    pub profile: Option<ParameterDefinitionProfileReference>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_profile")]
@@ -6062,6 +6078,21 @@ impl ParameterDefinition {
     #[must_use]
     pub fn builder() -> ParameterDefinitionBuilder {
         ParameterDefinitionBuilder::default()
+    }
+}
+/// Reference wrapper type of the profile field in ParameterDefinition
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct ParameterDefinitionProfileReference {
+    /// The resource that is being referred to. When doing searches, the client will fill this field if possible.
+    #[serde(skip)]
+    pub target: Option<Box<StructureDefinition>>,
+    /// The FHIR Reference field
+    #[serde(flatten)]
+    pub reference: Reference,
+}
+impl From<Reference> for ParameterDefinitionProfileReference {
+    fn from(reference: Reference) -> Self {
+        Self { target: None, reference }
     }
 }
 /** Base StructureDefinition for Period Type
@@ -6806,7 +6837,7 @@ pub struct RelatedArtifactInner {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "resource")]
-    pub resource: Option<Reference>,
+    pub resource: Option<RelatedArtifactResourceReference>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_resource")]
@@ -6842,6 +6873,21 @@ impl RelatedArtifact {
     #[must_use]
     pub fn builder() -> RelatedArtifactBuilder {
         RelatedArtifactBuilder::default()
+    }
+}
+/// Reference wrapper type of the resource field in RelatedArtifact
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct RelatedArtifactResourceReference {
+    /// The resource that is being referred to. When doing searches, the client will fill this field if possible.
+    #[serde(skip)]
+    pub target: Option<Box<Resource>>,
+    /// The FHIR Reference field
+    #[serde(flatten)]
+    pub reference: Reference,
+}
+impl From<Reference> for RelatedArtifactResourceReference {
+    fn from(reference: Reference) -> Self {
+        Self { target: None, reference }
     }
 }
 /** Base StructureDefinition for SampledData Type

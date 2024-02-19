@@ -42,6 +42,8 @@ pub enum Field {
 	Code(CodeField),
 	/// Definition of a choice field.
 	Choice(ChoiceField),
+	/// Definition of a reference field.
+	Reference(ReferenceField),
 }
 
 impl Field {
@@ -75,6 +77,7 @@ impl Field {
 			Self::Code(f) => &f.name,
 			Self::Choice(f) => &f.name,
 			Self::Object(f) => &f.name,
+			Self::Reference(f) => &f.name,
 		}
 	}
 
@@ -85,6 +88,7 @@ impl Field {
 			Self::Code(f) => f.optional,
 			Self::Choice(f) => f.optional,
 			Self::Object(f) => f.optional,
+			Self::Reference(f) => f.optional,
 		}
 	}
 
@@ -95,6 +99,7 @@ impl Field {
 			Self::Code(f) => f.is_array,
 			Self::Choice(f) => f.is_array,
 			Self::Object(f) => f.is_array,
+			Self::Reference(f) => f.is_array,
 		}
 	}
 
@@ -105,6 +110,7 @@ impl Field {
 			Self::Code(f) => f.is_base_field,
 			Self::Choice(f) => f.is_base_field,
 			Self::Object(f) => f.is_base_field,
+			Self::Reference(f) => f.is_base_field,
 		}
 	}
 
@@ -115,6 +121,7 @@ impl Field {
 			Self::Code(f) => f.is_base_field = true,
 			Self::Choice(f) => f.is_base_field = true,
 			Self::Object(f) => f.is_base_field = true,
+			Self::Reference(f) => f.is_base_field = true,
 		}
 	}
 }
@@ -274,6 +281,31 @@ pub struct ChoiceField {
 	pub is_base_field: bool,
 	/// Name of the possible types.
 	pub types: Vec<String>,
+	/// Whether this field is a modifier field.
+	pub is_modifier: bool,
+	/// Whether this field is part of the summary.
+	pub is_summary: bool,
+}
+
+/// Definition of a reference field.
+#[derive(Debug, Clone)]
+pub struct ReferenceField {
+	/// Field name.
+	pub name: String,
+	/// Short definition.
+	pub short: String,
+	/// Text definition.
+	pub definition: String,
+	/// Comment.
+	pub comment: Option<String>,
+	/// Whether this field is optional
+	pub optional: bool,
+	/// Whether this field is an array.
+	pub is_array: bool,
+	/// Whether this is a base type field.
+	pub is_base_field: bool,
+	/// Possible target resource types
+	pub target_resource_types: Vec<String>,
 	/// Whether this field is a modifier field.
 	pub is_modifier: bool,
 	/// Whether this field is part of the summary.

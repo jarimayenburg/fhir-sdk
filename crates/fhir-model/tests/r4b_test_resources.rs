@@ -1,5 +1,6 @@
 #![cfg(all(feature = "r4b", feature = "builders"))]
 #![allow(clippy::expect_used, clippy::unwrap_used, clippy::print_stdout)]
+#![recursion_limit = "1024"]
 
 mod json_compare;
 

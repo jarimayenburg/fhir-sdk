@@ -78,6 +78,7 @@ pub fn generate_types(
 		#[cfg(feature = "builders")]
 		use derive_builder::Builder;
 		use super::super::codes;
+		use super::super::resources::*;
 		#[allow(unused_imports)] // Integer64 is unused in R4B.
 		use crate::{Base64Binary, Date, DateTime, Instant, Time, Integer64};
 
