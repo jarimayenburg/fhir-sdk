@@ -4,7 +4,9 @@ use std::collections::BTreeMap;
 
 use fhir_model::{r4b, r5, stu3};
 
-use crate::model::structures::{ChoiceField, CodeField, Field, ObjectField, StandardField, Type};
+use crate::model::structures::{
+	ChoiceField, CodeField, Field, ObjectField, ReferenceField, StandardField, Type,
+};
 
 impl From<stu3::resources::StructureDefinition> for Type {
 	fn from(structure_definition: stu3::resources::StructureDefinition) -> Self {
@@ -141,6 +143,8 @@ impl From<stu3::types::ElementDefinition> for Field {
 			Self::Choice(ChoiceField::from(element))
 		} else if element.binding.is_some() {
 			Self::Code(CodeField::from(element))
+		} else if element.r#type.iter().flatten().any(|t| t.code == "Reference") {
+			Self::Reference(ReferenceField::from(element))
 		} else if element
 			.extension
 			.iter()
@@ -161,6 +165,8 @@ impl From<r4b::types::ElementDefinition> for Field {
 			Self::Choice(ChoiceField::from(element))
 		} else if element.binding.is_some() {
 			Self::Code(CodeField::from(element))
+		} else if element.r#type.iter().flatten().any(|t| t.code == "Reference") {
+			Self::Reference(ReferenceField::from(element))
 		} else if element
 			.extension
 			.iter()
@@ -181,6 +187,8 @@ impl From<r5::types::ElementDefinition> for Field {
 			Self::Choice(ChoiceField::from(element))
 		} else if element.binding.is_some() {
 			Self::Code(CodeField::from(element))
+		} else if element.r#type.iter().flatten().any(|t| t.code == "Reference") {
+			Self::Reference(ReferenceField::from(element))
 		} else if element
 			.extension
 			.iter()
@@ -918,6 +926,162 @@ impl From<r5::types::ElementDefinition> for ChoiceField {
 			is_array,
 			is_base_field,
 			types,
+			is_modifier,
+			is_summary,
+		}
+	}
+}
+
+impl From<stu3::types::ElementDefinition> for ReferenceField {
+	fn from(element: stu3::types::ElementDefinition) -> Self {
+		let element = element.0;
+		if !element.r#type.iter().flatten().any(|t| t.code == "Reference") {
+			panic!("Element not a Reference: {element:#?}");
+		}
+
+		let name =
+			element.path.rsplit_once('.').map_or(element.path.clone(), |(_, n)| n.to_owned());
+		let short = element.short.expect("ElementDefinition.short");
+		let definition = element.definition.expect("ElementDefinition.definition");
+		let comment = element.comment;
+		let min = element.min.expect("ElementDefinition.min");
+		let optional = min == 0;
+		let max = element.max.expect("ElementDefinition.max");
+		let is_array = &max != "1";
+
+		let mut target_resource_types: Vec<_> = element
+			.r#type
+			.into_iter()
+			.flatten()
+			.flat_map(|t| t.target_profile)
+			.flat_map(|t| {
+				t.strip_prefix("http://hl7.org/fhir/StructureDefinition/").map(|t| t.to_string())
+			})
+			.collect();
+
+		if target_resource_types.is_empty() {
+			target_resource_types.push("Resource".to_string());
+		}
+
+		target_resource_types.sort();
+		target_resource_types.dedup();
+
+		let is_modifier = element.is_modifier.expect("ElementDefinition.isModifier");
+		let is_summary = element.is_summary.unwrap_or(false);
+
+		Self {
+			name,
+			short,
+			definition,
+			comment,
+			optional,
+			is_array,
+			is_base_field: false,
+			target_resource_types,
+			is_modifier,
+			is_summary,
+		}
+	}
+}
+
+impl From<r4b::types::ElementDefinition> for ReferenceField {
+	fn from(element: r4b::types::ElementDefinition) -> Self {
+		let element = element.0;
+		if !element.r#type.iter().flatten().any(|t| t.code == "Reference") {
+			panic!("Element not a Reference: {element:#?}");
+		}
+
+		let name =
+			element.path.rsplit_once('.').map_or(element.path.clone(), |(_, n)| n.to_owned());
+		let short = element.short.expect("ElementDefinition.short");
+		let definition = element.definition.expect("ElementDefinition.definition");
+		let comment = element.comment;
+		let min = element.min.expect("ElementDefinition.min");
+		let optional = min == 0;
+		let max = element.max.expect("ElementDefinition.max");
+		let is_array = &max != "1";
+
+		let r#type = element.r#type.iter().flatten().find(|t| t.code == "Reference").unwrap();
+
+		let mut target_resource_types: Vec<_> = r#type
+			.target_profile
+			.iter()
+			.flatten()
+			.flat_map(|t| t.strip_prefix("http://hl7.org/fhir/StructureDefinition/"))
+			.map(|t| t.to_string())
+			.collect();
+
+		if target_resource_types.is_empty() {
+			target_resource_types.push("Resource".to_string());
+		}
+
+		target_resource_types.sort();
+		target_resource_types.dedup();
+
+		let is_modifier = element.is_modifier.expect("ElementDefinition.isModifier");
+		let is_summary = element.is_summary.unwrap_or(false);
+
+		Self {
+			name,
+			short,
+			definition,
+			comment,
+			optional,
+			is_array,
+			is_base_field: false,
+			target_resource_types,
+			is_modifier,
+			is_summary,
+		}
+	}
+}
+
+impl From<r5::types::ElementDefinition> for ReferenceField {
+	fn from(element: r5::types::ElementDefinition) -> Self {
+		let element = element.0;
+		if !element.r#type.iter().flatten().any(|t| t.code == "Reference") {
+			panic!("Element not a Reference: {element:#?}");
+		}
+
+		let name =
+			element.path.rsplit_once('.').map_or(element.path.clone(), |(_, n)| n.to_owned());
+		let short = element.short.expect("ElementDefinition.short");
+		let definition = element.definition.expect("ElementDefinition.definition");
+		let comment = element.comment;
+		let min = element.min.expect("ElementDefinition.min");
+		let optional = min == 0;
+		let max = element.max.expect("ElementDefinition.max");
+		let is_array = &max != "1";
+
+		let r#type = element.r#type.iter().flatten().find(|t| t.code == "Reference").unwrap();
+
+		let mut target_resource_types: Vec<_> = r#type
+			.target_profile
+			.iter()
+			.flatten()
+			.flat_map(|t| t.strip_prefix("http://hl7.org/fhir/StructureDefinition/"))
+			.map(|t| t.to_string())
+			.collect();
+
+		if target_resource_types.is_empty() {
+			target_resource_types.push("Resource".to_string());
+		}
+
+		target_resource_types.sort();
+		target_resource_types.dedup();
+
+		let is_modifier = element.is_modifier.expect("ElementDefinition.isModifier");
+		let is_summary = element.is_summary.unwrap_or(false);
+
+		Self {
+			name,
+			short,
+			definition,
+			comment,
+			optional,
+			is_array,
+			is_base_field: false,
+			target_resource_types,
 			is_modifier,
 			is_summary,
 		}

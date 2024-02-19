@@ -6,6 +6,7 @@
 	not(all(feature = "r5", feature = "client", feature = "builders", feature = "docs")),
 	doc = "Enable the following features to see the crate-level documentation: r5, client, docs"
 )]
+#![recursion_limit = "1024"]
 
 #[cfg(feature = "client")]
 pub mod client;

@@ -5,6 +5,7 @@ use serde::{Serialize, Deserialize};
 #[cfg(feature = "builders")]
 use derive_builder::Builder;
 use super::super::codes;
+use super::super::resources::*;
 #[allow(unused_imports)]
 use crate::{Base64Binary, Date, DateTime, Instant, Time, Integer64};
 /** Base StructureDefinition for Address Type: An address expressed using postal conventions (as opposed to GPS or other location definition formats).  This data type may be used to convey addresses for use in delivering mail as well as for visiting locations which might not be valid for mail delivery.  There are a variety of postal address formats defined around the world.
@@ -882,7 +883,7 @@ pub struct CodeableReferenceInner {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "reference")]
-    pub reference: Option<Reference>,
+    pub reference: Option<CodeableReferenceReferenceReference>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_reference")]
@@ -918,6 +919,21 @@ impl CodeableReference {
     #[must_use]
     pub fn builder() -> CodeableReferenceBuilder {
         CodeableReferenceBuilder::default()
+    }
+}
+/// Reference wrapper type of the reference field in CodeableReference
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct CodeableReferenceReferenceReference {
+    /// The resource that is being referred to. When doing searches, the client will fill this field if possible.
+    #[serde(skip)]
+    pub target: Option<Box<Resource>>,
+    /// The FHIR Reference field
+    #[serde(flatten)]
+    pub reference: Reference,
+}
+impl From<Reference> for CodeableReferenceReferenceReference {
+    fn from(reference: Reference) -> Self {
+        Self { target: None, reference }
     }
 }
 /** Base StructureDefinition for Coding Type: A reference to a code defined by a terminology system.
@@ -6324,7 +6340,7 @@ pub struct IdentifierInner {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "assigner")]
-    pub assigner: Option<Reference>,
+    pub assigner: Option<IdentifierAssignerReference>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_assigner")]
@@ -6360,6 +6376,21 @@ impl Identifier {
     #[must_use]
     pub fn builder() -> IdentifierBuilder {
         IdentifierBuilder::default()
+    }
+}
+/// Reference wrapper type of the assigner field in Identifier
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct IdentifierAssignerReference {
+    /// The resource that is being referred to. When doing searches, the client will fill this field if possible.
+    #[serde(skip)]
+    pub target: Option<Box<Organization>>,
+    /// The FHIR Reference field
+    #[serde(flatten)]
+    pub reference: Reference,
+}
+impl From<Reference> for IdentifierAssignerReference {
+    fn from(reference: Reference) -> Self {
+        Self { target: None, reference }
     }
 }
 /** Base StructureDefinition for MarketingStatus Type: The marketing status describes the date when a medicinal product is actually put on the market or the date as of which it is no longer available.
@@ -8851,7 +8882,7 @@ pub struct SignatureInner {
 
  This should agree with the information in the signature. */
     #[serde(rename = "who")]
-    pub who: Reference,
+    pub who: SignatureWhoReference,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_who")]
@@ -8865,7 +8896,7 @@ pub struct SignatureInner {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "onBehalfOf")]
-    pub on_behalf_of: Option<Reference>,
+    pub on_behalf_of: Option<SignatureOnBehalfOfReference>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_onBehalfOf")]
@@ -8940,6 +8971,68 @@ impl Signature {
     pub fn builder() -> SignatureBuilder {
         SignatureBuilder::default()
     }
+}
+/// Reference wrapper type of the who field in Signature
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct SignatureWhoReference {
+    /// The resource that is being referred to. When doing searches, the client will fill this field if possible.
+    #[serde(skip)]
+    pub target: Option<Box<SignatureWhoReferenceTarget>>,
+    /// The FHIR Reference field
+    #[serde(flatten)]
+    pub reference: Reference,
+}
+impl From<Reference> for SignatureWhoReference {
+    fn from(reference: Reference) -> Self {
+        Self { target: None, reference }
+    }
+}
+/// Target resources for the who reference field in Signature
+#[derive(Debug, Clone, PartialEq)]
+pub enum SignatureWhoReferenceTarget {
+    /// Variant for Device target resources
+    Device(Device),
+    /// Variant for Organization target resources
+    Organization(Organization),
+    /// Variant for Patient target resources
+    Patient(Patient),
+    /// Variant for Practitioner target resources
+    Practitioner(Practitioner),
+    /// Variant for PractitionerRole target resources
+    PractitionerRole(PractitionerRole),
+    /// Variant for RelatedPerson target resources
+    RelatedPerson(RelatedPerson),
+}
+/// Reference wrapper type of the onBehalfOf field in Signature
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct SignatureOnBehalfOfReference {
+    /// The resource that is being referred to. When doing searches, the client will fill this field if possible.
+    #[serde(skip)]
+    pub target: Option<Box<SignatureOnBehalfOfReferenceTarget>>,
+    /// The FHIR Reference field
+    #[serde(flatten)]
+    pub reference: Reference,
+}
+impl From<Reference> for SignatureOnBehalfOfReference {
+    fn from(reference: Reference) -> Self {
+        Self { target: None, reference }
+    }
+}
+/// Target resources for the onBehalfOf reference field in Signature
+#[derive(Debug, Clone, PartialEq)]
+pub enum SignatureOnBehalfOfReferenceTarget {
+    /// Variant for Device target resources
+    Device(Device),
+    /// Variant for Organization target resources
+    Organization(Organization),
+    /// Variant for Patient target resources
+    Patient(Patient),
+    /// Variant for Practitioner target resources
+    Practitioner(Practitioner),
+    /// Variant for PractitionerRole target resources
+    PractitionerRole(PractitionerRole),
+    /// Variant for RelatedPerson target resources
+    RelatedPerson(RelatedPerson),
 }
 /** Base StructureDefinition for Timing Type: Specifies an event that may occur multiple times. Timing schedules are used to record when things are planned, expected or requested to occur. The most common usage is in dosage instructions for medications. They are also used when planning care of various kinds, and may be used for reporting the schedule to which past regular activities were carried out.
 

@@ -3,6 +3,8 @@
 //! This is a sub-crate of [`fhir-sdk`](https://crates.io/crates/fhir-sdk). Please take a look at the main crate for
 //! more documentation.
 
+#![recursion_limit = "1024"]
+
 mod date_time;
 mod error;
 #[cfg(feature = "r4b")]
