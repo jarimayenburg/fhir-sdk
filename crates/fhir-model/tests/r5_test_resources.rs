@@ -8,11 +8,12 @@ use std::fs;
 
 use fhir_model::{
 	r5::{
-		codes::{CatalogType, RequestIntent, RequestStatus},
+		codes::{CatalogType, Kind, RequestIntent, RequestStatus},
 		resources::{
-			Basic, IdentifiableResource, NamedResource, Patient, RequestOrchestration,
-			RequestOrchestrationAction, RequestOrchestrationActionTiming, Resource,
-			WrongResourceType,
+			AccountCoverage, AccountCoverageCoverageReference, AccountOwnerReference,
+			AccountStatus, AccountSubjectReference, Basic, Coverage, IdentifiableResource,
+			NamedResource, Organization, Patient, RequestOrchestration, RequestOrchestrationAction,
+			RequestOrchestrationActionTiming, Resource, WrongResourceType,
 		},
 		types::{CodeableConcept, Coding, Identifier, Reference},
 	},
