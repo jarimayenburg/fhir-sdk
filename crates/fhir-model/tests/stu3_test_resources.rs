@@ -8,9 +8,11 @@ use std::fs;
 
 use fhir_model::{
 	stu3::{
-		codes::{ExtraActivityType, RequestIntent, RequestStatus},
+		codes::{ExtraActivityType, Kind, RequestIntent, RequestStatus},
 		resources::{
-			Basic, IdentifiableResource, NamedResource, Patient, RequestGroup, RequestGroupAction,
+			AccountCoverage, AccountCoverageCoverageReference, AccountOwnerReference,
+			AccountStatus, AccountSubjectReference, Basic, Coverage, IdentifiableResource,
+			NamedResource, Organization, Patient, RequestGroup, RequestGroupAction,
 			RequestGroupActionTiming, Resource, StructureDefinition, WrongResourceType,
 		},
 		types::{CodeableConcept, Coding, FieldExtension, Identifier, Reference},
