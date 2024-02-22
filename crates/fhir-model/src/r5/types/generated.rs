@@ -9953,6 +9953,36 @@ impl TryFrom<Resource> for SignatureWhoReferenceTarget {
         }
     }
 }
+impl From<Device> for SignatureWhoReferenceTarget {
+    fn from(resource: Device) -> SignatureWhoReferenceTarget {
+        SignatureWhoReferenceTarget::Device(resource)
+    }
+}
+impl From<Organization> for SignatureWhoReferenceTarget {
+    fn from(resource: Organization) -> SignatureWhoReferenceTarget {
+        SignatureWhoReferenceTarget::Organization(resource)
+    }
+}
+impl From<Patient> for SignatureWhoReferenceTarget {
+    fn from(resource: Patient) -> SignatureWhoReferenceTarget {
+        SignatureWhoReferenceTarget::Patient(resource)
+    }
+}
+impl From<Practitioner> for SignatureWhoReferenceTarget {
+    fn from(resource: Practitioner) -> SignatureWhoReferenceTarget {
+        SignatureWhoReferenceTarget::Practitioner(resource)
+    }
+}
+impl From<PractitionerRole> for SignatureWhoReferenceTarget {
+    fn from(resource: PractitionerRole) -> SignatureWhoReferenceTarget {
+        SignatureWhoReferenceTarget::PractitionerRole(resource)
+    }
+}
+impl From<RelatedPerson> for SignatureWhoReferenceTarget {
+    fn from(resource: RelatedPerson) -> SignatureWhoReferenceTarget {
+        SignatureWhoReferenceTarget::RelatedPerson(resource)
+    }
+}
 /// Reference wrapper type of the onBehalfOf field in Signature
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct SignatureOnBehalfOfReference {
@@ -10016,6 +10046,36 @@ impl TryFrom<Resource> for SignatureOnBehalfOfReferenceTarget {
             }
             _ => Err(WrongResourceType),
         }
+    }
+}
+impl From<Device> for SignatureOnBehalfOfReferenceTarget {
+    fn from(resource: Device) -> SignatureOnBehalfOfReferenceTarget {
+        SignatureOnBehalfOfReferenceTarget::Device(resource)
+    }
+}
+impl From<Organization> for SignatureOnBehalfOfReferenceTarget {
+    fn from(resource: Organization) -> SignatureOnBehalfOfReferenceTarget {
+        SignatureOnBehalfOfReferenceTarget::Organization(resource)
+    }
+}
+impl From<Patient> for SignatureOnBehalfOfReferenceTarget {
+    fn from(resource: Patient) -> SignatureOnBehalfOfReferenceTarget {
+        SignatureOnBehalfOfReferenceTarget::Patient(resource)
+    }
+}
+impl From<Practitioner> for SignatureOnBehalfOfReferenceTarget {
+    fn from(resource: Practitioner) -> SignatureOnBehalfOfReferenceTarget {
+        SignatureOnBehalfOfReferenceTarget::Practitioner(resource)
+    }
+}
+impl From<PractitionerRole> for SignatureOnBehalfOfReferenceTarget {
+    fn from(resource: PractitionerRole) -> SignatureOnBehalfOfReferenceTarget {
+        SignatureOnBehalfOfReferenceTarget::PractitionerRole(resource)
+    }
+}
+impl From<RelatedPerson> for SignatureOnBehalfOfReferenceTarget {
+    fn from(resource: RelatedPerson) -> SignatureOnBehalfOfReferenceTarget {
+        SignatureOnBehalfOfReferenceTarget::RelatedPerson(resource)
     }
 }
 /** Timing Type: Specifies an event that may occur multiple times. Timing schedules are used to record when things are planned, expected or requested to occur. The most common usage is in dosage instructions for medications. They are also used when planning care of various kinds, and may be used for reporting the schedule to which past regular activities were carried out.

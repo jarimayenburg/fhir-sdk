@@ -496,6 +496,18 @@ fn generate_reference_field(
 			}
 		});
 
+		let from_impls = field.target_resource_types.iter().map(|resource_type| {
+			let rt = format_ident!("{}", resource_type.to_pascal_case());
+
+			quote! {
+				impl From<#rt> for #target_type {
+					fn from(resource: #rt) -> #target_type {
+						#target_type::#rt(resource)
+					}
+				}
+			}
+		});
+
 		let target_defs = quote! {
 			#[doc = #enum_doc]
 			#[derive(Debug, Clone, PartialEq)]
@@ -513,6 +525,8 @@ fn generate_reference_field(
 					}
 				}
 			}
+
+			#(#from_impls)*
 		};
 
 		(target_type, Some(target_defs))
