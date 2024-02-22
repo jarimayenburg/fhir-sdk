@@ -5573,12 +5573,9 @@ impl From<Reference> for IdentifierAssignerReference {
     }
 }
 impl ReferenceField for IdentifierAssignerReference {
-    fn set_target(&mut self, target: Resource) {
-        let t = match target {
-            Resource::Organization(r) => r,
-            _ => panic!("Invalid resource type for reference field"),
-        };
-        self.target = Some(Box::new(t));
+    fn set_target(&mut self, target: Resource) -> Result<(), WrongResourceType> {
+        self.target = Some(Box::new(target.try_into()?));
+        Ok(())
     }
     fn reference(&self) -> &Reference {
         &self.reference
@@ -6168,12 +6165,9 @@ impl From<Reference> for ParameterDefinitionProfileReference {
     }
 }
 impl ReferenceField for ParameterDefinitionProfileReference {
-    fn set_target(&mut self, target: Resource) {
-        let t = match target {
-            Resource::StructureDefinition(r) => r,
-            _ => panic!("Invalid resource type for reference field"),
-        };
-        self.target = Some(Box::new(t));
+    fn set_target(&mut self, target: Resource) -> Result<(), WrongResourceType> {
+        self.target = Some(Box::new(target.try_into()?));
+        Ok(())
     }
     fn reference(&self) -> &Reference {
         &self.reference
@@ -6978,11 +6972,9 @@ impl From<Reference> for RelatedArtifactResourceReference {
     }
 }
 impl ReferenceField for RelatedArtifactResourceReference {
-    fn set_target(&mut self, target: Resource) {
-        let t = match target {
-            r => r,
-        };
-        self.target = Some(Box::new(t));
+    fn set_target(&mut self, target: Resource) -> Result<(), WrongResourceType> {
+        self.target = Some(Box::new(target.try_into()?));
+        Ok(())
     }
     fn reference(&self) -> &Reference {
         &self.reference

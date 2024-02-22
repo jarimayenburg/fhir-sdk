@@ -471,10 +471,11 @@ fn generate_reference_field(
 
 	// If there are more than one possible target resource types, we define an enum
 	// Otherwise, we refer directly to the resource
-	let (target_type, target_enum, set_target_arms) = if field.target_resource_types.len() > 1 {
-		let type_name = format_ident!("{type_ident}{}ReferenceTarget", field.name.to_pascal_case());
+	let (target_type, target_defs) = if field.target_resource_types.len() > 1 {
+		let target_type =
+			format_ident!("{type_ident}{}ReferenceTarget", field.name.to_pascal_case());
 
-		let doc =
+		let enum_doc =
 			format!(" Target resources for the {} reference field in {type_ident}", field.name);
 
 		let variants = field.target_resource_types.iter().map(|ty| {
@@ -487,44 +488,39 @@ fn generate_reference_field(
 			}
 		});
 
-		let enum_def = quote! {
-			#[doc = #doc]
-			#[derive(Debug, Clone, PartialEq)]
-			pub enum #type_name {
-				#(#variants)*
-			}
-		};
-
-		let arms = field.target_resource_types.iter().map(|resource_type| {
+		let match_arms = field.target_resource_types.iter().map(|resource_type| {
 			let rt = format_ident!("{}", resource_type.to_pascal_case());
 
 			quote! {
-				Resource::#rt(r) => #type_name::#rt(r),
+				Resource::#rt(r) => Ok(#target_type::#rt(r)),
 			}
 		});
 
-		let set_target_arms = quote! {
-			#(#arms)*
-			_ => panic!("Invalid resource type for reference field"),
+		let target_defs = quote! {
+			#[doc = #enum_doc]
+			#[derive(Debug, Clone, PartialEq)]
+			pub enum #target_type {
+				#(#variants)*
+			}
+
+			impl TryFrom<Resource> for #target_type {
+				type Error = WrongResourceType;
+
+				fn try_from(resource: Resource) -> Result<Self, Self::Error> {
+					match resource {
+						#(#match_arms)*
+						_ => Err(WrongResourceType),
+					}
+				}
+			}
 		};
 
-		(type_name, enum_def, set_target_arms)
+		(target_type, Some(target_defs))
 	} else {
 		let resource_type = field.target_resource_types.get(0).unwrap();
-		let rt = format_ident!("{}", resource_type.to_pascal_case());
+		let target_type = format_ident!("{}", resource_type.to_pascal_case());
 
-		let set_target_arms = if resource_type == "Resource" {
-			quote! {
-				r => r,
-			}
-		} else {
-			quote! {
-				Resource::#rt(r) => r,
-				_ => panic!("Invalid resource type for reference field"),
-			}
-		};
-
-		(rt, quote!(), set_target_arms)
+		(target_type, None)
 	};
 
 	let struct_type = format_ident!("{type_ident}{}Reference", field.name.to_pascal_case());
@@ -554,12 +550,10 @@ fn generate_reference_field(
 		}
 
 		impl ReferenceField for #struct_type {
-			fn set_target(&mut self, target: Resource) {
-				let t = match target {
-					#set_target_arms
-				};
+			fn set_target(&mut self, target: Resource) -> Result<(), WrongResourceType> {
+				self.target = Some(Box::new(target.try_into()?));
 
-				self.target = Some(Box::new(t));
+				Ok(())
 			}
 
 			fn reference(&self) -> &Reference {
@@ -571,7 +565,7 @@ fn generate_reference_field(
 			}
 		}
 
-		#target_enum
+		#target_defs
 	};
 
 	(doc_comment, (quote!(#struct_type), format_ident!("FieldExtension")), reference_struct)
