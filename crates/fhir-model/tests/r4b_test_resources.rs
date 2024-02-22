@@ -10,12 +10,13 @@ use fhir_model::{
 	r4b::{
 		codes::{Kind, RequestIntent, RequestStatus, RiskProbability},
 		resources::{
-			AccountCoverage, AccountCoverageCoverageReference, AccountOwnerReference,
+			Account, AccountCoverage, AccountCoverageCoverageReference, AccountOwnerReference,
 			AccountStatus, AccountSubjectReference, Basic, Coverage, IdentifiableResource,
 			NamedResource, Organization, Patient, RequestGroup, RequestGroupAction,
 			RequestGroupActionTiming, Resource, StructureDefinition, WrongResourceType,
 		},
 		types::{CodeableConcept, Coding, FieldExtension, Identifier, Reference},
+		AllReferences, ReferenceField,
 	},
 	Date, DateTime, ParsedReference,
 };

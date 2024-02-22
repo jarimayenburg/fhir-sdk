@@ -10,12 +10,13 @@ use fhir_model::{
 	stu3::{
 		codes::{ExtraActivityType, Kind, RequestIntent, RequestStatus},
 		resources::{
-			AccountCoverage, AccountCoverageCoverageReference, AccountOwnerReference,
+			Account, AccountCoverage, AccountCoverageCoverageReference, AccountOwnerReference,
 			AccountStatus, AccountSubjectReference, Basic, Coverage, IdentifiableResource,
 			NamedResource, Organization, Patient, RequestGroup, RequestGroupAction,
 			RequestGroupActionTiming, Resource, StructureDefinition, WrongResourceType,
 		},
 		types::{CodeableConcept, Coding, FieldExtension, Identifier, Reference},
+		AllReferences, ReferenceField,
 	},
 	Date, DateTime, ParsedReference,
 };
@@ -286,8 +287,7 @@ fn reference_search_and_mutate() {
 	let c = AccountCoverage::builder().coverage(cr).build().unwrap();
 
 	let mut a = Account::builder()
-		.status(AccountStatus::Active)
-		.subject(vec![Some(s.clone())])
+		.subject(s.clone())
 		.owner(o.clone())
 		.coverage(vec![Some(c.clone())])
 		.build()
@@ -320,13 +320,7 @@ fn reference_search_and_mutate() {
 	let mut c2 = c.clone();
 	c2.coverage.set_target(Resource::Coverage(coverage)).unwrap();
 
-	let a2 = Account::builder()
-		.status(AccountStatus::Active)
-		.subject(vec![Some(s2)])
-		.owner(o2)
-		.coverage(vec![Some(c2)])
-		.build()
-		.unwrap();
+	let a2 = Account::builder().subject(s2).owner(o2).coverage(vec![Some(c2)]).build().unwrap();
 
 	assert_eq!(a, a2);
 }
