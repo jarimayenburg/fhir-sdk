@@ -4,6 +4,7 @@ use ::core::num::NonZeroU32;
 use serde::{Serialize, Deserialize};
 #[cfg(feature = "builders")]
 use derive_builder::Builder;
+use super::super::*;
 use super::super::codes;
 use super::super::resources::*;
 #[allow(unused_imports)]
@@ -934,6 +935,20 @@ pub struct CodeableReferenceReferenceReference {
 impl From<Reference> for CodeableReferenceReferenceReference {
     fn from(reference: Reference) -> Self {
         Self { target: None, reference }
+    }
+}
+impl ReferenceField for CodeableReferenceReferenceReference {
+    fn set_target(&mut self, target: Resource) {
+        let t = match target {
+            r => r,
+        };
+        self.target = Some(Box::new(t));
+    }
+    fn reference(&self) -> &Reference {
+        &self.reference
+    }
+    fn reference_mut(&mut self) -> &mut Reference {
+        &mut self.reference
     }
 }
 /** Base StructureDefinition for Coding Type: A reference to a code defined by a terminology system.
@@ -1915,6 +1930,11 @@ impl DataRequirementCodeFilter {
         DataRequirementCodeFilterBuilder::default()
     }
 }
+impl AllReferences for DataRequirementCodeFilter {
+    fn all_references(&mut self) -> Vec<Box<&mut dyn ReferenceField>> {
+        Vec::new()
+    }
+}
 /// Sub-fields of the dateFilter field in DataRequirement
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
@@ -1995,6 +2015,11 @@ impl DataRequirementDateFilter {
     #[must_use]
     pub fn builder() -> DataRequirementDateFilterBuilder {
         DataRequirementDateFilterBuilder::default()
+    }
+}
+impl AllReferences for DataRequirementDateFilter {
+    fn all_references(&mut self) -> Vec<Box<&mut dyn ReferenceField>> {
+        Vec::new()
     }
 }
 /// Choice of types for the value[x] field in DataRequirementDateFilter
@@ -2087,6 +2112,11 @@ impl DataRequirementSort {
     #[must_use]
     pub fn builder() -> DataRequirementSortBuilder {
         DataRequirementSortBuilder::default()
+    }
+}
+impl AllReferences for DataRequirementSort {
+    fn all_references(&mut self) -> Vec<Box<&mut dyn ReferenceField>> {
+        Vec::new()
     }
 }
 /** Base StructureDefinition for Distance Type: A length - a value with a unit that is a physical distance.
@@ -2597,6 +2627,11 @@ impl DosageDoseAndRate {
     #[must_use]
     pub fn builder() -> DosageDoseAndRateBuilder {
         DosageDoseAndRateBuilder::default()
+    }
+}
+impl AllReferences for DosageDoseAndRate {
+    fn all_references(&mut self) -> Vec<Box<&mut dyn ReferenceField>> {
+        Vec::new()
     }
 }
 /// Choice of types for the dose[x] field in DosageDoseAndRate
@@ -3451,6 +3486,17 @@ impl ElementDefinitionSlicing {
         ElementDefinitionSlicingBuilder::default()
     }
 }
+impl AllReferences for ElementDefinitionSlicing {
+    fn all_references(&mut self) -> Vec<Box<&mut dyn ReferenceField>> {
+        let mut refs: Vec<Box<&mut dyn ReferenceField>> = Vec::new();
+        for discriminator in self.discriminator.iter_mut() {
+            if let Some(discriminator) = discriminator.as_mut() {
+                refs.extend(discriminator.all_references());
+            }
+        }
+        refs
+    }
+}
 /// Sub-fields of the discriminator field in ElementDefinitionSlicing
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
@@ -3513,6 +3559,11 @@ impl ElementDefinitionSlicingDiscriminator {
     #[must_use]
     pub fn builder() -> ElementDefinitionSlicingDiscriminatorBuilder {
         ElementDefinitionSlicingDiscriminatorBuilder::default()
+    }
+}
+impl AllReferences for ElementDefinitionSlicingDiscriminator {
+    fn all_references(&mut self) -> Vec<Box<&mut dyn ReferenceField>> {
+        Vec::new()
     }
 }
 /// Sub-fields of the base field in ElementDefinition
@@ -3589,6 +3640,11 @@ impl ElementDefinitionBase {
     #[must_use]
     pub fn builder() -> ElementDefinitionBaseBuilder {
         ElementDefinitionBaseBuilder::default()
+    }
+}
+impl AllReferences for ElementDefinitionBase {
+    fn all_references(&mut self) -> Vec<Box<&mut dyn ReferenceField>> {
+        Vec::new()
     }
 }
 /// Sub-fields of the type field in ElementDefinition
@@ -3697,6 +3753,11 @@ impl ElementDefinitionType {
     #[must_use]
     pub fn builder() -> ElementDefinitionTypeBuilder {
         ElementDefinitionTypeBuilder::default()
+    }
+}
+impl AllReferences for ElementDefinitionType {
+    fn all_references(&mut self) -> Vec<Box<&mut dyn ReferenceField>> {
+        Vec::new()
     }
 }
 /// Choice of types for the defaultValue[x] field in ElementDefinition
@@ -4711,6 +4772,11 @@ impl ElementDefinitionExample {
         ElementDefinitionExampleBuilder::default()
     }
 }
+impl AllReferences for ElementDefinitionExample {
+    fn all_references(&mut self) -> Vec<Box<&mut dyn ReferenceField>> {
+        Vec::new()
+    }
+}
 /// Choice of types for the value[x] field in ElementDefinitionExample
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -5287,6 +5353,11 @@ impl ElementDefinitionConstraint {
         ElementDefinitionConstraintBuilder::default()
     }
 }
+impl AllReferences for ElementDefinitionConstraint {
+    fn all_references(&mut self) -> Vec<Box<&mut dyn ReferenceField>> {
+        Vec::new()
+    }
+}
 /// Sub-fields of the binding field in ElementDefinition
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
@@ -5365,6 +5436,11 @@ impl ElementDefinitionBinding {
     #[must_use]
     pub fn builder() -> ElementDefinitionBindingBuilder {
         ElementDefinitionBindingBuilder::default()
+    }
+}
+impl AllReferences for ElementDefinitionBinding {
+    fn all_references(&mut self) -> Vec<Box<&mut dyn ReferenceField>> {
+        Vec::new()
     }
 }
 /// Sub-fields of the mapping field in ElementDefinition
@@ -5457,6 +5533,11 @@ impl ElementDefinitionMapping {
     #[must_use]
     pub fn builder() -> ElementDefinitionMappingBuilder {
         ElementDefinitionMappingBuilder::default()
+    }
+}
+impl AllReferences for ElementDefinitionMapping {
+    fn all_references(&mut self) -> Vec<Box<&mut dyn ReferenceField>> {
+        Vec::new()
     }
 }
 /** Base StructureDefinition for Expression Type: A expression that is evaluated in a specified context and returns a value. The context of use of the expression must specify the context in which the expression is evaluated, and how the result of the expression is used.
@@ -6391,6 +6472,21 @@ pub struct IdentifierAssignerReference {
 impl From<Reference> for IdentifierAssignerReference {
     fn from(reference: Reference) -> Self {
         Self { target: None, reference }
+    }
+}
+impl ReferenceField for IdentifierAssignerReference {
+    fn set_target(&mut self, target: Resource) {
+        let t = match target {
+            Resource::Organization(r) => r,
+            _ => panic!("Invalid resource type for reference field"),
+        };
+        self.target = Some(Box::new(t));
+    }
+    fn reference(&self) -> &Reference {
+        &self.reference
+    }
+    fn reference_mut(&mut self) -> &mut Reference {
+        &mut self.reference
     }
 }
 /** Base StructureDefinition for MarketingStatus Type: The marketing status describes the date when a medicinal product is actually put on the market or the date as of which it is no longer available.
@@ -8987,6 +9083,28 @@ impl From<Reference> for SignatureWhoReference {
         Self { target: None, reference }
     }
 }
+impl ReferenceField for SignatureWhoReference {
+    fn set_target(&mut self, target: Resource) {
+        let t = match target {
+            Resource::Device(r) => SignatureWhoReferenceTarget::Device(r),
+            Resource::Organization(r) => SignatureWhoReferenceTarget::Organization(r),
+            Resource::Patient(r) => SignatureWhoReferenceTarget::Patient(r),
+            Resource::Practitioner(r) => SignatureWhoReferenceTarget::Practitioner(r),
+            Resource::PractitionerRole(r) => {
+                SignatureWhoReferenceTarget::PractitionerRole(r)
+            }
+            Resource::RelatedPerson(r) => SignatureWhoReferenceTarget::RelatedPerson(r),
+            _ => panic!("Invalid resource type for reference field"),
+        };
+        self.target = Some(Box::new(t));
+    }
+    fn reference(&self) -> &Reference {
+        &self.reference
+    }
+    fn reference_mut(&mut self) -> &mut Reference {
+        &mut self.reference
+    }
+}
 /// Target resources for the who reference field in Signature
 #[derive(Debug, Clone, PartialEq)]
 pub enum SignatureWhoReferenceTarget {
@@ -9016,6 +9134,34 @@ pub struct SignatureOnBehalfOfReference {
 impl From<Reference> for SignatureOnBehalfOfReference {
     fn from(reference: Reference) -> Self {
         Self { target: None, reference }
+    }
+}
+impl ReferenceField for SignatureOnBehalfOfReference {
+    fn set_target(&mut self, target: Resource) {
+        let t = match target {
+            Resource::Device(r) => SignatureOnBehalfOfReferenceTarget::Device(r),
+            Resource::Organization(r) => {
+                SignatureOnBehalfOfReferenceTarget::Organization(r)
+            }
+            Resource::Patient(r) => SignatureOnBehalfOfReferenceTarget::Patient(r),
+            Resource::Practitioner(r) => {
+                SignatureOnBehalfOfReferenceTarget::Practitioner(r)
+            }
+            Resource::PractitionerRole(r) => {
+                SignatureOnBehalfOfReferenceTarget::PractitionerRole(r)
+            }
+            Resource::RelatedPerson(r) => {
+                SignatureOnBehalfOfReferenceTarget::RelatedPerson(r)
+            }
+            _ => panic!("Invalid resource type for reference field"),
+        };
+        self.target = Some(Box::new(t));
+    }
+    fn reference(&self) -> &Reference {
+        &self.reference
+    }
+    fn reference_mut(&mut self) -> &mut Reference {
+        &mut self.reference
     }
 }
 /// Target resources for the onBehalfOf reference field in Signature
@@ -9422,6 +9568,11 @@ impl TimingRepeat {
     #[must_use]
     pub fn builder() -> TimingRepeatBuilder {
         TimingRepeatBuilder::default()
+    }
+}
+impl AllReferences for TimingRepeat {
+    fn all_references(&mut self) -> Vec<Box<&mut dyn ReferenceField>> {
+        Vec::new()
     }
 }
 /// Choice of types for the bounds[x] field in TimingRepeat

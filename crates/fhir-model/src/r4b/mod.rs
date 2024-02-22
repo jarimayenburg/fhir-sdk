@@ -5,7 +5,7 @@ pub mod resources;
 pub mod types;
 
 use self::{
-	resources::{BaseResource, NamedResource},
+	resources::{BaseResource, NamedResource, Resource},
 	types::{Reference, ReferenceInner},
 };
 
@@ -57,4 +57,22 @@ where
 		}
 		.into(),
 	)
+}
+
+/// Trait implemented by all FHIR Reference field types
+pub trait ReferenceField {
+	/// Set the target field
+	fn set_target(&mut self, target: Resource);
+
+	/// Get a borrow to the FHIR Reference field
+	fn reference(&self) -> &Reference;
+
+	/// Get a mutable borrow to the FHIR Reference field
+	fn reference_mut(&mut self) -> &mut Reference;
+}
+
+/// Trait implemented on object types to get mutable borrows to all non-empty reference fields
+pub trait AllReferences {
+	/// Get mutable borrows to all the non-empty fields of type Reference in this type
+	fn all_references(&mut self) -> Vec<Box<&mut dyn ReferenceField>>;
 }
