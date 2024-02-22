@@ -8,12 +8,12 @@ use std::fs;
 
 use fhir_model::{
 	r4b::{
-		codes::{Kind, RequestIntent, RequestStatus, RiskProbability},
+		codes::{AccountStatus, RequestIntent, RequestStatus, RiskProbability},
 		resources::{
 			Account, AccountCoverage, AccountCoverageCoverageReference, AccountOwnerReference,
-			AccountStatus, AccountSubjectReference, Basic, Coverage, IdentifiableResource,
-			NamedResource, Organization, Patient, RequestGroup, RequestGroupAction,
-			RequestGroupActionTiming, Resource, StructureDefinition, WrongResourceType,
+			AccountSubjectReference, Basic, Coverage, IdentifiableResource, NamedResource,
+			Organization, Patient, RequestGroup, RequestGroupAction, RequestGroupActionTiming,
+			Resource, StructureDefinition, WrongResourceType,
 		},
 		types::{CodeableConcept, Coding, FieldExtension, Identifier, Reference},
 		AllReferences, ReferenceField,
@@ -312,8 +312,8 @@ fn reference_search_and_mutate() {
 	let organization = Organization::builder().build().unwrap();
 	let coverage = Coverage::builder()
 		.status("active".to_string())
-		.kind(Kind::Other)
 		.beneficiary(reference.clone().into())
+		.payor(vec![Some(reference.clone().into())])
 		.build()
 		.unwrap();
 
@@ -321,9 +321,9 @@ fn reference_search_and_mutate() {
 
 	assert_eq!(fields.len(), 3);
 
-	fields.get_mut(0).unwrap().set_target(patient.clone()).unwrap();
-	fields.get_mut(1).unwrap().set_target(coverage.clone()).unwrap();
-	fields.get_mut(2).unwrap().set_target(organization.clone()).unwrap();
+	fields.get_mut(0).unwrap().set_target(patient.clone().into()).unwrap();
+	fields.get_mut(1).unwrap().set_target(coverage.clone().into()).unwrap();
+	fields.get_mut(2).unwrap().set_target(organization.clone().into()).unwrap();
 
 	let mut s2 = s.clone();
 	s2.set_target(patient.into()).unwrap();
