@@ -5,15 +5,17 @@
 mod json_compare;
 
 use std::fs;
+use std::ops::Deref;
 
 use fhir_model::{
 	stu3::{
-		codes::{ExtraActivityType, Kind, RequestIntent, RequestStatus},
+		codes::{ExtraActivityType, RequestIntent, RequestStatus},
 		resources::{
 			Account, AccountCoverage, AccountCoverageCoverageReference, AccountOwnerReference,
-			AccountStatus, AccountSubjectReference, Basic, Coverage, IdentifiableResource,
-			NamedResource, Organization, Patient, RequestGroup, RequestGroupAction,
-			RequestGroupActionTiming, Resource, StructureDefinition, WrongResourceType,
+			AccountSubjectReference, AccountSubjectReferenceTarget, Basic, Coverage,
+			IdentifiableResource, NamedResource, Organization, Patient, RequestGroup,
+			RequestGroupAction, RequestGroupActionTiming, Resource, StructureDefinition,
+			WrongResourceType,
 		},
 		types::{CodeableConcept, Coding, FieldExtension, Identifier, Reference},
 		AllReferences, ReferenceField,
@@ -282,14 +284,14 @@ fn reference_search_and_mutate() {
 	let reference = Reference::builder().build().unwrap();
 
 	let s: AccountSubjectReference = reference.clone().into();
-	let o: AccountOwnerReference = reference.clone().into();
 	let cr: AccountCoverageCoverageReference = reference.clone().into();
 	let c = AccountCoverage::builder().coverage(cr).build().unwrap();
+	let o: AccountOwnerReference = reference.clone().into();
 
 	let mut a = Account::builder()
 		.subject(s.clone())
-		.owner(o.clone())
 		.coverage(vec![Some(c.clone())])
+		.owner(o.clone())
 		.build()
 		.unwrap();
 
@@ -298,7 +300,6 @@ fn reference_search_and_mutate() {
 	let organization = Organization::builder().build().unwrap();
 	let coverage = Coverage::builder()
 		.status("active".to_string())
-		.kind(Kind::Other)
 		.beneficiary(reference.clone().into())
 		.build()
 		.unwrap();
@@ -307,20 +308,20 @@ fn reference_search_and_mutate() {
 
 	assert_eq!(fields.len(), 3);
 
-	fields.get_mut(0).unwrap().set_target(Resource::Patient(patient.clone())).unwrap();
-	fields.get_mut(1).unwrap().set_target(Resource::Organization(organization.clone())).unwrap();
-	fields.get_mut(2).unwrap().set_target(Resource::Coverage(coverage.clone())).unwrap();
+	fields.get_mut(0).unwrap().set_target(patient.clone().into()).unwrap();
+	fields.get_mut(1).unwrap().set_target(coverage.clone().into()).unwrap();
+	fields.get_mut(2).unwrap().set_target(organization.clone().into()).unwrap();
 
 	let mut s2 = s.clone();
-	s2.set_target(Resource::Patient(patient.clone())).unwrap();
-
-	let mut o2 = o.clone();
-	o2.set_target(Resource::Organization(organization.clone())).unwrap();
+	s2.set_target(patient.into()).unwrap();
 
 	let mut c2 = c.clone();
-	c2.coverage.set_target(Resource::Coverage(coverage)).unwrap();
+	c2.coverage.set_target(coverage.into()).unwrap();
 
-	let a2 = Account::builder().subject(s2).owner(o2).coverage(vec![Some(c2)]).build().unwrap();
+	let mut o2 = o.clone();
+	o2.set_target(organization.into()).unwrap();
+
+	let a2 = Account::builder().subject(s2).coverage(vec![Some(c2)]).owner(o2).build().unwrap();
 
 	assert_eq!(a, a2);
 }
