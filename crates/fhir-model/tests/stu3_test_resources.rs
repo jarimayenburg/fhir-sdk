@@ -5,17 +5,15 @@
 mod json_compare;
 
 use std::fs;
-use std::ops::Deref;
 
 use fhir_model::{
 	stu3::{
 		codes::{ExtraActivityType, RequestIntent, RequestStatus},
 		resources::{
 			Account, AccountCoverage, AccountCoverageCoverageReference, AccountOwnerReference,
-			AccountSubjectReference, AccountSubjectReferenceTarget, Basic, Coverage,
-			IdentifiableResource, NamedResource, Organization, Patient, RequestGroup,
-			RequestGroupAction, RequestGroupActionTiming, Resource, StructureDefinition,
-			WrongResourceType,
+			AccountSubjectReference, Basic, Coverage, IdentifiableResource, NamedResource,
+			Organization, Patient, RequestGroup, RequestGroupAction, RequestGroupActionTiming,
+			Resource, StructureDefinition, WrongResourceType,
 		},
 		types::{CodeableConcept, Coding, FieldExtension, Identifier, Reference},
 		AllReferences, ReferenceField,
