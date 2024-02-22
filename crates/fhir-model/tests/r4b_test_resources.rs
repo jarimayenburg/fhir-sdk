@@ -318,18 +318,18 @@ fn reference_search_and_mutate() {
 
 	assert_eq!(fields.len(), 3);
 
-	fields.get_mut(0).unwrap().set_target(Resource::Patient(patient.clone()));
-	fields.get_mut(1).unwrap().set_target(Resource::Organization(organization.clone()));
-	fields.get_mut(2).unwrap().set_target(Resource::Coverage(coverage.clone()));
+	fields.get_mut(0).unwrap().set_target(Resource::Patient(patient.clone())).unwrap();
+	fields.get_mut(1).unwrap().set_target(Resource::Organization(organization.clone())).unwrap();
+	fields.get_mut(2).unwrap().set_target(Resource::Coverage(coverage.clone())).unwrap();
 
 	let mut s2 = s.clone();
-	s2.set_target(Resource::Patient(patient.clone()));
+	s2.set_target(Resource::Patient(patient.clone())).unwrap();
 
 	let mut o2 = o.clone();
-	o2.set_target(Resource::Organization(organization.clone()));
+	o2.set_target(Resource::Organization(organization.clone())).unwrap();
 
 	let mut c2 = c.clone();
-	c2.coverage.set_target(Resource::Coverage(coverage));
+	c2.coverage.set_target(Resource::Coverage(coverage)).unwrap();
 
 	let a2 = Account::builder()
 		.status(AccountStatus::Active)

@@ -938,11 +938,9 @@ impl From<Reference> for CodeableReferenceReferenceReference {
     }
 }
 impl ReferenceField for CodeableReferenceReferenceReference {
-    fn set_target(&mut self, target: Resource) {
-        let t = match target {
-            r => r,
-        };
-        self.target = Some(Box::new(t));
+    fn set_target(&mut self, target: Resource) -> Result<(), WrongResourceType> {
+        self.target = Some(Box::new(target.try_into()?));
+        Ok(())
     }
     fn reference(&self) -> &Reference {
         &self.reference
@@ -6475,12 +6473,9 @@ impl From<Reference> for IdentifierAssignerReference {
     }
 }
 impl ReferenceField for IdentifierAssignerReference {
-    fn set_target(&mut self, target: Resource) {
-        let t = match target {
-            Resource::Organization(r) => r,
-            _ => panic!("Invalid resource type for reference field"),
-        };
-        self.target = Some(Box::new(t));
+    fn set_target(&mut self, target: Resource) -> Result<(), WrongResourceType> {
+        self.target = Some(Box::new(target.try_into()?));
+        Ok(())
     }
     fn reference(&self) -> &Reference {
         &self.reference
@@ -9084,19 +9079,9 @@ impl From<Reference> for SignatureWhoReference {
     }
 }
 impl ReferenceField for SignatureWhoReference {
-    fn set_target(&mut self, target: Resource) {
-        let t = match target {
-            Resource::Device(r) => SignatureWhoReferenceTarget::Device(r),
-            Resource::Organization(r) => SignatureWhoReferenceTarget::Organization(r),
-            Resource::Patient(r) => SignatureWhoReferenceTarget::Patient(r),
-            Resource::Practitioner(r) => SignatureWhoReferenceTarget::Practitioner(r),
-            Resource::PractitionerRole(r) => {
-                SignatureWhoReferenceTarget::PractitionerRole(r)
-            }
-            Resource::RelatedPerson(r) => SignatureWhoReferenceTarget::RelatedPerson(r),
-            _ => panic!("Invalid resource type for reference field"),
-        };
-        self.target = Some(Box::new(t));
+    fn set_target(&mut self, target: Resource) -> Result<(), WrongResourceType> {
+        self.target = Some(Box::new(target.try_into()?));
+        Ok(())
     }
     fn reference(&self) -> &Reference {
         &self.reference
@@ -9121,6 +9106,24 @@ pub enum SignatureWhoReferenceTarget {
     /// Variant for RelatedPerson target resources
     RelatedPerson(RelatedPerson),
 }
+impl TryFrom<Resource> for SignatureWhoReferenceTarget {
+    type Error = WrongResourceType;
+    fn try_from(resource: Resource) -> Result<Self, Self::Error> {
+        match resource {
+            Resource::Device(r) => Ok(SignatureWhoReferenceTarget::Device(r)),
+            Resource::Organization(r) => Ok(SignatureWhoReferenceTarget::Organization(r)),
+            Resource::Patient(r) => Ok(SignatureWhoReferenceTarget::Patient(r)),
+            Resource::Practitioner(r) => Ok(SignatureWhoReferenceTarget::Practitioner(r)),
+            Resource::PractitionerRole(r) => {
+                Ok(SignatureWhoReferenceTarget::PractitionerRole(r))
+            }
+            Resource::RelatedPerson(r) => {
+                Ok(SignatureWhoReferenceTarget::RelatedPerson(r))
+            }
+            _ => Err(WrongResourceType),
+        }
+    }
+}
 /// Reference wrapper type of the onBehalfOf field in Signature
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct SignatureOnBehalfOfReference {
@@ -9137,25 +9140,9 @@ impl From<Reference> for SignatureOnBehalfOfReference {
     }
 }
 impl ReferenceField for SignatureOnBehalfOfReference {
-    fn set_target(&mut self, target: Resource) {
-        let t = match target {
-            Resource::Device(r) => SignatureOnBehalfOfReferenceTarget::Device(r),
-            Resource::Organization(r) => {
-                SignatureOnBehalfOfReferenceTarget::Organization(r)
-            }
-            Resource::Patient(r) => SignatureOnBehalfOfReferenceTarget::Patient(r),
-            Resource::Practitioner(r) => {
-                SignatureOnBehalfOfReferenceTarget::Practitioner(r)
-            }
-            Resource::PractitionerRole(r) => {
-                SignatureOnBehalfOfReferenceTarget::PractitionerRole(r)
-            }
-            Resource::RelatedPerson(r) => {
-                SignatureOnBehalfOfReferenceTarget::RelatedPerson(r)
-            }
-            _ => panic!("Invalid resource type for reference field"),
-        };
-        self.target = Some(Box::new(t));
+    fn set_target(&mut self, target: Resource) -> Result<(), WrongResourceType> {
+        self.target = Some(Box::new(target.try_into()?));
+        Ok(())
     }
     fn reference(&self) -> &Reference {
         &self.reference
@@ -9179,6 +9166,28 @@ pub enum SignatureOnBehalfOfReferenceTarget {
     PractitionerRole(PractitionerRole),
     /// Variant for RelatedPerson target resources
     RelatedPerson(RelatedPerson),
+}
+impl TryFrom<Resource> for SignatureOnBehalfOfReferenceTarget {
+    type Error = WrongResourceType;
+    fn try_from(resource: Resource) -> Result<Self, Self::Error> {
+        match resource {
+            Resource::Device(r) => Ok(SignatureOnBehalfOfReferenceTarget::Device(r)),
+            Resource::Organization(r) => {
+                Ok(SignatureOnBehalfOfReferenceTarget::Organization(r))
+            }
+            Resource::Patient(r) => Ok(SignatureOnBehalfOfReferenceTarget::Patient(r)),
+            Resource::Practitioner(r) => {
+                Ok(SignatureOnBehalfOfReferenceTarget::Practitioner(r))
+            }
+            Resource::PractitionerRole(r) => {
+                Ok(SignatureOnBehalfOfReferenceTarget::PractitionerRole(r))
+            }
+            Resource::RelatedPerson(r) => {
+                Ok(SignatureOnBehalfOfReferenceTarget::RelatedPerson(r))
+            }
+            _ => Err(WrongResourceType),
+        }
+    }
 }
 /** Base StructureDefinition for Timing Type: Specifies an event that may occur multiple times. Timing schedules are used to record when things are planned, expected or requested to occur. The most common usage is in dosage instructions for medications. They are also used when planning care of various kinds, and may be used for reporting the schedule to which past regular activities were carried out.
 

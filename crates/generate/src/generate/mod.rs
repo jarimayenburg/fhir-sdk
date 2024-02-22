@@ -192,6 +192,12 @@ pub fn generate_resources(
 		}
 		impl ::std::error::Error for WrongResourceType {}
 
+		impl From<::core::convert::Infallible> for WrongResourceType {
+			fn from(x: ::core::convert::Infallible) -> WrongResourceType {
+				match x {}
+			}
+		}
+
 		#resource_conversions
 		#resource_impls
 

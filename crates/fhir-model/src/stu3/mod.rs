@@ -5,7 +5,7 @@ pub mod resources;
 pub mod types;
 
 use self::{
-	resources::{BaseResource, NamedResource, Resource},
+	resources::{BaseResource, NamedResource, Resource, WrongResourceType},
 	types::{Reference, ReferenceInner},
 };
 
@@ -58,7 +58,7 @@ where
 /// Trait implemented by all FHIR Reference field types
 pub trait ReferenceField {
 	/// Set the target field
-	fn set_target(&mut self, target: Resource);
+	fn set_target(&mut self, target: Resource) -> Result<(), WrongResourceType>;
 
 	/// Get a borrow to the FHIR Reference field
 	fn reference(&self) -> &Reference;
