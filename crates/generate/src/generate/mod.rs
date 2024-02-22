@@ -77,6 +77,7 @@ pub fn generate_types(
 		use serde::{Serialize, Deserialize};
 		#[cfg(feature = "builders")]
 		use derive_builder::Builder;
+		use super::super::*;
 		use super::super::codes;
 		use super::super::resources::*;
 		#[allow(unused_imports)] // Integer64 is unused in R4B.
@@ -148,6 +149,7 @@ pub fn generate_resources(
 		use serde::{Serialize, Deserialize};
 		#[cfg(feature = "builders")]
 		use derive_builder::Builder;
+		use super::super::*;
 		use super::super::codes;
 		use super::super::types::*;
 		#[allow(unused_imports)] // Integer64 is unused in R4B.

@@ -66,6 +66,9 @@ pub fn generate_type_struct(
 		.map(|field| generate_field(field, &ident, ty, implemented_codes))
 		.unzip();
 
+	let all_references_impl = (ty.kind == StructureDefinitionKind::Resource)
+		.then(|| all_references_impl(&ident, &ty.elements, true));
+
 	let wrapper_impls = wrapper_impls(&ident, &ident_inner, &ident_builder);
 
 	Ok(quote! {
@@ -96,11 +99,90 @@ pub fn generate_type_struct(
 			}
 		}
 
+		#all_references_impl
 		#wrapper_impls
 		#resource_type_fn
 
 		#(#structs)*
 	})
+}
+
+/// Implement the AllReferences trait for a type
+fn all_references_impl(ident: &Ident, field: &ObjectField, is_type: bool) -> TokenStream {
+	let refs_pushes: Vec<_> = field
+		.fields
+		.iter()
+		.filter(|f| matches!(f, Field::Reference(_) | Field::Object(_)))
+		.map(|f| {
+			let name = f.name().replace("[x]", "");
+			let name = map_field_ident(&name);
+			let name = quote! { #name };
+			let path = if is_type {
+				quote! { self.0.#name }
+			} else {
+				quote! { self.#name }
+			};
+
+			let is_wrapped = f.optional() || f.is_array();
+			let mut push = match f {
+				Field::Reference(_) if is_wrapped => quote! {
+					refs.push(Box::new(#name));
+				},
+				Field::Reference(_) => quote! {
+					refs.push(Box::new(&mut #path));
+				},
+				Field::Object(_) if is_wrapped => quote! {
+					refs.extend(#name.all_references());
+				},
+				Field::Object(_) => quote! {
+					refs.extend(#path.all_references());
+				},
+				_ => panic!("Wrong field type"),
+			};
+
+			// Wrap in Option check
+			if f.optional() || (f.is_array() && !f.is_base_field()) {
+				let var = if f.is_array() { &name } else { &path };
+
+				push = quote! {
+					if let Some(#name) = #var.as_mut() {
+						#push
+					}
+				};
+			}
+
+			// Unwind Vec types
+			if f.is_array() {
+				push = quote! {
+					for #name in #path.iter_mut() {
+						#push
+					}
+				}
+			}
+
+			push
+		})
+		.collect();
+
+	let body = if refs_pushes.is_empty() {
+		quote! { Vec::new() }
+	} else {
+		quote! {
+			let mut refs: Vec<Box<&mut dyn ReferenceField>> = Vec::new();
+
+			#(#refs_pushes)*
+
+			refs
+		}
+	};
+
+	quote! {
+		impl AllReferences for #ident {
+			fn all_references(&mut self) -> Vec<Box<&mut dyn ReferenceField>> {
+				#body
+			}
+		}
+	}
 }
 
 /// Implementations of From, Deref and DerefMut towards the inner type.
@@ -337,6 +419,8 @@ fn generate_object_field(
 		.map(|f| generate_field(f, &struct_type, base_type, implemented_codes))
 		.unzip();
 
+	let all_references_impl = all_references_impl(&struct_type, field, false);
+
 	let object_struct_builder = format_ident!("{struct_type}Builder");
 	let object_struct_builder_name = object_struct_builder.to_string();
 	let object_struct = quote! {
@@ -357,7 +441,10 @@ fn generate_object_field(
 				#object_struct_builder ::default()
 			}
 		}
+
+		#all_references_impl
 	};
+
 	let structs = [object_struct]
 		.into_iter()
 		.chain(structs)
@@ -366,6 +453,7 @@ fn generate_object_field(
 			l
 		})
 		.expect("Cannot fail");
+
 	(doc_comment, (quote!(#struct_type), format_ident!("FieldExtension")), structs)
 }
 
@@ -383,7 +471,7 @@ fn generate_reference_field(
 
 	// If there are more than one possible target resource types, we define an enum
 	// Otherwise, we refer directly to the resource
-	let (target_type, target_enum) = if field.target_resource_types.len() > 1 {
+	let (target_type, target_enum, set_target_arms) = if field.target_resource_types.len() > 1 {
 		let type_name = format_ident!("{type_ident}{}ReferenceTarget", field.name.to_pascal_case());
 
 		let doc =
@@ -407,9 +495,36 @@ fn generate_reference_field(
 			}
 		};
 
-		(type_name, enum_def)
+		let arms = field.target_resource_types.iter().map(|resource_type| {
+			let rt = format_ident!("{}", resource_type.to_pascal_case());
+
+			quote! {
+				Resource::#rt(r) => #type_name::#rt(r),
+			}
+		});
+
+		let set_target_arms = quote! {
+			#(#arms)*
+			_ => panic!("Invalid resource type for reference field"),
+		};
+
+		(type_name, enum_def, set_target_arms)
 	} else {
-		(format_ident!("{}", field.target_resource_types.get(0).unwrap()), quote!())
+		let resource_type = field.target_resource_types.get(0).unwrap();
+		let rt = format_ident!("{}", resource_type.to_pascal_case());
+
+		let set_target_arms = if resource_type == "Resource" {
+			quote! {
+				r => r,
+			}
+		} else {
+			quote! {
+				Resource::#rt(r) => r,
+				_ => panic!("Invalid resource type for reference field"),
+			}
+		};
+
+		(rt, quote!(), set_target_arms)
 	};
 
 	let struct_type = format_ident!("{type_ident}{}Reference", field.name.to_pascal_case());
@@ -435,6 +550,24 @@ fn generate_reference_field(
 					target: None,
 					reference,
 				}
+			}
+		}
+
+		impl ReferenceField for #struct_type {
+			fn set_target(&mut self, target: Resource) {
+				let t = match target {
+					#set_target_arms
+				};
+
+				self.target = Some(Box::new(t));
+			}
+
+			fn reference(&self) -> &Reference {
+				&self.reference
+			}
+
+			fn reference_mut(&mut self) -> &mut Reference {
+				&mut self.reference
 			}
 		}
 

@@ -4,6 +4,7 @@ use ::core::num::NonZeroU32;
 use serde::{Serialize, Deserialize};
 #[cfg(feature = "builders")]
 use derive_builder::Builder;
+use super::super::*;
 use super::super::codes;
 use super::super::resources::*;
 #[allow(unused_imports)]
@@ -1735,6 +1736,11 @@ impl DataRequirementCodeFilter {
         DataRequirementCodeFilterBuilder::default()
     }
 }
+impl AllReferences for DataRequirementCodeFilter {
+    fn all_references(&mut self) -> Vec<Box<&mut dyn ReferenceField>> {
+        Vec::new()
+    }
+}
 /// Choice of types for the valueSet[x] field in DataRequirementCodeFilter
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -1821,6 +1827,11 @@ impl DataRequirementDateFilter {
     #[must_use]
     pub fn builder() -> DataRequirementDateFilterBuilder {
         DataRequirementDateFilterBuilder::default()
+    }
+}
+impl AllReferences for DataRequirementDateFilter {
+    fn all_references(&mut self) -> Vec<Box<&mut dyn ReferenceField>> {
+        Vec::new()
     }
 }
 /// Choice of types for the value[x] field in DataRequirementDateFilter
@@ -3085,6 +3096,17 @@ impl ElementDefinitionSlicing {
         ElementDefinitionSlicingBuilder::default()
     }
 }
+impl AllReferences for ElementDefinitionSlicing {
+    fn all_references(&mut self) -> Vec<Box<&mut dyn ReferenceField>> {
+        let mut refs: Vec<Box<&mut dyn ReferenceField>> = Vec::new();
+        for discriminator in self.discriminator.iter_mut() {
+            if let Some(discriminator) = discriminator.as_mut() {
+                refs.extend(discriminator.all_references());
+            }
+        }
+        refs
+    }
+}
 /// Sub-fields of the discriminator field in ElementDefinitionSlicing
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
@@ -3147,6 +3169,11 @@ impl ElementDefinitionSlicingDiscriminator {
     #[must_use]
     pub fn builder() -> ElementDefinitionSlicingDiscriminatorBuilder {
         ElementDefinitionSlicingDiscriminatorBuilder::default()
+    }
+}
+impl AllReferences for ElementDefinitionSlicingDiscriminator {
+    fn all_references(&mut self) -> Vec<Box<&mut dyn ReferenceField>> {
+        Vec::new()
     }
 }
 /// Sub-fields of the base field in ElementDefinition
@@ -3223,6 +3250,11 @@ impl ElementDefinitionBase {
     #[must_use]
     pub fn builder() -> ElementDefinitionBaseBuilder {
         ElementDefinitionBaseBuilder::default()
+    }
+}
+impl AllReferences for ElementDefinitionBase {
+    fn all_references(&mut self) -> Vec<Box<&mut dyn ReferenceField>> {
+        Vec::new()
     }
 }
 /// Sub-fields of the type field in ElementDefinition
@@ -3331,6 +3363,11 @@ impl ElementDefinitionType {
     #[must_use]
     pub fn builder() -> ElementDefinitionTypeBuilder {
         ElementDefinitionTypeBuilder::default()
+    }
+}
+impl AllReferences for ElementDefinitionType {
+    fn all_references(&mut self) -> Vec<Box<&mut dyn ReferenceField>> {
+        Vec::new()
     }
 }
 /// Choice of types for the defaultValue[x] field in ElementDefinition
@@ -4111,6 +4148,11 @@ impl ElementDefinitionExample {
         ElementDefinitionExampleBuilder::default()
     }
 }
+impl AllReferences for ElementDefinitionExample {
+    fn all_references(&mut self) -> Vec<Box<&mut dyn ReferenceField>> {
+        Vec::new()
+    }
+}
 /// Choice of types for the value[x] field in ElementDefinitionExample
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -4609,6 +4651,11 @@ impl ElementDefinitionConstraint {
         ElementDefinitionConstraintBuilder::default()
     }
 }
+impl AllReferences for ElementDefinitionConstraint {
+    fn all_references(&mut self) -> Vec<Box<&mut dyn ReferenceField>> {
+        Vec::new()
+    }
+}
 /// Sub-fields of the binding field in ElementDefinition
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
@@ -4687,6 +4734,11 @@ impl ElementDefinitionBinding {
     #[must_use]
     pub fn builder() -> ElementDefinitionBindingBuilder {
         ElementDefinitionBindingBuilder::default()
+    }
+}
+impl AllReferences for ElementDefinitionBinding {
+    fn all_references(&mut self) -> Vec<Box<&mut dyn ReferenceField>> {
+        Vec::new()
     }
 }
 /// Choice of types for the valueSet[x] field in ElementDefinitionBinding
@@ -4801,6 +4853,11 @@ impl ElementDefinitionMapping {
     #[must_use]
     pub fn builder() -> ElementDefinitionMappingBuilder {
         ElementDefinitionMappingBuilder::default()
+    }
+}
+impl AllReferences for ElementDefinitionMapping {
+    fn all_references(&mut self) -> Vec<Box<&mut dyn ReferenceField>> {
+        Vec::new()
     }
 }
 /** Base StructureDefinition for Extension Type
@@ -5515,6 +5572,21 @@ impl From<Reference> for IdentifierAssignerReference {
         Self { target: None, reference }
     }
 }
+impl ReferenceField for IdentifierAssignerReference {
+    fn set_target(&mut self, target: Resource) {
+        let t = match target {
+            Resource::Organization(r) => r,
+            _ => panic!("Invalid resource type for reference field"),
+        };
+        self.target = Some(Box::new(t));
+    }
+    fn reference(&self) -> &Reference {
+        &self.reference
+    }
+    fn reference_mut(&mut self) -> &mut Reference {
+        &mut self.reference
+    }
+}
 /** Base StructureDefinition for Meta Type
 
  **[Meta](http://hl7.org/fhir/StructureDefinition/Meta) v3.0.2**
@@ -6093,6 +6165,21 @@ pub struct ParameterDefinitionProfileReference {
 impl From<Reference> for ParameterDefinitionProfileReference {
     fn from(reference: Reference) -> Self {
         Self { target: None, reference }
+    }
+}
+impl ReferenceField for ParameterDefinitionProfileReference {
+    fn set_target(&mut self, target: Resource) {
+        let t = match target {
+            Resource::StructureDefinition(r) => r,
+            _ => panic!("Invalid resource type for reference field"),
+        };
+        self.target = Some(Box::new(t));
+    }
+    fn reference(&self) -> &Reference {
+        &self.reference
+    }
+    fn reference_mut(&mut self) -> &mut Reference {
+        &mut self.reference
     }
 }
 /** Base StructureDefinition for Period Type
@@ -6890,6 +6977,20 @@ impl From<Reference> for RelatedArtifactResourceReference {
         Self { target: None, reference }
     }
 }
+impl ReferenceField for RelatedArtifactResourceReference {
+    fn set_target(&mut self, target: Resource) {
+        let t = match target {
+            r => r,
+        };
+        self.target = Some(Box::new(t));
+    }
+    fn reference(&self) -> &Reference {
+        &self.reference
+    }
+    fn reference_mut(&mut self) -> &mut Reference {
+        &mut self.reference
+    }
+}
 /** Base StructureDefinition for SampledData Type
 
  **[SampledData](http://hl7.org/fhir/StructureDefinition/SampledData) v3.0.2**
@@ -7637,6 +7738,11 @@ impl TimingRepeat {
     #[must_use]
     pub fn builder() -> TimingRepeatBuilder {
         TimingRepeatBuilder::default()
+    }
+}
+impl AllReferences for TimingRepeat {
+    fn all_references(&mut self) -> Vec<Box<&mut dyn ReferenceField>> {
+        Vec::new()
     }
 }
 /// Choice of types for the bounds[x] field in TimingRepeat

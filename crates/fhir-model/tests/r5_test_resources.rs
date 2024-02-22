@@ -285,3 +285,58 @@ fn codeable_concept() {
 	let code3 = concept.code_with_system("system3");
 	assert_eq!(code3, Some("code3"));
 }
+
+#[test]
+fn reference_search_and_mutate() {
+	let reference = Reference::builder().build().unwrap();
+
+	let s: AccountSubjectReference = reference.clone().into();
+	let o: AccountOwnerReference = reference.clone().into();
+	let cr: AccountCoverageCoverageReference = reference.clone().into();
+	let c = AccountCoverage::builder().coverage(cr).build().unwrap();
+
+	let mut a = Account::builder()
+		.status(AccountStatus::Active)
+		.subject(vec![Some(s.clone())])
+		.owner(o.clone())
+		.coverage(vec![Some(c.clone())])
+		.build()
+		.unwrap();
+
+	// The resources we are going to refer to in the Account reference fields
+	let patient = Patient::builder().build().unwrap();
+	let organization = Organization::builder().build().unwrap();
+	let coverage = Coverage::builder()
+		.status("active".to_string())
+		.kind(Kind::Other)
+		.beneficiary(reference.clone().into())
+		.build()
+		.unwrap();
+
+	let mut fields = a.all_references();
+
+	assert_eq!(fields.len(), 3);
+
+	fields.get_mut(0).unwrap().set_target(Resource::Patient(patient.clone()));
+	fields.get_mut(1).unwrap().set_target(Resource::Organization(organization.clone()));
+	fields.get_mut(2).unwrap().set_target(Resource::Coverage(coverage.clone()));
+
+	let mut s2 = s.clone();
+	s2.set_target(Resource::Patient(patient.clone()));
+
+	let mut o2 = o.clone();
+	o2.set_target(Resource::Organization(organization.clone()));
+
+	let mut c2 = c.clone();
+	c2.coverage.set_target(Resource::Coverage(coverage));
+
+	let a2 = Account::builder()
+		.status(AccountStatus::Active)
+		.subject(vec![Some(s2)])
+		.owner(o2)
+		.coverage(vec![Some(c2)])
+		.build()
+		.unwrap();
+
+	assert_eq!(a, a2);
+}
