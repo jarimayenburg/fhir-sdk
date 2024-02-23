@@ -176,6 +176,29 @@ pub fn generate_resources(
 			)*
 		}
 
+		/// Unknown resource type when parsing from string
+		#[derive(Debug, Clone)]
+		pub struct UnknownResourceType(String);
+		impl ::core::fmt::Display for UnknownResourceType {
+			fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+				write!(f, "Unknown Resource type '{}'", self.0)
+			}
+		}
+		impl ::std::error::Error for UnknownResourceType {}
+
+		impl ::std::str::FromStr for ResourceType {
+			type Err = UnknownResourceType;
+
+			fn from_str(s: &str) -> Result<Self, Self::Err> {
+				match s {
+					#(
+						stringify!(#resource_names) => Ok(ResourceType::#resource_names),
+					)*
+					_ => Err(UnknownResourceType(s.to_string())),
+				}
+			}
+		}
+
 		impl ::core::fmt::Display for ResourceType {
 			fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
 				f.write_str(self.as_str())
