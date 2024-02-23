@@ -181,9 +181,10 @@ fn reference_parsing() {
 	assert_eq!(
 		parsed,
 		ParsedReference::Absolute {
-			url: "https://server.test/fhir/Encounter/1",
+			base_url: "https://server.test/fhir",
 			resource_type: Some("Encounter"),
-			id: Some("1")
+			id: Some("1"),
+			version_id: None,
 		}
 	);
 
@@ -195,9 +196,10 @@ fn reference_parsing() {
 	assert_eq!(
 		parsed,
 		ParsedReference::Absolute {
-			url: "https://server.test/fhir/Encounter/1/_history/1",
+			base_url: "https://server.test/fhir",
 			resource_type: Some("Encounter"),
-			id: Some("1")
+			id: Some("1"),
+			version_id: Some("1")
 		}
 	);
 
@@ -226,9 +228,10 @@ fn reference_parsing() {
 	assert_eq!(
 		parsed,
 		ParsedReference::Absolute {
-			url: "http://not-fhir.test/1",
-			resource_type: Some("not-fhir.test"), // irks
-			id: Some("1")
+			base_url: "http://not-fhir.test/1",
+			resource_type: None,
+			id: None,
+			version_id: None,
 		}
 	);
 }

@@ -2,284 +2,76 @@
 
 #[rustfmt::skip] // Too much for rustfmt
 mod generated;
+mod identifiable;
 
 pub use generated::*;
+pub use identifiable::*;
 
-use super::types::{FieldExtension, Identifier};
+use crate::ParsedReference;
 
-/// Trait for all resources with multiple identifiers in the `identifier` field.
-/// Simplifies access to identifiers.
-pub trait IdentifiableResource {
-	/// Get the identifier field.
-	fn identifier(&self) -> &Vec<Option<Identifier>>;
-	/// Get the identifier field mutably.
-	fn identifier_mut(&mut self) -> &mut Vec<Option<Identifier>>;
-	/// Set the identifier field.
-	fn set_identifier(&mut self, value: Vec<Option<Identifier>>);
-
-	/// Get the identifier extension field.
-	fn identifier_ext(&self) -> &Vec<Option<FieldExtension>>;
-	/// Get the identifier extension field mutably.
-	fn identifier_ext_mut(&mut self) -> &mut Vec<Option<FieldExtension>>;
-	/// Set the identifier extension field.
-	fn set_identifier_ext(&mut self, value: Vec<Option<FieldExtension>>);
-
-	/// Append or replace an identifier. If there is already an identifier with
-	/// the same system or type (exact full match), it is replaced, otherwise
-	/// appended.
+impl Bundle {
+	/// Try to resolve an internal reference in the Bundle pretty much in accordance with
+	/// the spec found at <https://www.hl7.org/fhir/r5/bundle.html#references>.
 	///
-	/// Returns whether it was created (true) or replaced another identifier
-	/// (false).
-	fn place_identifier(&mut self, identifier: Identifier) -> bool {
-		if let Some(ident) = self.identifier_mut().iter_mut().flatten().find(|ident| {
-			(ident.system.is_some() && ident.system == identifier.system)
-				|| (ident.r#type.is_some() && ident.r#type == identifier.r#type)
-		}) {
-			*ident = identifier;
+	/// Deviations from the spec:
+	/// 1. When resolving versioned absolute references, if multiple entries are found with matching fullUrl
+	///    and with a resource with a matching version ID, the spec says to fail the lookup. Instead, we
+	///    return the first one we find.
+	/// 2. When resolving relative references, the spec says to use the root of the fullUrl of the entry
+	///    of the resource that contains the reference field as the root to stick the relative reference
+	///    on before comparing it to fullUrls of other entries. Instead, we always use the value of the
+	///    `base_url` parameter as the root for relative references.
+	///
+	/// Conditional references and external reference resolution are unsupported
+	pub fn resolve_reference(
+		&self,
+		base_url: &str,
+		reference: &ParsedReference,
+	) -> Option<&Resource> {
+		let full_url = reference.to_string();
 
-			false
-		} else {
-			self.identifier_mut().push(Some(identifier));
-
-			if !self.identifier_ext_mut().is_empty()
-				&& self.identifier_mut().len() == self.identifier_ext_mut().len() + 1
-			{
-				self.identifier_ext_mut().push(None);
+		match *reference {
+			// If the reference is local it has to be looked up in the resource itself
+			ParsedReference::Local { .. } => {
+				panic!("Can't resolve local (contained) references in Bundle");
 			}
-
-			true
+			// If the reference is an URN, look for an entry with a matching fullUrl
+			ParsedReference::Absolute { .. } if full_url.starts_with("urn:") => self
+				.entry
+				.iter()
+				.flatten()
+				.find(|e| e.full_url.as_ref() == Some(&full_url))
+				.and_then(|e| e.resource.as_ref()),
+			// If the reference is absolute and versionless, look for an entry with a matching fullUrl
+			// If multiple are found, use the one with the most recent lastUpdated value.
+			ParsedReference::Absolute { version_id: None, .. } => self
+				.entry
+				.iter()
+				.flatten()
+				.filter(|e| e.full_url.as_ref() == Some(&full_url))
+				.filter_map(|e| e.resource.as_ref())
+				.max_by_key(|r| {
+					r.as_base_resource().meta().as_ref().and_then(|m| m.last_updated.as_ref())
+				}),
+			// If the reference is absolute and versioned, look for an entry with the versionless version
+			// of the reference as its fullUrl and whose resource has a matching version ID.
+			// We go slightly off spec here because we return the first resource found if there are multiple
+			// resources in the Bundle with the same fullUrl and version ID.
+			ParsedReference::Absolute { version_id: Some(version_id), .. } => self
+				.entry
+				.iter()
+				.flatten()
+				.filter(|e| e.full_url.as_ref() == Some(&full_url))
+				.filter_map(|e| e.resource.as_ref())
+				.find(|r| {
+					r.as_base_resource().meta().as_ref().and_then(|m| m.version_id.as_ref())
+						== Some(&version_id.to_string())
+				}),
+			// If the reference is relative, use the `base_url` parameter to make it
+			// absolute and resolve that.
+			ParsedReference::Relative { .. } => {
+				self.resolve_reference(base_url, &reference.with_base_url(base_url))
+			}
 		}
-	}
-
-	/// Return the first identifier value for a given system.
-	fn identifier_with_system(&self, system: &str) -> Option<&String> {
-		self.identifier()
-			.iter()
-			.flatten()
-			.filter(|ident| ident.system.as_ref().map_or(false, |sys| sys == system))
-			.find_map(|ident| ident.value.as_ref())
-	}
-
-	/// Return a list of identifiers for a given system.
-	fn identifiers_with_system(&self, system: &str) -> Vec<&Identifier> {
-		self.identifier()
-			.iter()
-			.flatten()
-			.filter(|ident| ident.system.as_ref().map_or(false, |sys| sys == system))
-			.collect()
-	}
-
-	/// Return the first identifier value for a given type.
-	fn identifier_with_type(&self, type_system: &str, type_code: &str) -> Option<&String> {
-		self.identifier()
-			.iter()
-			.flatten()
-			.filter(|ident| {
-				ident.r#type.as_ref().map_or(false, |ty| {
-					ty.coding.iter().flatten().any(|coding| {
-						coding.system.as_deref() == Some(type_system)
-							&& coding.code.as_deref() == Some(type_code)
-					})
-				})
-			})
-			.find_map(|ident| ident.value.as_ref())
-	}
-
-	/// Return a list of identifiers for a given type.
-	fn identifiers_with_type(&self, type_system: &str, type_code: &str) -> Vec<&Identifier> {
-		self.identifier()
-			.iter()
-			.flatten()
-			.filter(|ident| {
-				ident.r#type.as_ref().map_or(false, |ty| {
-					ty.coding.iter().flatten().any(|coding| {
-						coding.system.as_deref() == Some(type_system)
-							&& coding.code.as_deref() == Some(type_code)
-					})
-				})
-			})
-			.collect()
 	}
 }
-
-/// Implement the IdentifiableResource trait for the resources and the resource
-/// enum.
-macro_rules! impl_identifiable_resource {
-	([$($resource:ident),*$(,)?]) => {
-		$(impl_identifiable_resource!($resource);)*
-
-		impl Resource {
-			/// Return the resource as identifiable resource.
-			#[must_use]
-			#[inline]
-			pub fn as_identifiable_resource(&self) -> Option<&dyn IdentifiableResource> {
-				match self {
-					$(
-						Self::$resource(r) => Some(r),
-					)*
-					_ => None,
-				}
-			}
-
-			/// Return the resource as mutable identifiable resource.
-			#[must_use]
-			#[inline]
-			pub fn as_identifiable_resource_mut(&mut self) -> Option<&mut dyn IdentifiableResource> {
-				match self {
-					$(
-						Self::$resource(r) => Some(r),
-					)*
-					_ => None,
-				}
-			}
-		}
-	};
-	($resource:ident) => {
-		impl IdentifiableResource for $resource {
-			#[inline]
-			fn identifier(&self) -> &Vec<Option<Identifier>> {
-				&self.identifier
-			}
-
-			#[inline]
-			fn identifier_mut(&mut self) -> &mut Vec<Option<Identifier>> {
-				&mut self.identifier
-			}
-
-			#[inline]
-			fn set_identifier(&mut self, value: Vec<Option<Identifier>>) {
-				self.identifier = value;
-			}
-
-			#[inline]
-			fn identifier_ext(&self) -> &Vec<Option<FieldExtension>> {
-				&self.identifier_ext
-			}
-
-			#[inline]
-			fn identifier_ext_mut(&mut self) -> &mut Vec<Option<FieldExtension>> {
-				&mut self.identifier_ext
-			}
-
-			#[inline]
-			fn set_identifier_ext(&mut self, value: Vec<Option<FieldExtension>>) {
-				self.identifier_ext = value;
-			}
-		}
-	};
-}
-
-impl_identifiable_resource!([
-	Account,
-	ActivityDefinition,
-	AdministrableProductDefinition,
-	AllergyIntolerance,
-	Appointment,
-	AppointmentResponse,
-	Basic,
-	BiologicallyDerivedProduct,
-	BodyStructure,
-	CarePlan,
-	CareTeam,
-	CatalogEntry,
-	ChargeItem,
-	ChargeItemDefinition,
-	Citation,
-	Claim,
-	ClaimResponse,
-	ClinicalImpression,
-	ClinicalUseDefinition,
-	CodeSystem,
-	Communication,
-	CommunicationRequest,
-	Condition,
-	Consent,
-	Contract,
-	Coverage,
-	CoverageEligibilityRequest,
-	CoverageEligibilityResponse,
-	DetectedIssue,
-	Device,
-	DeviceDefinition,
-	DeviceMetric,
-	DeviceRequest,
-	DeviceUseStatement,
-	DiagnosticReport,
-	DocumentManifest,
-	DocumentReference,
-	Encounter,
-	Endpoint,
-	EnrollmentRequest,
-	EnrollmentResponse,
-	EpisodeOfCare,
-	EventDefinition,
-	Evidence,
-	EvidenceReport,
-	EvidenceVariable,
-	ExampleScenario,
-	ExplanationOfBenefit,
-	FamilyMemberHistory,
-	Flag,
-	Goal,
-	Group,
-	GuidanceResponse,
-	HealthcareService,
-	ImagingStudy,
-	Immunization,
-	ImmunizationEvaluation,
-	ImmunizationRecommendation,
-	InsurancePlan,
-	Invoice,
-	Library,
-	List,
-	Location,
-	ManufacturedItemDefinition,
-	Measure,
-	MeasureReport,
-	Media,
-	Medication,
-	MedicationAdministration,
-	MedicationDispense,
-	MedicationRequest,
-	MedicationStatement,
-	MedicinalProductDefinition,
-	MessageDefinition,
-	MolecularSequence,
-	NutritionOrder,
-	Observation,
-	ObservationDefinition,
-	Organization,
-	OrganizationAffiliation,
-	PackagedProductDefinition,
-	Patient,
-	PaymentNotice,
-	PaymentReconciliation,
-	Person,
-	PlanDefinition,
-	Practitioner,
-	PractitionerRole,
-	Procedure,
-	Questionnaire,
-	RegulatedAuthorization,
-	RelatedPerson,
-	RequestGroup,
-	ResearchDefinition,
-	ResearchElementDefinition,
-	ResearchStudy,
-	ResearchSubject,
-	RiskAssessment,
-	Schedule,
-	ServiceRequest,
-	Slot,
-	Specimen,
-	StructureDefinition,
-	StructureMap,
-	SubscriptionTopic,
-	Substance,
-	SubstanceDefinition,
-	SupplyDelivery,
-	SupplyRequest,
-	Task,
-	ValueSet,
-	VisionPrescription
-]);

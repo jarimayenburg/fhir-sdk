@@ -14,7 +14,7 @@ pub mod r5;
 #[cfg(feature = "stu3")]
 pub mod stu3;
 
-use std::ops::{Deref, DerefMut};
+use std::ops::{Deref, DerefMut, Not};
 
 use base64::prelude::{Engine, BASE64_STANDARD};
 use serde::{Deserialize, Serialize};
@@ -44,14 +44,17 @@ pub enum ParsedReference<'a> {
 	/// Absolute reference, the resource can be anywhere, might not even be FHIR
 	/// server. Might not be a URL, but a URI like a `urn:uuid:...`.
 	Absolute {
-		/// Raw URL string.
-		url: &'a str,
+		/// The FHIR base URL for FHIR server references, or the whole
+		/// URL for non-FHIR server URLs or URNs
+		base_url: &'a str,
 		/// Assumed resource type part if exists. Is just the positional URL
 		/// segment, could be wrong.
 		resource_type: Option<&'a str>,
 		/// Assumed resource ID part if exists. Is just the positional URL
 		/// segment, could be wrong.
 		id: Option<&'a str>,
+		/// Targeted version ID if set.
+		version_id: Option<&'a str>,
 	},
 }
 
@@ -63,31 +66,48 @@ impl<'a> ParsedReference<'a> {
 			return Self::Local { id: reference.split_at(1).1 };
 		}
 
-		let Some((resource_type, id, version_id, is_absolute)) = Self::parse_segments(reference)
+		let Some((base_url, resource_type, id, version_id)) = Self::parse_segments(reference)
 		else {
-			return Self::Absolute { url: reference, resource_type: None, id: None };
+			return Self::Absolute {
+				base_url: reference,
+				resource_type: None,
+				id: None,
+				version_id: None,
+			};
 		};
 
-		if is_absolute {
-			Self::Absolute { url: reference, resource_type: Some(resource_type), id: Some(id) }
+		if base_url.is_some() {
+			Self::Absolute {
+				base_url: base_url.unwrap(),
+				resource_type: Some(resource_type),
+				id: Some(id),
+				version_id,
+			}
 		} else {
 			Self::Relative { resource_type, id, version_id }
 		}
 	}
 
 	/// Helper function to split the reference segments if possible.
-	/// Returns resource type, id, version id and if there is more segments if
-	/// possible.
-	fn parse_segments(reference: &'a str) -> Option<(&'a str, &'a str, Option<&'a str>, bool)> {
-		let mut segments = reference.rsplit('/');
+	/// Returns the base URL (if absolute), the resource type, resource ID and version ID (if versioned)
+	///
+	/// e.g. "https://fhir.hapi.org/fhir/Patient/123/_history/456" is parsed to
+	/// (Some("https://fhir.hapi.org/fhir"),  "Patient", "123", Some("456"))
+	fn parse_segments(
+		reference: &'a str,
+	) -> Option<(Option<&'a str>, &'a str, &'a str, Option<&'a str>)> {
+		let mut segments = reference.rsplitn(3, '/');
 		let id_or_version = segments.next()?;
 		let history_or_type = segments.next()?;
+		let base = segments.next()?;
 		Some(if history_or_type == "_history" {
+			let mut segments = base.rsplitn(3, '/');
 			let id = segments.next()?;
 			let resource_type = segments.next()?;
-			(resource_type, id, Some(id_or_version), segments.next().is_some())
+			let base = segments.next()?;
+			(base.is_empty().not().then_some(base), resource_type, id, Some(id_or_version))
 		} else {
-			(history_or_type, id_or_version, None, segments.next().is_some())
+			(base.is_empty().not().then_some(base), history_or_type, id_or_version, None)
 		})
 	}
 
@@ -115,6 +135,84 @@ impl<'a> ParsedReference<'a> {
 			Self::Local { id } => Some(id),
 			Self::Relative { id, .. } => Some(id),
 			Self::Absolute { id, .. } => *id,
+		}
+	}
+
+	/// Strips off the version segments
+	#[must_use]
+	pub fn to_versionless(&self) -> Self {
+		match *self {
+			Self::Local { .. } => *self,
+			Self::Relative { resource_type, id, .. } => {
+				Self::Relative { resource_type, id, version_id: None }
+			}
+			Self::Absolute { base_url, resource_type, id, .. } => {
+				Self::Absolute { base_url, resource_type, id, version_id: None }
+			}
+		}
+	}
+
+	/// Strips off the base URL, making absolute references relative
+	#[must_use]
+	pub fn to_unqualified(&self) -> Self {
+		match *self {
+			Self::Local { .. } | Self::Relative { .. } => *self,
+			Self::Absolute {
+				resource_type: Some(resource_type), id: Some(id), version_id, ..
+			} => Self::Relative { resource_type, id, version_id },
+			_ => panic!("Local references can't be made relative"),
+		}
+	}
+
+	/// Sets a base URL for this reference. Updates the base URL for absolute
+	/// references and turns relative references into absolute ones.
+	///
+	/// Panics for local references
+	pub fn with_base_url(&self, base_url: &'a str) -> Self {
+		match *self {
+			Self::Relative { resource_type, id, version_id } => Self::Absolute {
+				base_url,
+				resource_type: Some(resource_type),
+				id: Some(id),
+				version_id,
+			},
+			Self::Absolute { resource_type, id, version_id, .. } => {
+				Self::Absolute { base_url, resource_type, id, version_id }
+			}
+			Self::Local { .. } => panic!("Local reference can't be made absolute"),
+		}
+	}
+}
+
+impl ToString for ParsedReference<'_> {
+	fn to_string(&self) -> String {
+		match *self {
+			ParsedReference::Local { id } => format!("#{id}"),
+			ParsedReference::Relative { resource_type, id, version_id: None } => {
+				[resource_type, id].join("/")
+			}
+			ParsedReference::Relative { resource_type, id, version_id: Some(version_id) } => {
+				[resource_type, id, "_history", version_id].join("/")
+			}
+			ParsedReference::Absolute {
+				base_url,
+				resource_type: None,
+				id: None,
+				version_id: None,
+			} => base_url.to_string(),
+			ParsedReference::Absolute {
+				base_url,
+				resource_type: Some(resource_type),
+				id: Some(id),
+				version_id: None,
+			} => [base_url, resource_type, id].join("/"),
+			ParsedReference::Absolute {
+				base_url,
+				resource_type: Some(resource_type),
+				id: Some(id),
+				version_id: Some(version_id),
+			} => [base_url, resource_type, id, "_history", version_id].join("/"),
+			_ => panic!("Invalid reference"),
 		}
 	}
 }
