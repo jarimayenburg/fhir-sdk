@@ -15,12 +15,15 @@ pub mod r5;
 pub mod stu3;
 
 use std::ops::{Deref, DerefMut};
+use std::str::FromStr;
 
 use base64::prelude::{Engine, BASE64_STANDARD};
 use serde::{Deserialize, Serialize};
-pub use time;
+
+use crate::error::UnknownResourceType;
 
 pub use self::date_time::*;
+pub use time;
 
 /// Parsed parts of a FHIR reference. Can be one of local reference, relative
 /// reference or absolute reference. The absolute reference is unchecked and can
@@ -61,12 +64,12 @@ pub enum ParsedReference<'a> {
 impl<'a> ParsedReference<'a> {
 	/// Parse the reference from a reference string.
 	#[must_use]
-	pub fn new(reference: &'a str) -> Self {
+	pub fn new<R: FromStr<Err = UnknownResourceType>>(reference: &'a str) -> Self {
 		if reference.starts_with('#') {
 			return Self::Local { id: reference.split_at(1).1 };
 		}
 
-		let Some((base_url, resource_type, id, version_id)) = Self::parse_segments(reference)
+		let Some((base_url, resource_type, id, version_id)) = Self::parse_segments::<R>(reference)
 		else {
 			return Self::Absolute {
 				base_url: reference,
@@ -89,18 +92,21 @@ impl<'a> ParsedReference<'a> {
 	}
 
 	/// Helper function to split the reference segments if possible.
-	/// Returns the base URL (if absolute), the resource type, resource ID and version ID (if versioned)
+	/// Returns the base URL (if absolute), the resource type, resource ID and version ID (if versioned).
+	/// Returns None if the reference could not be parsed as an absolute or relative reference
+	/// to a FHIR resource on a FHIR server.
 	///
 	/// e.g. "https://fhir.hapi.org/fhir/Patient/123/_history/456" is parsed to
 	/// (Some("https://fhir.hapi.org/fhir"),  "Patient", "123", Some("456"))
-	fn parse_segments(
+	fn parse_segments<R: FromStr<Err = UnknownResourceType>>(
 		reference: &'a str,
 	) -> Option<(Option<&'a str>, &'a str, &'a str, Option<&'a str>)> {
 		let mut segments = reference.rsplitn(3, '/');
 		let id_or_version = segments.next()?;
 		let history_or_type = segments.next()?;
 		let base = segments.next();
-		Some(if history_or_type == "_history" {
+
+		let parsed = if history_or_type == "_history" {
 			let mut segments = base?.rsplitn(3, '/');
 			let id = segments.next()?;
 			let resource_type = segments.next()?;
@@ -108,7 +114,10 @@ impl<'a> ParsedReference<'a> {
 			(base, resource_type, id, Some(id_or_version))
 		} else {
 			(base, history_or_type, id_or_version, None)
-		})
+		};
+
+		// Check if the resource type segment is actually a resource type
+		R::from_str(&parsed.1).is_ok().then(|| parsed)
 	}
 
 	/// Get the resource type that this reference points to as string reference.

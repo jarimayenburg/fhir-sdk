@@ -5,6 +5,7 @@ mod generated;
 
 pub use generated::*;
 
+use super::resources::ResourceType;
 use crate::ParsedReference;
 
 impl CodeableConcept {
@@ -36,6 +37,6 @@ impl Reference {
 	#[must_use]
 	pub fn parse(&self) -> Option<ParsedReference<'_>> {
 		let url = self.reference.as_ref()?;
-		Some(ParsedReference::new(url))
+		Some(ParsedReference::new::<ResourceType>(url))
 	}
 }
