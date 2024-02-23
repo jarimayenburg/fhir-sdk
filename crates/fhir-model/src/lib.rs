@@ -14,7 +14,7 @@ pub mod r5;
 #[cfg(feature = "stu3")]
 pub mod stu3;
 
-use std::ops::{Deref, DerefMut, Not};
+use std::ops::{Deref, DerefMut};
 
 use base64::prelude::{Engine, BASE64_STANDARD};
 use serde::{Deserialize, Serialize};
@@ -99,15 +99,15 @@ impl<'a> ParsedReference<'a> {
 		let mut segments = reference.rsplitn(3, '/');
 		let id_or_version = segments.next()?;
 		let history_or_type = segments.next()?;
-		let base = segments.next()?;
+		let base = segments.next();
 		Some(if history_or_type == "_history" {
-			let mut segments = base.rsplitn(3, '/');
+			let mut segments = base?.rsplitn(3, '/');
 			let id = segments.next()?;
 			let resource_type = segments.next()?;
-			let base = segments.next()?;
-			(base.is_empty().not().then_some(base), resource_type, id, Some(id_or_version))
+			let base = segments.next();
+			(base, resource_type, id, Some(id_or_version))
 		} else {
-			(base.is_empty().not().then_some(base), history_or_type, id_or_version, None)
+			(base, history_or_type, id_or_version, None)
 		})
 	}
 
