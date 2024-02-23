@@ -71,3 +71,14 @@ impl From<UninitializedFieldError> for BuilderError {
 		Self(err)
 	}
 }
+
+/// Unknown resource type when parsing from string
+#[derive(Debug, Clone)]
+pub(crate) struct UnknownResourceType(pub String);
+
+impl std::fmt::Display for UnknownResourceType {
+	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> ::core::fmt::Result {
+		write!(f, "Unknown Resource type '{}'", self.0)
+	}
+}
+impl std::error::Error for UnknownResourceType {}

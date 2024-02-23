@@ -154,6 +154,7 @@ pub fn generate_resources(
 		use super::super::types::*;
 		#[allow(unused_imports)] // Integer64 is unused in R4B.
 		use crate::{Base64Binary, Date, DateTime, Instant, Time, Integer64};
+		use crate::error::UnknownResourceType;
 
 		#(#resource_defs)*
 
@@ -175,16 +176,6 @@ pub fn generate_resources(
 				#resource_names,
 			)*
 		}
-
-		/// Unknown resource type when parsing from string
-		#[derive(Debug, Clone)]
-		pub struct UnknownResourceType(String);
-		impl ::core::fmt::Display for UnknownResourceType {
-			fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
-				write!(f, "Unknown Resource type '{}'", self.0)
-			}
-		}
-		impl ::std::error::Error for UnknownResourceType {}
 
 		impl ::std::str::FromStr for ResourceType {
 			type Err = UnknownResourceType;
