@@ -1,4 +1,4 @@
-use super::types::{FieldExtension, Identifier};
+use super::super::types::{FieldExtension, Identifier};
 
 use super::*;
 
