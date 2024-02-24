@@ -92,17 +92,12 @@ impl Client<FhirR4B> {
 	/// Read the resource that is targeted in the reference.
 	pub async fn read_referenced(&self, reference: &Reference) -> Result<Resource, Error> {
 		let parsed_reference = reference.parse().ok_or(Error::MissingReference)?;
-		let url = match parsed_reference {
+		let url: Url = match parsed_reference {
 			ParsedReference::Local { .. } => return Err(Error::LocalReference),
-			ParsedReference::Relative { resource_type, id, version_id } => {
-				if let Some(version_id) = version_id {
-					self.url(&[resource_type, id, "_history", version_id])
-				} else {
-					self.url(&[resource_type, id])
-				}
-			}
-			ParsedReference::Absolute { url, .. } => {
-				url.parse().map_err(|_| Error::UrlParse(url.to_owned()))?
+			other => {
+				let url = other.to_string();
+
+				url.parse().map_err(|_| Error::UrlParse(url))?
 			}
 		};
 
