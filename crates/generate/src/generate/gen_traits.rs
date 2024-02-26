@@ -31,7 +31,7 @@ pub fn generate_base_resource(
 		get_field_names_and_types(&resource.elements.fields, implemented_codes);
 
 	let ident = format_ident!("BaseResource");
-	let supertraits = [format_ident!("LookupReferences"), format_ident!("NamedResource")];
+	let supertraits = [format_ident!("LookupReferences")];
 	let trait_definition =
 		make_trait_definition(resource, &field_names, &field_types, &ident, &supertraits);
 
