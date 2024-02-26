@@ -68,7 +68,7 @@ pub trait ReferenceField {
 }
 
 /// Trait implemented on object types to get mutable borrows to all non-empty reference fields
-pub trait AllReferences {
+pub trait LookupReferences {
 	/// Get mutable borrows to all the non-empty fields of type Reference in this type
-	fn all_references(&mut self) -> Vec<Box<&mut dyn ReferenceField>>;
+	fn lookup_references(&mut self) -> Vec<Box<&mut dyn ReferenceField>>;
 }

@@ -1736,8 +1736,8 @@ impl DataRequirementCodeFilter {
         DataRequirementCodeFilterBuilder::default()
     }
 }
-impl AllReferences for DataRequirementCodeFilter {
-    fn all_references(&mut self) -> Vec<Box<&mut dyn ReferenceField>> {
+impl LookupReferences for DataRequirementCodeFilter {
+    fn lookup_references(&mut self) -> Vec<Box<&mut dyn ReferenceField>> {
         Vec::new()
     }
 }
@@ -1829,8 +1829,8 @@ impl DataRequirementDateFilter {
         DataRequirementDateFilterBuilder::default()
     }
 }
-impl AllReferences for DataRequirementDateFilter {
-    fn all_references(&mut self) -> Vec<Box<&mut dyn ReferenceField>> {
+impl LookupReferences for DataRequirementDateFilter {
+    fn lookup_references(&mut self) -> Vec<Box<&mut dyn ReferenceField>> {
         Vec::new()
     }
 }
@@ -3096,12 +3096,12 @@ impl ElementDefinitionSlicing {
         ElementDefinitionSlicingBuilder::default()
     }
 }
-impl AllReferences for ElementDefinitionSlicing {
-    fn all_references(&mut self) -> Vec<Box<&mut dyn ReferenceField>> {
+impl LookupReferences for ElementDefinitionSlicing {
+    fn lookup_references(&mut self) -> Vec<Box<&mut dyn ReferenceField>> {
         let mut refs: Vec<Box<&mut dyn ReferenceField>> = Vec::new();
         for discriminator in self.discriminator.iter_mut() {
             if let Some(discriminator) = discriminator.as_mut() {
-                refs.extend(discriminator.all_references());
+                refs.extend(discriminator.lookup_references());
             }
         }
         refs
@@ -3171,8 +3171,8 @@ impl ElementDefinitionSlicingDiscriminator {
         ElementDefinitionSlicingDiscriminatorBuilder::default()
     }
 }
-impl AllReferences for ElementDefinitionSlicingDiscriminator {
-    fn all_references(&mut self) -> Vec<Box<&mut dyn ReferenceField>> {
+impl LookupReferences for ElementDefinitionSlicingDiscriminator {
+    fn lookup_references(&mut self) -> Vec<Box<&mut dyn ReferenceField>> {
         Vec::new()
     }
 }
@@ -3252,8 +3252,8 @@ impl ElementDefinitionBase {
         ElementDefinitionBaseBuilder::default()
     }
 }
-impl AllReferences for ElementDefinitionBase {
-    fn all_references(&mut self) -> Vec<Box<&mut dyn ReferenceField>> {
+impl LookupReferences for ElementDefinitionBase {
+    fn lookup_references(&mut self) -> Vec<Box<&mut dyn ReferenceField>> {
         Vec::new()
     }
 }
@@ -3365,8 +3365,8 @@ impl ElementDefinitionType {
         ElementDefinitionTypeBuilder::default()
     }
 }
-impl AllReferences for ElementDefinitionType {
-    fn all_references(&mut self) -> Vec<Box<&mut dyn ReferenceField>> {
+impl LookupReferences for ElementDefinitionType {
+    fn lookup_references(&mut self) -> Vec<Box<&mut dyn ReferenceField>> {
         Vec::new()
     }
 }
@@ -4148,8 +4148,8 @@ impl ElementDefinitionExample {
         ElementDefinitionExampleBuilder::default()
     }
 }
-impl AllReferences for ElementDefinitionExample {
-    fn all_references(&mut self) -> Vec<Box<&mut dyn ReferenceField>> {
+impl LookupReferences for ElementDefinitionExample {
+    fn lookup_references(&mut self) -> Vec<Box<&mut dyn ReferenceField>> {
         Vec::new()
     }
 }
@@ -4651,8 +4651,8 @@ impl ElementDefinitionConstraint {
         ElementDefinitionConstraintBuilder::default()
     }
 }
-impl AllReferences for ElementDefinitionConstraint {
-    fn all_references(&mut self) -> Vec<Box<&mut dyn ReferenceField>> {
+impl LookupReferences for ElementDefinitionConstraint {
+    fn lookup_references(&mut self) -> Vec<Box<&mut dyn ReferenceField>> {
         Vec::new()
     }
 }
@@ -4736,8 +4736,8 @@ impl ElementDefinitionBinding {
         ElementDefinitionBindingBuilder::default()
     }
 }
-impl AllReferences for ElementDefinitionBinding {
-    fn all_references(&mut self) -> Vec<Box<&mut dyn ReferenceField>> {
+impl LookupReferences for ElementDefinitionBinding {
+    fn lookup_references(&mut self) -> Vec<Box<&mut dyn ReferenceField>> {
         Vec::new()
     }
 }
@@ -4855,8 +4855,8 @@ impl ElementDefinitionMapping {
         ElementDefinitionMappingBuilder::default()
     }
 }
-impl AllReferences for ElementDefinitionMapping {
-    fn all_references(&mut self) -> Vec<Box<&mut dyn ReferenceField>> {
+impl LookupReferences for ElementDefinitionMapping {
+    fn lookup_references(&mut self) -> Vec<Box<&mut dyn ReferenceField>> {
         Vec::new()
     }
 }
@@ -7732,8 +7732,8 @@ impl TimingRepeat {
         TimingRepeatBuilder::default()
     }
 }
-impl AllReferences for TimingRepeat {
-    fn all_references(&mut self) -> Vec<Box<&mut dyn ReferenceField>> {
+impl LookupReferences for TimingRepeat {
+    fn lookup_references(&mut self) -> Vec<Box<&mut dyn ReferenceField>> {
         Vec::new()
     }
 }

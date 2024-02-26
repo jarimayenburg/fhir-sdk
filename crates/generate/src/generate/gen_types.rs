@@ -66,8 +66,8 @@ pub fn generate_type_struct(
 		.map(|field| generate_field(field, &ident, ty, implemented_codes))
 		.unzip();
 
-	let all_references_impl = (ty.kind == StructureDefinitionKind::Resource)
-		.then(|| all_references_impl(&ident, &ty.elements, true));
+	let lookup_references_impl = (ty.kind == StructureDefinitionKind::Resource)
+		.then(|| lookup_references_impl(&ident, &ty.elements, true));
 
 	let wrapper_impls = wrapper_impls(&ident, &ident_inner, &ident_builder);
 
@@ -99,7 +99,7 @@ pub fn generate_type_struct(
 			}
 		}
 
-		#all_references_impl
+		#lookup_references_impl
 		#wrapper_impls
 		#resource_type_fn
 
@@ -107,8 +107,8 @@ pub fn generate_type_struct(
 	})
 }
 
-/// Implement the AllReferences trait for a type
-fn all_references_impl(ident: &Ident, field: &ObjectField, is_type: bool) -> TokenStream {
+/// Implement the LookupReferences trait for a type
+fn lookup_references_impl(ident: &Ident, field: &ObjectField, is_type: bool) -> TokenStream {
 	let refs_pushes: Vec<_> = field
 		.fields
 		.iter()
@@ -132,10 +132,10 @@ fn all_references_impl(ident: &Ident, field: &ObjectField, is_type: bool) -> Tok
 					refs.push(Box::new(&mut #path));
 				},
 				Field::Object(_) if is_wrapped => quote! {
-					refs.extend(#name.all_references());
+					refs.extend(#name.lookup_references());
 				},
 				Field::Object(_) => quote! {
-					refs.extend(#path.all_references());
+					refs.extend(#path.lookup_references());
 				},
 				_ => panic!("Wrong field type"),
 			};
@@ -177,8 +177,8 @@ fn all_references_impl(ident: &Ident, field: &ObjectField, is_type: bool) -> Tok
 	};
 
 	quote! {
-		impl AllReferences for #ident {
-			fn all_references(&mut self) -> Vec<Box<&mut dyn ReferenceField>> {
+		impl LookupReferences for #ident {
+			fn lookup_references(&mut self) -> Vec<Box<&mut dyn ReferenceField>> {
 				#body
 			}
 		}
@@ -419,7 +419,7 @@ fn generate_object_field(
 		.map(|f| generate_field(f, &struct_type, base_type, implemented_codes))
 		.unzip();
 
-	let all_references_impl = all_references_impl(&struct_type, field, false);
+	let lookup_references_impl = lookup_references_impl(&struct_type, field, false);
 
 	let object_struct_builder = format_ident!("{struct_type}Builder");
 	let object_struct_builder_name = object_struct_builder.to_string();
@@ -442,7 +442,7 @@ fn generate_object_field(
 			}
 		}
 
-		#all_references_impl
+		#lookup_references_impl
 	};
 
 	let structs = [object_struct]

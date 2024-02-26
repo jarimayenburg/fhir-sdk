@@ -16,7 +16,7 @@ use fhir_model::{
 			RequestOrchestrationActionTiming, Resource, WrongResourceType,
 		},
 		types::{CodeableConcept, Coding, Identifier, Reference},
-		AllReferences, ReferenceField,
+		LookupReferences, ReferenceField,
 	},
 	Date, DateTime, ParsedReference,
 };
@@ -318,7 +318,7 @@ fn reference_search_and_mutate() {
 		.build()
 		.unwrap();
 
-	let mut fields = a.all_references();
+	let mut fields = a.lookup_references();
 
 	assert_eq!(fields.len(), 3);
 
