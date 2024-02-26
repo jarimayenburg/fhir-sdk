@@ -7,18 +7,16 @@ mod transaction;
 
 use fhir_model::{
 	r4b::{
-		codes::SearchEntryMode,
 		resources::{
 			BaseResource, Bundle, CapabilityStatement, NamedResource, Parameters,
 			ParametersParameter, ParametersParameterValue, Patient, Resource, ResourceType,
-			WrongResourceType,
 		},
 		types::Reference,
 		JSON_MIME_TYPE,
 	},
 	ParsedReference,
 };
-use futures::{Stream, TryStreamExt};
+use futures::Stream;
 use reqwest::{
 	header::{self, HeaderValue},
 	StatusCode, Url,
@@ -214,33 +212,24 @@ impl Client<FhirR4B> {
 		let mut url = self.url(&[]);
 		url.query_pairs_mut().extend_pairs(queries.into_queries()).finish();
 
-		Paged::new(self.clone(), url, |entry| {
-			entry
-				.search
-				.as_ref()
-				.and_then(|search| search.mode.as_ref())
-				.map_or(true, |search_mode| *search_mode == SearchEntryMode::Match)
-		})
+		Paged::new_system(self.clone(), url)
 	}
 
 	/// Search for FHIR resources of a given type given the query parameters.
 	/// This simply ignores resources of the wrong type, e.g. an additional
 	/// OperationOutcome.
-	pub fn search<R: NamedResource + TryFrom<Resource, Error = WrongResourceType>>(
+	pub fn search<R>(
 		&self,
 		queries: SearchParameters,
-	) -> impl Stream<Item = Result<R, Error>> + Send + 'static {
+	) -> impl Stream<Item = Result<R, Error>> + Send + 'static
+	where
+		R: NamedResource + TryFrom<Resource> + DeserializeOwned + 'static,
+		for<'a> &'a mut Resource: From<&'a mut R>,
+	{
 		let mut url = self.url(&[R::TYPE.as_str()]);
 		url.query_pairs_mut().extend_pairs(queries.into_queries()).finish();
 
-		Paged::new(self.clone(), url, |entry| {
-			entry
-				.search
-				.as_ref()
-				.and_then(|search| search.mode.as_ref())
-				.map_or(true, |search_mode| *search_mode == SearchEntryMode::Match)
-		})
-		.try_filter_map(|resource| async move { Ok(R::try_from(resource).ok()) })
+		Paged::new_typed(self.clone(), url)
 	}
 
 	/// Start building a new batch request.
