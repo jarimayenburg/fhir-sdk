@@ -31,7 +31,7 @@ pub fn generate_base_resource(
 		get_field_names_and_types(&resource.elements.fields, implemented_codes);
 
 	let ident = format_ident!("BaseResource");
-	let supertraits = [format_ident!("LookupReferences")];
+	let supertraits = [format_ident!("LookupReferences"), format_ident!("NamedResource")];
 	let trait_definition =
 		make_trait_definition(resource, &field_names, &field_types, &ident, &supertraits);
 
@@ -88,8 +88,13 @@ pub fn generate_domain_resource(
 		.filter(|ty| ty.kind == StructureDefinitionKind::Resource)
 		.find(|ty| &ty.name == "DomainResource")
 		.ok_or(anyhow!("Could not find DomainResource definition"))?;
-	let (field_names, field_types) =
-		get_field_names_and_types(&resource.elements.fields, implemented_codes);
+
+	// Only generate getters and setters for fields in DomainResource that are not in Resource
+	// cause Resource fields are covered in the supertrait BaseResource
+	let fields: Vec<_> =
+		resource.elements.fields.iter().filter(|ty| !ty.is_base_field()).cloned().collect();
+
+	let (field_names, field_types) = get_field_names_and_types(&fields, implemented_codes);
 
 	let ident = format_ident!("DomainResource");
 	let supertraits = [format_ident!("BaseResource")];
