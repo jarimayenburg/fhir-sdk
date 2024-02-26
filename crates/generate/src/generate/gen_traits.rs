@@ -31,7 +31,9 @@ pub fn generate_base_resource(
 		get_field_names_and_types(&resource.elements.fields, implemented_codes);
 
 	let ident = format_ident!("BaseResource");
-	let trait_definition = make_trait_definition(resource, &field_names, &field_types, &ident);
+	let supertraits = [format_ident!("LookupReferences")];
+	let trait_definition =
+		make_trait_definition(resource, &field_names, &field_types, &ident, &supertraits);
 
 	let mut filtered_resources = Vec::new();
 	let trait_implementations: TokenStream = resources
@@ -90,7 +92,9 @@ pub fn generate_domain_resource(
 		get_field_names_and_types(&resource.elements.fields, implemented_codes);
 
 	let ident = format_ident!("DomainResource");
-	let trait_definition = make_trait_definition(resource, &field_names, &field_types, &ident);
+	let supertraits = [format_ident!("BaseResource")];
+	let trait_definition =
+		make_trait_definition(resource, &field_names, &field_types, &ident, &supertraits);
 
 	let mut filtered_resources = Vec::new();
 	let trait_implementations: TokenStream = resources
@@ -203,6 +207,7 @@ fn make_trait_definition(
 	field_names: &[Ident],
 	field_types: &[TokenStream],
 	ident: &Ident,
+	supertraits: &[Ident],
 ) -> TokenStream {
 	assert_eq!(resource.name, resource.elements.name);
 	let mut doc_comment = format!(
@@ -221,9 +226,14 @@ fn make_trait_definition(
 	let mut_getters = field_names.iter().map(|name| format_ident!("{name}_mut"));
 	let setters = field_names.iter().map(|name| format_ident!("set_{name}"));
 
+	let name = match supertraits {
+		&[] => quote!(#ident),
+		traits => quote!(#ident: #(#traits)+*),
+	};
+
 	quote! {
 		#[doc = #doc_comment]
-		pub trait #ident {
+		pub trait #name {
 			#(
 				#[doc = concat!("Get `", stringify!(#field_names), "`.")]
 				fn #field_names(&self) -> & #field_types;
