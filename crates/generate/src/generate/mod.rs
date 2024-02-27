@@ -133,11 +133,12 @@ pub fn generate_resources(
 		.collect::<Result<_, _>>()?;
 
 	let resource_conversions = resource_conversion_impls(&resource_names);
-	let resource_impls = resource_impls(&resource_names);
+	let resource_type_impls = resource_type_impls(&resource_names);
 
 	let base_resource_impls = gen_traits::generate_base_resource(&resources, implemented_codes)?;
 	let domain_resource_impls =
 		gen_traits::generate_domain_resource(&resources, implemented_codes)?;
+	let typed_resource_impls = gen_traits::generate_typed_resource(&resources)?;
 	let named_resource_impls = gen_traits::generate_named_resource(&resources)?;
 
 	// Generate the code.
@@ -213,10 +214,11 @@ pub fn generate_resources(
 		}
 
 		#resource_conversions
-		#resource_impls
+		#resource_type_impls
 
 		#base_resource_impls
 		#domain_resource_impls
+		#typed_resource_impls
 		#named_resource_impls
 	})
 }
@@ -268,20 +270,8 @@ fn resource_conversion_impls(names: &[Ident]) -> TokenStream {
 }
 
 /// Implementations for the Resource and ResourceType enum.
-fn resource_impls(names: &[Ident]) -> TokenStream {
+fn resource_type_impls(names: &[Ident]) -> TokenStream {
 	quote! {
-		impl Resource {
-			/// Get the resource type of the resource.
-			#[must_use]
-			pub fn resource_type(&self) -> ResourceType {
-				match self {
-					#(
-						Self::#names(_) => ResourceType::#names,
-					)*
-				}
-			}
-		}
-
 		impl ResourceType {
 			/// Get the resource type as str.
 			#[must_use]

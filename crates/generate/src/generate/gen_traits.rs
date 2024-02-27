@@ -31,7 +31,7 @@ pub fn generate_base_resource(
 		get_field_names_and_types(&resource.elements.fields, implemented_codes);
 
 	let ident = format_ident!("BaseResource");
-	let supertraits = [format_ident!("LookupReferences")];
+	let supertraits = [format_ident!("LookupReferences"), format_ident!("TypedResource")];
 	let trait_definition =
 		make_trait_definition(resource, &field_names, &field_types, &ident, &supertraits);
 
@@ -178,6 +178,43 @@ pub fn generate_named_resource(resources: &[Type]) -> Result<TokenStream> {
 	Ok(quote! {
 		#trait_definition
 		#trait_implementations
+	})
+}
+
+/// Generate the TypedResource trait and its implementations.
+pub fn generate_typed_resource(resources: &[Type]) -> Result<TokenStream> {
+	let names: Vec<Ident> = resources
+		.iter()
+		.filter(|ty| !ty.r#abstract)
+		.filter(|ty| ty.kind == StructureDefinitionKind::Resource)
+		.map(|ty| format_ident!("{}", ty.name))
+		.collect();
+
+	Ok(quote! {
+		/// Simple trait to supply the resource type
+		pub trait TypedResource {
+			/// The ResourceType of this resouce.
+			fn resource_type(&self) -> ResourceType;
+		}
+
+		#(
+			impl TypedResource for #names {
+				#[inline]
+				fn resource_type(&self) -> ResourceType {
+					ResourceType::#names
+				}
+			}
+		)*
+
+		impl TypedResource for Resource {
+			fn resource_type(&self) -> ResourceType {
+				match self {
+					#(
+						Self::#names(r) => r.resource_type(),
+					)*
+				}
+			}
+		}
 	})
 }
 
