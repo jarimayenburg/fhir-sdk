@@ -53,18 +53,22 @@ where
 
 		// If there are still matches left, get the next one
 		if let Some(matches) = self.matches.as_mut() {
+			tracing::debug!("Paged::matches is set, polling for next match");
 			if let Poll::Ready(res) = matches.poll_next_unpin(cx) {
 				if let Some(r) = res {
+					tracing::debug!("Next match in Paged::matches available");
 					return Poll::Ready(Some(r));
 				} else {
+					tracing::debug!("Paged::matches is empty, waiting for next page");
 					self.matches = None;
 				}
 			}
 		// If there are no more matches and there is a next page future, check if it's ready
 		} else if let Some(future_next_page) = self.future_next_page.as_mut() {
+			tracing::debug!("Paged::future_next_page is set, polling for next page");
 			if let Poll::Ready(next_page) = future_next_page.as_mut().poll(cx) {
 				self.future_next_page = None;
-				tracing::trace!("Next page fetched and ready");
+				tracing::debug!("Next page fetched and ready");
 
 				// Get the Bundle or error out.
 				let bundle = match next_page {
@@ -85,27 +89,29 @@ where
 				self.matches = Some(SearchMatches::from_searchset(self.client.clone(), bundle));
 			}
 		// Start retrieving the next page if we have a next URL and there is no next page being fetched.
-		} else if let Some(next_url) = &self.next_url {
-			tracing::trace!("Current page has next URL, starting to fetch next page");
+		} else if let Some(next_url) = self.next_url.as_ref() {
+			tracing::debug!("Current page has next URL, starting to fetch next page");
 			self.future_next_page =
 				Some(fetch_resource(self.client.clone(), next_url.clone()).boxed());
-			cx.waker().wake_by_ref();
+			self.next_url = None;
 		}
 
 		// Else check if all resources were consumed or if we are waiting for new
 		// resources to arrive.
 		if self.matches.is_some() {
-			tracing::trace!("Paged results waiting for remaining resources in current page");
+			tracing::debug!("Paged results waiting for remaining resources in current page");
+			cx.waker().wake_by_ref();
 			Poll::Pending
 		} else if self.future_next_page.is_some() {
-			tracing::trace!("Paged results waiting for response to next URL fetch");
+			tracing::debug!("Paged results waiting for response to next URL fetch");
+			cx.waker().wake_by_ref();
 			Poll::Pending
 		} else if self.next_url.is_some() {
-			tracing::trace!("Paged results waiting to fetch next URL");
+			tracing::debug!("Paged results waiting to fetch next URL");
 			cx.waker().wake_by_ref();
 			Poll::Pending
 		} else {
-			tracing::trace!("Paged results exhausted");
+			tracing::debug!("Paged results exhausted");
 			Poll::Ready(None)
 		}
 	}
@@ -137,14 +143,16 @@ fn find_next_page_url(bundle: &Bundle) -> Option<&String> {
 
 /// Query a resource from a given URL.
 async fn fetch_resource<R: DeserializeOwned>(client: Client<FhirR5>, url: Url) -> Result<R, Error> {
+	let url_str = url.to_string();
+
 	// Make sure we are not forwarded to any malicious server.
 	if url.origin() != client.0.base_url.origin() {
-		return Err(Error::DifferentOrigin(url.to_string()));
+		return Err(Error::DifferentOrigin(url_str));
 	}
 
 	// Fetch a single resource from the given URL.
-	let resource = client.read_generic(url.clone()).await?;
-	resource.ok_or_else(|| Error::ResourceNotFound(url.to_string()))
+	let resource = client.read_generic(url).await?;
+	resource.ok_or_else(|| Error::ResourceNotFound(url_str))
 }
 
 impl<R> std::fmt::Debug for Paged<R> {
@@ -277,6 +285,7 @@ where
 		// Otherwise get the next match from the list
 		while let Some(entry) = self.matches.pop_front() {
 			if let Some(resource) = entry.resource {
+				tracing::debug!("Found next Bundle entry to return");
 				let resource_type = resource.resource_type();
 
 				let mut r: R = resource.try_into().map_err(|_| {
@@ -288,7 +297,7 @@ where
 				return Poll::Ready(Some(Ok(r)));
 			} else if let Some(url) = entry.full_url {
 				if let Ok(url) = Url::parse(&url) {
-					tracing::trace!("Next entry needs to be fetched, starting to fetch it");
+					tracing::debug!("Next entry needs to be fetched, starting to fetch it");
 
 					self.future_resource = Some(fetch_resource(self.client.clone(), url).boxed());
 					cx.waker().wake_by_ref();
