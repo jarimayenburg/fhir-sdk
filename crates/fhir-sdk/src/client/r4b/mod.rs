@@ -7,9 +7,11 @@ mod transaction;
 
 use fhir_model::{
 	r4b::{
+		codes::SubscriptionPayloadContent,
 		resources::{
-			BaseResource, Bundle, CapabilityStatement, NamedResource, Parameters,
+			BaseResource, Bundle, CapabilityStatement, DomainResource, NamedResource, Parameters,
 			ParametersParameter, ParametersParameterValue, Patient, Resource, ResourceType,
+			SubscriptionStatus, TypedResource,
 		},
 		types::Reference,
 		JSON_MIME_TYPE,
@@ -204,17 +206,6 @@ impl Client<FhirR4B> {
 		}
 	}
 
-	/// Search for any FHIR resources given the query parameters.
-	pub fn search_all(
-		&self,
-		queries: SearchParameters,
-	) -> impl Stream<Item = Result<Resource, Error>> + Send + 'static {
-		let mut url = self.url(&[]);
-		url.query_pairs_mut().extend_pairs(queries.into_queries()).finish();
-
-		Paged::new_system(self.clone(), url)
-	}
-
 	/// Search for FHIR resources of a given type given the query parameters.
 	/// This simply ignores resources of the wrong type, e.g. an additional
 	/// OperationOutcome.
@@ -223,13 +214,12 @@ impl Client<FhirR4B> {
 		queries: SearchParameters,
 	) -> impl Stream<Item = Result<R, Error>> + Send + 'static
 	where
-		R: NamedResource + TryFrom<Resource> + DeserializeOwned + 'static,
-		for<'a> &'a mut Resource: From<&'a mut R>,
+		R: NamedResource + DomainResource + TryFrom<Resource> + DeserializeOwned + 'static,
 	{
 		let mut url = self.url(&[R::TYPE.as_str()]);
 		url.query_pairs_mut().extend_pairs(queries.into_queries()).finish();
 
-		Paged::new_typed(self.clone(), url)
+		Paged::new(self.clone(), url)
 	}
 
 	/// Start building a new batch request.
