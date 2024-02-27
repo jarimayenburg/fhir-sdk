@@ -3,7 +3,7 @@
 
 use fhir_model::r5::{
 	codes::{BundleType, HTTPVerb},
-	resources::{Bundle, BundleEntry, BundleEntryRequest, Resource, ResourceType},
+	resources::{Bundle, BundleEntry, BundleEntryRequest, Resource, ResourceType, TypedResource},
 };
 use reqwest::header::{self, HeaderValue};
 use uuid::Uuid;

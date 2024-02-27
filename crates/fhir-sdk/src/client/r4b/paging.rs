@@ -4,8 +4,8 @@ use std::{collections::VecDeque, pin::Pin, task::Poll};
 
 use fhir_model::{
 	r4b::{
-		codes::{BundleType, SearchEntryMode},
-		resources::{Bundle, BundleEntry, NamedResource, Resource, ResourceType},
+		codes::{BundleType, LinkRelationTypes, SearchEntryMode},
+		resources::{Bundle, BundleEntry, DomainResource, NamedResource, Resource, TypedResource},
 	},
 	ParsedReference,
 };
@@ -25,37 +25,22 @@ pub struct Paged<R> {
 	next_url: Option<Url>,
 	/// The current set of search matches.
 	matches: Option<SearchMatches<R>>,
-	/// The resource type to match on. None for system searches.
-	resource_type: Option<ResourceType>,
 	/// Current future to retrieve the next page.
 	future_next_page: Option<BoxFuture<'static, Result<Bundle, Error>>>,
 }
 
 impl<R: NamedResource> Paged<R> {
 	/// Start up a new Paged<R> stream.
-	pub(crate) fn new_typed(client: Client<FhirR4B>, url: Url) -> Self {
-		Self::new(client, url, Some(R::TYPE))
-	}
-}
-
-impl Paged<Resource> {
-	pub(crate) fn new_system(client: Client<FhirR4B>, url: Url) -> Self {
-		Self::new(client, url, None)
-	}
-}
-
-impl<R> Paged<R> {
-	fn new(client: Client<FhirR4B>, url: Url, resource_type: Option<ResourceType>) -> Self {
+	pub(crate) fn new(client: Client<FhirR4B>, url: Url) -> Self {
 		let future_next_page = Some(fetch_resource(client.clone(), url).boxed());
 
-		Self { client, next_url: None, matches: None, resource_type, future_next_page }
+		Self { client, next_url: None, matches: None, future_next_page }
 	}
 }
 
 impl<R> Stream for Paged<R>
 where
-	R: TryFrom<Resource> + DeserializeOwned + 'static,
-	for<'a> &'a mut Resource: From<&'a mut R>,
+	R: NamedResource + DomainResource + TryFrom<Resource> + DeserializeOwned + 'static,
 {
 	type Item = Result<R, Error>;
 
@@ -97,11 +82,7 @@ where
 				}
 
 				// Save the `BundleEntry`s.
-				self.matches = Some(SearchMatches::from_searchset(
-					self.client.clone(),
-					self.resource_type,
-					bundle,
-				));
+				self.matches = Some(SearchMatches::from_searchset(self.client.clone(), bundle));
 			}
 		// Start retrieving the next page if we have a next URL and there is no next page being fetched.
 		} else if let Some(next_url) = &self.next_url {
@@ -146,7 +127,12 @@ where
 
 /// Find the URL of the next page of the results returned in the Bundle.
 fn find_next_page_url(bundle: &Bundle) -> Option<&String> {
-	bundle.link.iter().flatten().find(|link| link.relation == "next").map(|link| &link.url)
+	bundle
+		.link
+		.iter()
+		.flatten()
+		.find(|link| link.relation == LinkRelationTypes::Next)
+		.map(|link| &link.url)
 }
 
 /// Query a resource from a given URL.
@@ -182,20 +168,14 @@ struct SearchMatches<R> {
 	client: Client<FhirR4B>,
 	bundle: Bundle,
 	matches: VecDeque<BundleEntry>,
-	resource_type: Option<ResourceType>,
 	future_resource: Option<BoxFuture<'static, Result<R, Error>>>,
 }
 
 impl<R> SearchMatches<R>
 where
-	R: TryFrom<Resource>,
-	for<'a> &'a mut Resource: From<&'a mut R>,
+	R: NamedResource + DomainResource + TryFrom<Resource>,
 {
-	pub fn from_searchset(
-		client: Client<FhirR4B>,
-		resource_type: Option<ResourceType>,
-		bundle: Bundle,
-	) -> SearchMatches<R> {
+	pub fn from_searchset(client: Client<FhirR4B>, bundle: Bundle) -> SearchMatches<R> {
 		assert!(
 			bundle.r#type == BundleType::Searchset,
 			"unable to get search matches from non-searchset Bundles"
@@ -216,40 +196,36 @@ where
 			.cloned()
 			.collect();
 
-		Self { client, bundle, matches, resource_type, future_resource: None }
+		Self { client, bundle, matches, future_resource: None }
 	}
 
-	fn populate_reference_targets(&self, r: &mut R) {
-		let resource: &mut Resource = r.into();
-
+	fn populate_reference_targets(&self, resource: &mut R) {
 		let resource_type_and_id = format!(
 			"{}/{}",
 			resource.resource_type(),
-			resource.as_base_resource().id().clone().unwrap_or("<unknown>".to_string())
+			resource.id().clone().unwrap_or("<unknown>".to_string())
 		);
 
-		let contained = resource.as_domain_resource().map(|dr| dr.contained().clone());
+		let contained = resource.contained().clone();
 
-		for field in resource.as_base_resource_mut().lookup_references() {
+		for field in resource.lookup_references() {
 			if let Some(reference) = field.reference().clone().parse() {
 				match reference {
 					// (Only if the resource is a domain resource) Look up local references in the resource's own contained field.
 					ParsedReference::Local { id } => {
-						if let Some(ref contained) = contained {
-							if let Some(target) = contained
-								.iter()
-								.find(|c| c.as_base_resource().id() == &Some(id.to_string()))
-							{
-								if field.set_target(target.clone()).is_err() {
-									tracing::warn!("Reference field in {} refers to contained resource {} of unsupported type {}", resource_type_and_id, id, target.resource_type().to_string());
-								}
-							} else {
-								tracing::warn!(
-                                    "Resource {} in Bundle refers to missing contained resource #{}",
-                                    resource_type_and_id,
-                                    id
-                                );
+						if let Some(target) = contained
+							.iter()
+							.find(|c| c.as_base_resource().id() == &Some(id.to_string()))
+						{
+							if field.set_target(target.clone()).is_err() {
+								tracing::warn!("Reference field in {} refers to contained resource {} of unsupported type {}", resource_type_and_id, id, target.resource_type().to_string());
 							}
+						} else {
+							tracing::warn!(
+								"Resource {} in Bundle refers to missing contained resource #{}",
+								resource_type_and_id,
+								id
+							);
 						}
 					}
 					other => {
@@ -275,8 +251,7 @@ where
 
 impl<R> Stream for SearchMatches<R>
 where
-	R: TryFrom<Resource> + DeserializeOwned + 'static,
-	for<'a> &'a mut Resource: From<&'a mut R>,
+	R: NamedResource + DomainResource + TryFrom<Resource> + DeserializeOwned + 'static,
 {
 	type Item = Result<R, Error>;
 
@@ -308,12 +283,7 @@ where
 				let resource_type = resource.resource_type();
 
 				let mut r: R = resource.try_into().map_err(|_| {
-					Error::WrongResourceType(
-						resource_type.to_string(),
-						// Unwrapping here should be fine since resource_type will always be set when R: NamedResource
-						// And if R is Resource, TryInto has error type Infallible and won't be called
-						self.resource_type.unwrap().to_string(),
-					)
+					Error::WrongResourceType(resource_type.to_string(), R::TYPE.to_string())
 				})?;
 
 				self.populate_reference_targets(&mut r);
