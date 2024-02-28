@@ -1,15 +1,39 @@
-use fhir_model::r5::resources::{Bundle, DomainResource, TypedResource};
+use fhir_model::r5::resources::{Bundle, DomainResource, Resource, TypedResource};
 use fhir_model::ParsedReference;
 
 use super::{Client, FhirR5};
 
 impl Client<FhirR5> {
-	/// Looks up all references in a resource and populates reference target fields with
+	/// Looks up all references in `resource` and populates reference target fields with
 	/// any matching resources it can find in the contained resource or in the Bundle.
-	pub(super) fn populate_reference_targets<R: DomainResource>(
+	pub(super) fn populate_reference_targets_bundle(&self, bundle: &mut Bundle) {
+		let lookup = bundle.clone();
+
+		for entry in bundle.entry.iter_mut().flatten() {
+			if let Some(resource) = entry.resource.as_mut() {
+				if let Some(domain_resource) = resource.as_domain_resource_mut() {
+					self.populate_reference_targets_internal(domain_resource, Some(&lookup));
+				}
+			}
+		}
+	}
+
+	pub(super) fn populate_reference_targets<R: DomainResource>(&self, resource: &mut R) {
+		self.populate_reference_targets_internal(resource, None);
+	}
+
+	pub(super) fn populate_reference_targets_resource(&self, resource: &mut Resource) {
+		if let Resource::Bundle(bundle) = resource {
+			self.populate_reference_targets_bundle(bundle)
+		} else if let Some(domain_resource) = resource.as_domain_resource_mut() {
+			self.populate_reference_targets_internal(domain_resource, None)
+		}
+	}
+
+	pub(super) fn populate_reference_targets_internal(
 		&self,
-		bundle: &Bundle,
-		resource: &mut R,
+		resource: &mut dyn DomainResource,
+		bundle: Option<&Bundle>,
 	) {
 		let contained = resource.contained().clone();
 
@@ -19,7 +43,10 @@ impl Client<FhirR5> {
 					ParsedReference::Local { id } => contained
 						.iter()
 						.find(|c| c.as_base_resource().id() == &Some(id.to_string())),
-					other => bundle.resolve_reference(self.0.base_url.as_str(), &other),
+					other if bundle.is_some() => {
+						bundle.unwrap().resolve_reference(self.0.base_url.as_str(), &other)
+					}
+					_ => None,
 				};
 
 				if let Some(target) = target {
@@ -68,9 +95,7 @@ mod tests {
 		observation.contained = vec![patient.clone().into()];
 		observation.subject = Some(subject.into());
 
-		let bundle = test_bundle(vec![]);
-
-		client.populate_reference_targets(&bundle, &mut observation);
+		client.populate_reference_targets(&mut observation);
 
 		assert_eq!(observation.contained, vec![Resource::Patient(patient)]);
 	}
@@ -96,7 +121,7 @@ mod tests {
 			(&observation_full_url, observation.clone().into()),
 		]);
 
-		client.populate_reference_targets(&bundle, &mut observation);
+		client.populate_reference_targets_internal(&mut observation, Some(&bundle));
 
 		assert_eq!(
 			observation.subject.as_ref().and_then(|s| s.target.as_ref()),
@@ -123,7 +148,7 @@ mod tests {
 			(&observation_full_url.to_string(), observation.clone().into()),
 		]);
 
-		client.populate_reference_targets(&bundle, &mut observation);
+		client.populate_reference_targets_internal(&mut observation, Some(&bundle));
 
 		assert_eq!(
 			observation.subject.as_ref().and_then(|s| s.target.as_ref()),
@@ -150,7 +175,7 @@ mod tests {
 			(&observation_full_url.to_string(), observation.clone().into()),
 		]);
 
-		client.populate_reference_targets(&bundle, &mut observation);
+		client.populate_reference_targets_internal(&mut observation, Some(&bundle));
 
 		assert_eq!(
 			observation.subject.as_ref().and_then(|s| s.target.as_ref()),
