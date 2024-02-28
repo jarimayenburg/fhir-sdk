@@ -10,7 +10,6 @@ use futures::{future::BoxFuture, ready, FutureExt, Stream, StreamExt};
 use reqwest::Url;
 use serde::de::DeserializeOwned;
 
-use super::references::populate_reference_targets;
 use super::{Client, Error, FhirR5};
 
 /// Results of a query that can be paged or given via URL only. The resources
@@ -216,8 +215,6 @@ where
 		let span = tracing::trace_span!("SearchMatches::poll_next");
 		let _span_guard = span.enter();
 
-		let base_url = self.client.0.base_url.to_string();
-
 		// Check on resource fetch future first to output as the next resource.
 		if let Some(future_resource) = self.future_resource.as_mut() {
 			return match ready!(future_resource.as_mut().poll(cx)) {
@@ -225,7 +222,7 @@ where
 					tracing::trace!("Next `fullUrl` fetched resource ready");
 
 					self.future_resource = None;
-					populate_reference_targets(&base_url, &self.bundle, &mut resource);
+					self.client.populate_reference_targets(&self.bundle, &mut resource);
 
 					Poll::Ready(Some(Ok(resource)))
 				}
@@ -243,7 +240,7 @@ where
 					Error::WrongResourceType(resource_type.to_string(), R::TYPE.to_string())
 				})?;
 
-				populate_reference_targets(&base_url, &self.bundle, &mut r);
+				self.client.populate_reference_targets(&self.bundle, &mut r);
 
 				return Poll::Ready(Some(Ok(r)));
 			} else if let Some(url) = entry.full_url {
