@@ -343,11 +343,11 @@ async fn paging_inner() -> Result<()> {
 }
 
 #[test]
-fn search_populates_target_fields() -> Result<()> {
-	common::RUNTIME.block_on(search_populates_target_fields_inner())
+fn paging_with_includes() -> Result<()> {
+	common::RUNTIME.block_on(paging_with_includes_inner())
 }
 
-async fn search_populates_target_fields_inner() -> Result<()> {
+async fn paging_with_includes_inner() -> Result<()> {
 	let client = client().await?;
 
 	println!("Preparing..");
