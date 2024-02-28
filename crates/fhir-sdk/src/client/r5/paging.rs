@@ -238,7 +238,7 @@ where
 							self.bundle.resolve_reference(self.client.0.base_url.as_str(), &other)
 						{
 							if field.set_target(target.clone()).is_err() {
-								tracing::warn!("Reference field in {} refers to resource {} of unsupported type {}", resource_type_and_id, other.to_string(), other.resource_type().unwrap().to_string());
+								tracing::warn!("Reference field in {} refers to resource {} of unsupported type {}: {}", resource_type_and_id, other.to_string(), other.resource_type().unwrap().to_string(), other.to_string());
 							}
 						} else {
 							tracing::debug!(
