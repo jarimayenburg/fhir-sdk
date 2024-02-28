@@ -1,12 +1,10 @@
 use fhir_model::r5::resources::{Bundle, DomainResource, TypedResource};
 use fhir_model::ParsedReference;
 
-use super::{Client, FhirR5};
-
 /// Looks up all references in a resource and populates reference target fields with any matching
 /// resources it can find in the Bundle.
 pub fn populate_reference_targets<R: DomainResource>(
-	client: &Client<FhirR5>,
+	base_url: &str,
 	bundle: &Bundle,
 	resource: &mut R,
 ) {
@@ -24,7 +22,7 @@ pub fn populate_reference_targets<R: DomainResource>(
 				ParsedReference::Local { id } => {
 					contained.iter().find(|c| c.as_base_resource().id() == &Some(id.to_string()))
 				}
-				other => bundle.resolve_reference(client.0.base_url.as_str(), &other),
+				other => bundle.resolve_reference(base_url, &other),
 			};
 
 			if let Some(target) = target {
