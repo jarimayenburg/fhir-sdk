@@ -2,12 +2,9 @@
 
 use std::{collections::VecDeque, pin::Pin, task::Poll};
 
-use fhir_model::{
-	stu3::{
-		codes::{BundleType, LinkRelationTypes, SearchEntryMode},
-		resources::{Bundle, BundleEntry, DomainResource, NamedResource, Resource, TypedResource},
-	},
-	ParsedReference,
+use fhir_model::stu3::{
+	codes::{BundleType, SearchEntryMode},
+	resources::{Bundle, BundleEntry, DomainResource, NamedResource, Resource, TypedResource},
 };
 use futures::{future::BoxFuture, ready, FutureExt, Stream, StreamExt};
 use reqwest::Url;
@@ -53,18 +50,22 @@ where
 
 		// If there are still matches left, get the next one
 		if let Some(matches) = self.matches.as_mut() {
+			tracing::debug!("Paged::matches is set, polling for next match");
 			if let Poll::Ready(res) = matches.poll_next_unpin(cx) {
 				if let Some(r) = res {
+					tracing::debug!("Next match in Paged::matches available");
 					return Poll::Ready(Some(r));
 				} else {
+					tracing::debug!("Paged::matches is empty, waiting for next page");
 					self.matches = None;
 				}
 			}
 		// If there are no more matches and there is a next page future, check if it's ready
 		} else if let Some(future_next_page) = self.future_next_page.as_mut() {
+			tracing::debug!("Paged::future_next_page is set, polling for next page");
 			if let Poll::Ready(next_page) = future_next_page.as_mut().poll(cx) {
 				self.future_next_page = None;
-				tracing::trace!("Next page fetched and ready");
+				tracing::debug!("Next page fetched and ready");
 
 				// Get the Bundle or error out.
 				let bundle = match next_page {
@@ -85,27 +86,29 @@ where
 				self.matches = Some(SearchMatches::from_searchset(self.client.clone(), bundle));
 			}
 		// Start retrieving the next page if we have a next URL and there is no next page being fetched.
-		} else if let Some(next_url) = &self.next_url {
-			tracing::trace!("Current page has next URL, starting to fetch next page");
+		} else if let Some(next_url) = self.next_url.as_ref() {
+			tracing::debug!("Current page has next URL, starting to fetch next page");
 			self.future_next_page =
 				Some(fetch_resource(self.client.clone(), next_url.clone()).boxed());
-			cx.waker().wake_by_ref();
+			self.next_url = None;
 		}
 
 		// Else check if all resources were consumed or if we are waiting for new
 		// resources to arrive.
 		if self.matches.is_some() {
-			tracing::trace!("Paged results waiting for remaining resources in current page");
+			tracing::debug!("Paged results waiting for remaining resources in current page");
+			cx.waker().wake_by_ref();
 			Poll::Pending
 		} else if self.future_next_page.is_some() {
-			tracing::trace!("Paged results waiting for response to next URL fetch");
+			tracing::debug!("Paged results waiting for response to next URL fetch");
+			cx.waker().wake_by_ref();
 			Poll::Pending
 		} else if self.next_url.is_some() {
-			tracing::trace!("Paged results waiting to fetch next URL");
+			tracing::debug!("Paged results waiting to fetch next URL");
 			cx.waker().wake_by_ref();
 			Poll::Pending
 		} else {
-			tracing::trace!("Paged results exhausted");
+			tracing::debug!("Paged results exhausted");
 			Poll::Ready(None)
 		}
 	}
@@ -127,12 +130,7 @@ where
 
 /// Find the URL of the next page of the results returned in the Bundle.
 fn find_next_page_url(bundle: &Bundle) -> Option<&String> {
-	bundle
-		.link
-		.iter()
-		.flatten()
-		.find(|link| link.relation == LinkRelationTypes::Next)
-		.map(|link| &link.url)
+	bundle.link.iter().flatten().find(|link| link.relation == "next").map(|link| &link.url)
 }
 
 /// Query a resource from a given URL.
@@ -140,14 +138,16 @@ async fn fetch_resource<R: DeserializeOwned>(
 	client: Client<FhirStu3>,
 	url: Url,
 ) -> Result<R, Error> {
+	let url_str = url.to_string();
+
 	// Make sure we are not forwarded to any malicious server.
 	if url.origin() != client.0.base_url.origin() {
-		return Err(Error::DifferentOrigin(url.to_string()));
+		return Err(Error::DifferentOrigin(url_str));
 	}
 
 	// Fetch a single resource from the given URL.
-	let resource = client.read_generic(url.clone()).await?;
-	resource.ok_or_else(|| Error::ResourceNotFound(url.to_string()))
+	let resource = client.read_generic(url).await?;
+	resource.ok_or_else(|| Error::ResourceNotFound(url_str))
 }
 
 impl<R> std::fmt::Debug for Paged<R> {
@@ -198,55 +198,6 @@ where
 
 		Self { client, bundle, matches, future_resource: None }
 	}
-
-	fn populate_reference_targets(&self, resource: &mut R) {
-		let resource_type_and_id = format!(
-			"{}/{}",
-			resource.resource_type(),
-			resource.id().clone().unwrap_or("<unknown>".to_string())
-		);
-
-		let contained = resource.contained().clone();
-
-		for field in resource.lookup_references() {
-			if let Some(reference) = field.reference().clone().parse() {
-				match reference {
-					// (Only if the resource is a domain resource) Look up local references in the resource's own contained field.
-					ParsedReference::Local { id } => {
-						if let Some(target) = contained
-							.iter()
-							.find(|c| c.as_base_resource().id() == &Some(id.to_string()))
-						{
-							if field.set_target(target.clone()).is_err() {
-								tracing::warn!("Reference field in {} refers to contained resource {} of unsupported type {}", resource_type_and_id, id, target.resource_type().to_string());
-							}
-						} else {
-							tracing::warn!(
-								"Resource {} in Bundle refers to missing contained resource #{}",
-								resource_type_and_id,
-								id
-							);
-						}
-					}
-					other => {
-						if let Some(target) =
-							self.bundle.resolve_reference(self.client.0.base_url.as_str(), &other)
-						{
-							if field.set_target(target.clone()).is_err() {
-								tracing::warn!("Reference field in {} refers to resource {} of unsupported type {}", resource_type_and_id, other.to_string(), other.resource_type().unwrap().to_string());
-							}
-						} else {
-							tracing::debug!(
-								"Resource {} in Bundle refers to resource {}, which is not in the Bundle",
-                                resource_type_and_id,
-                                other.to_string()
-							);
-						}
-					}
-				}
-			}
-		}
-	}
 }
 
 impl<R> Stream for SearchMatches<R>
@@ -269,7 +220,7 @@ where
 					tracing::trace!("Next `fullUrl` fetched resource ready");
 
 					self.future_resource = None;
-					self.populate_reference_targets(&mut resource);
+					self.client.populate_reference_targets(&self.bundle, &mut resource);
 
 					Poll::Ready(Some(Ok(resource)))
 				}
@@ -280,18 +231,19 @@ where
 		// Otherwise get the next match from the list
 		while let Some(entry) = self.matches.pop_front() {
 			if let Some(resource) = entry.resource {
+				tracing::debug!("Found next Bundle entry to return");
 				let resource_type = resource.resource_type();
 
 				let mut r: R = resource.try_into().map_err(|_| {
 					Error::WrongResourceType(resource_type.to_string(), R::TYPE.to_string())
 				})?;
 
-				self.populate_reference_targets(&mut r);
+				self.client.populate_reference_targets(&self.bundle, &mut r);
 
 				return Poll::Ready(Some(Ok(r)));
 			} else if let Some(url) = entry.full_url {
 				if let Ok(url) = Url::parse(&url) {
-					tracing::trace!("Next entry needs to be fetched, starting to fetch it");
+					tracing::debug!("Next entry needs to be fetched, starting to fetch it");
 
 					self.future_resource = Some(fetch_resource(self.client.clone(), url).boxed());
 					cx.waker().wake_by_ref();
