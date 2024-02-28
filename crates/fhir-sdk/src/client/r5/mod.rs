@@ -2,6 +2,7 @@
 
 mod paging;
 mod patch;
+mod references;
 mod search;
 mod transaction;
 

@@ -2,17 +2,15 @@
 
 use std::{collections::VecDeque, pin::Pin, task::Poll};
 
-use fhir_model::{
-	r5::{
-		codes::{BundleType, LinkRelationTypes, SearchEntryMode},
-		resources::{Bundle, BundleEntry, DomainResource, NamedResource, Resource, TypedResource},
-	},
-	ParsedReference,
+use fhir_model::r5::{
+	codes::{BundleType, LinkRelationTypes, SearchEntryMode},
+	resources::{Bundle, BundleEntry, DomainResource, NamedResource, Resource, TypedResource},
 };
 use futures::{future::BoxFuture, ready, FutureExt, Stream, StreamExt};
 use reqwest::Url;
 use serde::de::DeserializeOwned;
 
+use super::references::populate_reference_targets;
 use super::{Client, Error, FhirR5};
 
 /// Results of a query that can be paged or given via URL only. The resources
@@ -203,39 +201,6 @@ where
 
 		Self { client, bundle, matches, future_resource: None }
 	}
-
-	fn populate_reference_targets(&self, resource: &mut R) {
-		let resource_type_and_id = format!(
-			"{}/{}",
-			resource.resource_type(),
-			resource.id().clone().unwrap_or("<unknown>".to_string())
-		);
-
-		let contained = resource.contained().clone();
-
-		for field in resource.lookup_references() {
-			if let Some(reference) = field.reference().clone().parse() {
-				let target = match reference {
-					ParsedReference::Local { id } => contained
-						.iter()
-						.find(|c| c.as_base_resource().id() == &Some(id.to_string())),
-					other => self.bundle.resolve_reference(self.client.0.base_url.as_str(), &other),
-				};
-
-				if let Some(target) = target {
-					if field.set_target(target.clone()).is_err() {
-						tracing::warn!("Reference {} in Bundled resource {} refers to resource of unsupported type {}", reference.to_string(), resource_type_and_id, target.resource_type());
-					}
-				} else {
-					tracing::debug!(
-						"Unable to resolve reference {} in Bundled resource {}",
-						reference.to_string(),
-						resource_type_and_id,
-					);
-				}
-			}
-		}
-	}
 }
 
 impl<R> Stream for SearchMatches<R>
@@ -258,7 +223,7 @@ where
 					tracing::trace!("Next `fullUrl` fetched resource ready");
 
 					self.future_resource = None;
-					self.populate_reference_targets(&mut resource);
+					populate_reference_targets(&self.client, &self.bundle, &mut resource);
 
 					Poll::Ready(Some(Ok(resource)))
 				}
@@ -276,7 +241,7 @@ where
 					Error::WrongResourceType(resource_type.to_string(), R::TYPE.to_string())
 				})?;
 
-				self.populate_reference_targets(&mut r);
+				populate_reference_targets(&self.client, &self.bundle, &mut r);
 
 				return Poll::Ready(Some(Ok(r)));
 			} else if let Some(url) = entry.full_url {
