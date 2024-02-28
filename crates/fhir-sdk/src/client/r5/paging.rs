@@ -215,39 +215,23 @@ where
 
 		for field in resource.lookup_references() {
 			if let Some(reference) = field.reference().clone().parse() {
-				match reference {
-					// (Only if the resource is a domain resource) Look up local references in the resource's own contained field.
-					ParsedReference::Local { id } => {
-						if let Some(target) = contained
-							.iter()
-							.find(|c| c.as_base_resource().id() == &Some(id.to_string()))
-						{
-							if field.set_target(target.clone()).is_err() {
-								tracing::warn!("Reference field in {} refers to contained resource {} of unsupported type {}", resource_type_and_id, id, target.resource_type().to_string());
-							}
-						} else {
-							tracing::warn!(
-								"Resource {} in Bundle refers to missing contained resource #{}",
-								resource_type_and_id,
-								id
-							);
-						}
+				let target = match reference {
+					ParsedReference::Local { id } => contained
+						.iter()
+						.find(|c| c.as_base_resource().id() == &Some(id.to_string())),
+					other => self.bundle.resolve_reference(self.client.0.base_url.as_str(), &other),
+				};
+
+				if let Some(target) = target {
+					if field.set_target(target.clone()).is_err() {
+						tracing::warn!("Reference {} in Bundled resource {} refers to resource of unsupported type {}", reference.to_string(), resource_type_and_id, target.resource_type());
 					}
-					other => {
-						if let Some(target) =
-							self.bundle.resolve_reference(self.client.0.base_url.as_str(), &other)
-						{
-							if field.set_target(target.clone()).is_err() {
-								tracing::warn!("Reference field in {} refers to resource {} of unsupported type {}: {}", resource_type_and_id, other.to_string(), other.resource_type().unwrap().to_string(), other.to_string());
-							}
-						} else {
-							tracing::debug!(
-								"Resource {} in Bundle refers to resource {}, which is not in the Bundle",
-                                resource_type_and_id,
-                                other.to_string()
-							);
-						}
-					}
+				} else {
+					tracing::debug!(
+						"Unable to resolve reference {} in Bundled resource {}",
+						reference.to_string(),
+						resource_type_and_id,
+					);
 				}
 			}
 		}
