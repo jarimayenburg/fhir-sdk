@@ -177,7 +177,11 @@ impl<'a> ParsedReference<'a> {
 	/// references and turns relative references into absolute ones.
 	///
 	/// Panics for local references
-	pub fn with_base_url(&self, base_url: &'a str) -> Self {
+	pub fn with_base_url(&self, mut base_url: &'a str) -> Self {
+		if base_url.ends_with('/') {
+			base_url = base_url.strip_suffix('/').unwrap();
+		}
+
 		match *self {
 			Self::Relative { resource_type, id, version_id } => Self::Absolute {
 				base_url,
