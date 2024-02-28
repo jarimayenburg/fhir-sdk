@@ -2,16 +2,15 @@
 
 mod paging;
 mod patch;
+mod references;
 mod search;
 mod transaction;
 
 use fhir_model::{
 	stu3::{
-		codes::SubscriptionPayloadContent,
 		resources::{
 			BaseResource, Bundle, CapabilityStatement, DomainResource, NamedResource, Parameters,
 			ParametersParameter, ParametersParameterValue, Patient, Resource, ResourceType,
-			SubscriptionStatus, TypedResource,
 		},
 		types::Reference,
 		JSON_MIME_TYPE,
@@ -105,14 +104,6 @@ impl Client<FhirStu3> {
 			.read_generic(url.clone())
 			.await?
 			.ok_or_else(|| Error::ResourceNotFound(url.to_string()))?;
-		if let Some(resource_type) = reference.r#type.as_ref() {
-			if resource.resource_type().as_str() != resource_type {
-				return Err(Error::WrongResourceType(
-					resource.resource_type().to_string(),
-					resource_type.clone(),
-				));
-			}
-		}
 
 		Ok(resource)
 	}

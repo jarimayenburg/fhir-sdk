@@ -2,16 +2,16 @@
 
 mod paging;
 mod patch;
+mod references;
 mod search;
 mod transaction;
 
 use fhir_model::{
 	r4b::{
-		codes::SubscriptionPayloadContent,
 		resources::{
 			BaseResource, Bundle, CapabilityStatement, DomainResource, NamedResource, Parameters,
 			ParametersParameter, ParametersParameterValue, Patient, Resource, ResourceType,
-			SubscriptionStatus, TypedResource,
+			TypedResource,
 		},
 		types::Reference,
 		JSON_MIME_TYPE,
