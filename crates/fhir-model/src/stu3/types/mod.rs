@@ -40,3 +40,9 @@ impl Reference {
 		Some(ParsedReference::new::<ResourceType>(url))
 	}
 }
+
+impl From<ParsedReference<'_>> for Reference {
+	fn from(parsed: ParsedReference<'_>) -> Self {
+		Self::builder().reference(parsed.to_string()).build().unwrap()
+	}
+}
