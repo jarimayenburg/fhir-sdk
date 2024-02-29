@@ -151,7 +151,8 @@ impl BatchTransaction {
 
 		let response = self.client.run_request(request).await?;
 		if response.status().is_success() {
-			let bundle: Bundle = response.json().await?;
+			let mut bundle: Bundle = response.json().await?;
+			self.client.populate_reference_targets_bundle(&mut bundle);
 			Ok(bundle)
 		} else {
 			Err(Error::from_response_r5(response).await)

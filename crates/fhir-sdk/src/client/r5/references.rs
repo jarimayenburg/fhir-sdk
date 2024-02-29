@@ -4,40 +4,34 @@ use fhir_model::ParsedReference;
 use super::{Client, FhirR5};
 
 impl Client<FhirR5> {
-	/// Looks up all references in `resource` and populates reference target fields with
-	/// any matching resources it can find in the contained resource or in the Bundle.
 	pub(super) fn populate_reference_targets_bundle(&self, bundle: &mut Bundle) {
 		let lookup = bundle.clone();
 
 		for entry in bundle.entry.iter_mut().flatten() {
 			if let Some(resource) = entry.resource.as_mut() {
 				if let Some(domain_resource) = resource.as_domain_resource_mut() {
-					self.populate_reference_targets_internal(domain_resource, Some(&lookup), None);
+					self.populate_reference_targets(domain_resource, Some(&lookup), None);
 				}
 			}
 		}
-	}
-
-	pub(super) fn populate_reference_targets<R: DomainResource>(&self, resource: &mut R) {
-		self.populate_reference_targets_internal(resource, None, None);
 	}
 
 	pub(super) fn populate_reference_targets_resource(&self, resource: &mut Resource) {
 		if let Resource::Bundle(bundle) = resource {
 			self.populate_reference_targets_bundle(bundle)
 		} else if let Some(domain_resource) = resource.as_domain_resource_mut() {
-			self.populate_reference_targets_internal(domain_resource, None, None)
+			self.populate_reference_targets(domain_resource, None, None)
 		}
 	}
 
-	pub(super) fn populate_reference_targets_internal(
+	pub(super) fn populate_reference_targets(
 		&self,
 		resource: &mut dyn DomainResource,
 		bundle: Option<&Bundle>,
 		sibling_contained: Option<&Vec<Resource>>,
 	) {
 		// If this resource is a contained resource, sibling_contained will be set so we use
-		// that foor lookup. Otherwise, this resource is not contained and we use its contained
+		// that for lookup. Otherwise, this resource is not contained and we use its contained
 		// resources for lookup
 		let contained_lookup = sibling_contained.unwrap_or_else(|| resource.contained()).clone();
 
@@ -77,7 +71,7 @@ impl Client<FhirR5> {
 			if let Some(contained_domain_resource) = c.as_domain_resource_mut() {
 				// We pass on the same sibling_contained lookup value since contained resources
 				// are able to refer to siblings but they're not allowed to be nested
-				self.populate_reference_targets_internal(
+				self.populate_reference_targets(
 					contained_domain_resource,
 					bundle,
 					Some(&contained_lookup),
@@ -125,7 +119,7 @@ mod tests {
 		observation.contained = vec![patient.clone().into(), practitioner.clone().into()];
 		observation.subject = Some(patient_ref.into());
 
-		client.populate_reference_targets(&mut observation);
+		client.populate_reference_targets(&mut observation, None, None);
 
 		// Check if the subject field points to the patient
 		assert_eq!(
@@ -171,7 +165,7 @@ mod tests {
 			(&observation_full_url, observation.clone().into()),
 		]);
 
-		client.populate_reference_targets_internal(&mut observation, Some(&bundle), None);
+		client.populate_reference_targets(&mut observation, Some(&bundle), None);
 
 		assert_eq!(
 			observation.subject.as_ref().and_then(|s| s.target.as_ref()),
@@ -198,7 +192,7 @@ mod tests {
 			(&observation_full_url.to_string(), observation.clone().into()),
 		]);
 
-		client.populate_reference_targets_internal(&mut observation, Some(&bundle), None);
+		client.populate_reference_targets(&mut observation, Some(&bundle), None);
 
 		assert_eq!(
 			observation.subject.as_ref().and_then(|s| s.target.as_ref()),
@@ -225,7 +219,7 @@ mod tests {
 			(&observation_full_url.to_string(), observation.clone().into()),
 		]);
 
-		client.populate_reference_targets_internal(&mut observation, Some(&bundle), None);
+		client.populate_reference_targets(&mut observation, Some(&bundle), None);
 
 		assert_eq!(
 			observation.subject.as_ref().and_then(|s| s.target.as_ref()),
