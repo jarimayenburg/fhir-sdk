@@ -40,6 +40,10 @@ use super::{misc, Client, Error, FhirR5, SearchParameters};
 /// FHIR MIME-type this client uses.
 const MIME_TYPE: &str = JSON_MIME_TYPE;
 
+/// Alias for the traits required to deserialize a resource and convert it into the Resource enum
+pub trait DeserializableResource: Into<Resource> + TryFrom<Resource> + DeserializeOwned {}
+impl<R: Into<Resource> + TryFrom<Resource> + DeserializeOwned> DeserializableResource for R {}
+
 impl Client<FhirR5> {
 	/// Get the server's capabilities. Fails if the respective FHIR version is
 	/// not supported at all.
@@ -57,13 +61,16 @@ impl Client<FhirR5> {
 	}
 
 	/// Read any resource from any URL.
-	async fn read_generic<R: DeserializeOwned>(&self, url: Url) -> Result<Option<R>, Error> {
+	async fn read_generic<R: DeserializableResource>(&self, url: Url) -> Result<Option<R>, Error> {
 		let request = self.0.client.get(url).header(header::ACCEPT, MIME_TYPE);
 
 		let response = self.run_request(request).await?;
 		if response.status().is_success() {
-			let resource: R = response.json().await?;
-			Ok(Some(resource))
+			let mut resource: Resource = response.json::<R>().await?.into();
+
+			self.populate_reference_targets_resource(&mut resource);
+
+			Ok(Some(resource.try_into().unwrap_or_else(|_| panic!("should never happen"))))
 		} else if [StatusCode::NOT_FOUND, StatusCode::GONE].contains(&response.status()) {
 			Ok(None)
 		} else {
@@ -72,7 +79,7 @@ impl Client<FhirR5> {
 	}
 
 	/// Read the current version of a specific FHIR resource.
-	pub async fn read<R: NamedResource + DeserializeOwned>(
+	pub async fn read<R: NamedResource + DeserializableResource>(
 		&self,
 		id: &str,
 	) -> Result<Option<R>, Error> {
@@ -81,7 +88,7 @@ impl Client<FhirR5> {
 	}
 
 	/// Read a specific version of a specific FHIR resource.
-	pub async fn read_version<R: NamedResource + DeserializeOwned>(
+	pub async fn read_version<R: NamedResource + DeserializableResource>(
 		&self,
 		id: &str,
 		version_id: &str,
@@ -215,7 +222,7 @@ impl Client<FhirR5> {
 		queries: SearchParameters,
 	) -> impl Stream<Item = Result<R, Error>> + Send + 'static
 	where
-		R: NamedResource + DomainResource + TryFrom<Resource> + DeserializeOwned + 'static,
+		R: NamedResource + DomainResource + DeserializableResource + 'static,
 	{
 		let mut url = self.url(&[R::TYPE.as_str()]);
 		url.query_pairs_mut().extend_pairs(queries.into_queries()).finish();
@@ -241,7 +248,10 @@ impl Client<FhirR5> {
 
 		let response = self.run_request(request).await?;
 		if response.status().is_success() {
-			let resource: Bundle = response.json().await?;
+			let mut resource: Bundle = response.json().await?;
+
+			self.populate_reference_targets_bundle(&mut resource);
+
 			Ok(resource)
 		} else {
 			Err(Error::from_response_r5(response).await)
@@ -256,7 +266,10 @@ impl Client<FhirR5> {
 
 		let response = self.run_request(request).await?;
 		if response.status().is_success() {
-			let resource: Bundle = response.json().await?;
+			let mut resource: Bundle = response.json().await?;
+
+			self.populate_reference_targets_bundle(&mut resource);
+
 			Ok(resource)
 		} else {
 			Err(Error::from_response_r5(response).await)
@@ -310,7 +323,10 @@ impl Client<FhirR5> {
 
 		let response = self.run_request(request).await?;
 		if response.status().is_success() {
-			let resource: Bundle = response.json().await?;
+			let mut resource: Bundle = response.json().await?;
+
+			self.populate_reference_targets_bundle(&mut resource);
+
 			Ok(resource)
 		} else {
 			Err(Error::from_response_r5(response).await)
@@ -328,7 +344,10 @@ impl Client<FhirR5> {
 
 		let response = self.run_request(request).await?;
 		if response.status().is_success() {
-			let bundle: Bundle = response.json().await?;
+			let mut bundle: Bundle = response.json().await?;
+
+			self.populate_reference_targets_bundle(&mut bundle);
+
 			let resource = bundle
 				.0
 				.entry
@@ -368,7 +387,10 @@ impl Client<FhirR5> {
 
 		let response = self.run_request(request).await?;
 		if response.status().is_success() {
-			let bundle: Bundle = response.json().await?;
+			let mut bundle: Bundle = response.json().await?;
+
+			self.populate_reference_targets_bundle(&mut bundle);
+
 			Ok(bundle)
 		} else {
 			Err(Error::from_response_r5(response).await)

@@ -8,9 +8,8 @@ use fhir_model::r5::{
 };
 use futures::{future::BoxFuture, ready, FutureExt, Stream, StreamExt};
 use reqwest::Url;
-use serde::de::DeserializeOwned;
 
-use super::{Client, Error, FhirR5};
+use super::{Client, DeserializableResource, Error, FhirR5};
 
 /// Results of a query that can be paged or given via URL only. The resources
 /// can be consumed via the `Stream`/`StreamExt` traits.
@@ -37,7 +36,7 @@ impl<R: NamedResource> Paged<R> {
 
 impl<R> Stream for Paged<R>
 where
-	R: NamedResource + DomainResource + TryFrom<Resource> + DeserializeOwned + 'static,
+	R: NamedResource + DomainResource + DeserializableResource + 'static,
 {
 	type Item = Result<R, Error>;
 
@@ -139,7 +138,10 @@ fn find_next_page_url(bundle: &Bundle) -> Option<&String> {
 }
 
 /// Query a resource from a given URL.
-async fn fetch_resource<R: DeserializeOwned>(client: Client<FhirR5>, url: Url) -> Result<R, Error> {
+async fn fetch_resource<R: DeserializableResource>(
+	client: Client<FhirR5>,
+	url: Url,
+) -> Result<R, Error> {
 	let url_str = url.to_string();
 
 	// Make sure we are not forwarded to any malicious server.
@@ -204,7 +206,7 @@ where
 
 impl<R> Stream for SearchMatches<R>
 where
-	R: NamedResource + DomainResource + TryFrom<Resource> + DeserializeOwned + 'static,
+	R: NamedResource + DomainResource + DeserializableResource + 'static,
 {
 	type Item = Result<R, Error>;
 
@@ -222,11 +224,7 @@ where
 					tracing::trace!("Next `fullUrl` fetched resource ready");
 
 					self.future_resource = None;
-					self.client.populate_reference_targets_internal(
-						&mut resource,
-						Some(&self.bundle),
-						None,
-					);
+					self.client.populate_reference_targets(&mut resource, Some(&self.bundle), None);
 
 					Poll::Ready(Some(Ok(resource)))
 				}
@@ -244,7 +242,7 @@ where
 					Error::WrongResourceType(resource_type.to_string(), R::TYPE.to_string())
 				})?;
 
-				self.client.populate_reference_targets_internal(&mut r, Some(&self.bundle), None);
+				self.client.populate_reference_targets(&mut r, Some(&self.bundle), None);
 
 				return Poll::Ready(Some(Ok(r)));
 			} else if let Some(url) = entry.full_url {
