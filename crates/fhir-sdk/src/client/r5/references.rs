@@ -2,27 +2,28 @@ use fhir_model::r5::resources::{Bundle, DomainResource, Resource, TypedResource}
 use fhir_model::ParsedReference;
 use reqwest::Url;
 
-pub(super) fn populate_reference_targets_bundle(base_url: &Url, bundle: &mut Bundle) {
-	let lookup = bundle.clone();
+pub(super) fn populate_reference_targets(base_url: &Url, resource: &mut Resource) {
+	if let Resource::Bundle(bundle) = resource {
+		let lookup = bundle.clone();
 
-	for entry in bundle.entry.iter_mut().flatten() {
-		if let Some(resource) = entry.resource.as_mut() {
-			if let Some(domain_resource) = resource.as_domain_resource_mut() {
-				populate_reference_targets(base_url, domain_resource, Some(&lookup), None);
+		for entry in bundle.entry.iter_mut().flatten() {
+			if let Some(resource) = entry.resource.as_mut() {
+				if let Some(domain_resource) = resource.as_domain_resource_mut() {
+					populate_reference_targets_internal(
+						base_url,
+						domain_resource,
+						Some(&lookup),
+						None,
+					);
+				}
 			}
 		}
-	}
-}
-
-pub(super) fn populate_reference_targets_resource(base_url: &Url, resource: &mut Resource) {
-	if let Resource::Bundle(bundle) = resource {
-		populate_reference_targets_bundle(base_url, bundle)
 	} else if let Some(domain_resource) = resource.as_domain_resource_mut() {
-		populate_reference_targets(base_url, domain_resource, None, None)
+		populate_reference_targets_internal(base_url, domain_resource, None, None)
 	}
 }
 
-pub(super) fn populate_reference_targets(
+pub(super) fn populate_reference_targets_internal(
 	base_url: &Url,
 	resource: &mut dyn DomainResource,
 	bundle: Option<&Bundle>,
@@ -69,7 +70,7 @@ pub(super) fn populate_reference_targets(
 		if let Some(contained_domain_resource) = c.as_domain_resource_mut() {
 			// We pass on the same sibling_contained lookup value since contained resources
 			// are able to refer to siblings but they're not allowed to be nested
-			populate_reference_targets(
+			populate_reference_targets_internal(
 				base_url,
 				contained_domain_resource,
 				bundle,
@@ -118,7 +119,7 @@ mod tests {
 		observation.contained = vec![patient.clone().into(), practitioner.clone().into()];
 		observation.subject = Some(patient_ref.into());
 
-		populate_reference_targets(&base_url, &mut observation, None, None);
+		populate_reference_targets_internal(&base_url, &mut observation, None, None);
 
 		// Check if the subject field points to the patient
 		assert_eq!(
@@ -164,7 +165,7 @@ mod tests {
 			(&observation_full_url, observation.clone().into()),
 		]);
 
-		populate_reference_targets(&base_url, &mut observation, Some(&bundle), None);
+		populate_reference_targets_internal(&base_url, &mut observation, Some(&bundle), None);
 
 		assert_eq!(
 			observation.subject.as_ref().and_then(|s| s.target.as_ref()),
@@ -192,7 +193,7 @@ mod tests {
 			(&observation_full_url.to_string(), observation.clone().into()),
 		]);
 
-		populate_reference_targets(&base_url, &mut observation, Some(&bundle), None);
+		populate_reference_targets_internal(&base_url, &mut observation, Some(&bundle), None);
 
 		assert_eq!(
 			observation.subject.as_ref().and_then(|s| s.target.as_ref()),
@@ -220,7 +221,7 @@ mod tests {
 			(&observation_full_url.to_string(), observation.clone().into()),
 		]);
 
-		populate_reference_targets(&base_url, &mut observation, Some(&bundle), None);
+		populate_reference_targets_internal(&base_url, &mut observation, Some(&bundle), None);
 
 		assert_eq!(
 			observation.subject.as_ref().and_then(|s| s.target.as_ref()),

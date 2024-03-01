@@ -4,7 +4,7 @@ use reqwest::Url;
 use crate::client::response::FhirResponse;
 use crate::client::Error;
 
-use super::references::populate_reference_targets_resource;
+use super::references::populate_reference_targets;
 
 impl FhirResponse {
 	/// Attempts to parse the response body as a FHIR resource.
@@ -46,7 +46,7 @@ fn parse<R: TryFrom<Resource>>(base_url: &Url, body: &str) -> Result<R, Error> {
 	let mut resource: Resource = serde_json::from_str(body)?;
 	let resource_type = resource.resource_type();
 
-	populate_reference_targets_resource(base_url, &mut resource);
+	populate_reference_targets(base_url, &mut resource);
 
 	resource.try_into().map_err(|_| Error::UnexpectedResourceType(resource_type.to_string()))
 }
