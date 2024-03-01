@@ -255,7 +255,7 @@ async fn transaction_inner() -> Result<()> {
 					.build()
 					.unwrap(),
 			)
-			.subject(Reference::builder().reference(patient_ref.clone()).build().unwrap())
+			.subject(Reference::builder().reference(patient_ref.clone()).build().unwrap().into())
 			.build()
 			.unwrap(),
 	);
@@ -283,6 +283,7 @@ async fn transaction_inner() -> Result<()> {
 		.subject
 		.as_ref()
 		.expect("Encounter.subject")
+		.reference
 		.reference
 		.as_ref()
 		.expect("Encounter.subject.reference");
