@@ -25,7 +25,7 @@ use reqwest::{
 	header::{self, HeaderValue},
 	StatusCode, Url,
 };
-use serde::{de::DeserializeOwned, Serialize};
+use serde::Serialize;
 
 pub use self::search::{
 	DateSearch, MissingSearch, NumberSearch, QuantitySearch, ReferenceSearch, StringSearch,
@@ -41,10 +41,6 @@ use super::{misc, response::ParseResponseBody, Client, Error, FhirR5, SearchPara
 /// FHIR MIME-type this client uses.
 const MIME_TYPE: &str = JSON_MIME_TYPE;
 
-/// Alias for the traits required to deserialize a resource and convert it into the Resource enum
-pub trait DeserializableResource: Into<Resource> + TryFrom<Resource> + DeserializeOwned {}
-impl<R: Into<Resource> + TryFrom<Resource> + DeserializeOwned> DeserializableResource for R {}
-
 impl Client<FhirR5> {
 	/// Get the server's capabilities. Fails if the respective FHIR version is
 	/// not supported at all.
@@ -58,7 +54,7 @@ impl Client<FhirR5> {
 	}
 
 	/// Read any resource from any URL.
-	async fn read_generic<R: DeserializableResource>(&self, url: Url) -> Result<Option<R>, Error> {
+	async fn read_generic<R: TryFrom<Resource>>(&self, url: Url) -> Result<Option<R>, Error> {
 		let request = self.0.client.get(url).header(header::ACCEPT, MIME_TYPE);
 
 		let response = self.run_request(request).await?;
@@ -71,7 +67,7 @@ impl Client<FhirR5> {
 	}
 
 	/// Read the current version of a specific FHIR resource.
-	pub async fn read<R: NamedResource + DeserializableResource>(
+	pub async fn read<R: NamedResource + TryFrom<Resource>>(
 		&self,
 		id: &str,
 	) -> Result<Option<R>, Error> {
@@ -80,7 +76,7 @@ impl Client<FhirR5> {
 	}
 
 	/// Read a specific version of a specific FHIR resource.
-	pub async fn read_version<R: NamedResource + DeserializableResource>(
+	pub async fn read_version<R: NamedResource + TryFrom<Resource>>(
 		&self,
 		id: &str,
 		version_id: &str,
@@ -215,7 +211,7 @@ impl Client<FhirR5> {
 		queries: SearchParameters,
 	) -> impl Stream<Item = Result<R, Error>> + Send + 'static
 	where
-		R: NamedResource + DomainResource + DeserializableResource + 'static,
+		R: NamedResource + DomainResource + TryFrom<Resource> + 'static,
 	{
 		let mut url = self.url(&[R::TYPE.as_str()]);
 		url.query_pairs_mut().extend_pairs(queries.into_queries()).finish();

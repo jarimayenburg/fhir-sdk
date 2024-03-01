@@ -11,7 +11,7 @@ use reqwest::Url;
 
 use crate::client::r5::references::populate_reference_targets;
 
-use super::{Client, DeserializableResource, Error, FhirR5};
+use super::{Client, Error, FhirR5};
 
 /// Results of a query that can be paged or given via URL only. The resources
 /// can be consumed via the `Stream`/`StreamExt` traits.
@@ -38,7 +38,7 @@ impl<R: NamedResource> Paged<R> {
 
 impl<R> Stream for Paged<R>
 where
-	R: NamedResource + DomainResource + DeserializableResource + 'static,
+	R: NamedResource + DomainResource + TryFrom<Resource> + 'static,
 {
 	type Item = Result<R, Error>;
 
@@ -140,7 +140,7 @@ fn find_next_page_url(bundle: &Bundle) -> Option<&String> {
 }
 
 /// Query a resource from a given URL.
-async fn fetch_resource<R: DeserializableResource>(
+async fn fetch_resource<R: TryFrom<Resource>>(
 	client: Client<FhirR5>,
 	url: Url,
 ) -> Result<R, Error> {
@@ -208,7 +208,7 @@ where
 
 impl<R> Stream for SearchMatches<R>
 where
-	R: NamedResource + DomainResource + DeserializableResource + 'static,
+	R: NamedResource + DomainResource + TryFrom<Resource> + 'static,
 {
 	type Item = Result<R, Error>;
 

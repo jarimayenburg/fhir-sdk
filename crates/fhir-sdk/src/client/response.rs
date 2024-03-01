@@ -2,7 +2,6 @@ use std::ops::Deref;
 
 use async_trait::async_trait;
 use reqwest::Url;
-use serde::de::DeserializeOwned;
 
 use super::Error;
 
@@ -12,7 +11,7 @@ pub struct FhirResponse {
 }
 
 #[async_trait]
-pub(crate) trait ParseResponseBody<R: DeserializeOwned> {
+pub(crate) trait ParseResponseBody<R> {
 	/// Attempts to parse the response body as a FHIR resource.
 	/// Returns an [Error] if the request failed or the body could not be
 	/// parsed as `R`.
