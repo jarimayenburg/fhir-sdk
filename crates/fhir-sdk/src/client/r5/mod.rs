@@ -92,14 +92,18 @@ impl Client<FhirR5> {
 	/// Read the resource that is targeted in the reference.
 	pub async fn read_referenced(&self, reference: &Reference) -> Result<Resource, Error> {
 		let parsed_reference = reference.parse().ok_or(Error::MissingReference)?;
-		let url: Url = match parsed_reference {
-			ParsedReference::Local { .. } => return Err(Error::LocalReference),
-			other => {
-				let url = other.to_string();
 
-				url.parse().map_err(|_| Error::UrlParse(url))?
+		tracing::debug!("parsed_reference: {:?}", parsed_reference);
+
+		let absolute: String = match parsed_reference {
+			ParsedReference::Local { .. } => return Err(Error::LocalReference),
+			ParsedReference::Relative { .. } => {
+				parsed_reference.with_base_url(self.0.base_url.as_str()).to_string()
 			}
+			absolute => absolute.to_string(),
 		};
+
+		let url: Url = absolute.parse().map_err(|_| Error::UrlParse(absolute))?;
 
 		let resource: Resource = self
 			.read_generic(url.clone())
