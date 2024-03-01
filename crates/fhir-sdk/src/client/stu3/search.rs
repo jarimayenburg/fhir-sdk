@@ -182,7 +182,7 @@ impl<'a> SearchParameter for TokenSearch<'a> {
 					(format!("{name}:in"), escape_value(value_set))
 				}
 			}
-			Self::CodeText { name, text } => (format!("{name}:code-text"), escape_value(text)),
+			Self::CodeText { name, text } => (format!("{name}:text"), escape_value(text)),
 		}
 	}
 }
