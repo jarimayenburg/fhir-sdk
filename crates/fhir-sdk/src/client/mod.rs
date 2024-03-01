@@ -10,6 +10,7 @@ pub mod r4b;
 #[cfg(feature = "r5")]
 pub mod r5;
 mod request;
+mod response;
 mod search;
 #[cfg(feature = "stu3")]
 pub mod stu3;
@@ -27,6 +28,7 @@ pub use reqwest::{
 	StatusCode, Url,
 };
 
+use self::response::FhirResponse;
 pub use self::{
 	builder::ClientBuilder, error::Error, request::RequestSettings, search::SearchParameters,
 	write::ResourceWrite,
@@ -141,15 +143,14 @@ impl<V: Send + Sync> Client<V> {
 	/// Run a request using the internal request settings, calling the auth
 	/// callback to retrieve a new Authorization header on `unauthtorized`
 	/// responses.
-	async fn run_request(
-		&self,
-		request: reqwest::RequestBuilder,
-	) -> Result<reqwest::Response, Error> {
+	async fn run_request(&self, request: reqwest::RequestBuilder) -> Result<FhirResponse, Error> {
 		// Try running the request
 		let mut request_settings = self.request_settings();
 		let response = request_settings
 			.make_request(request.try_clone().ok_or(Error::RequestNotClone)?)
 			.await?;
+
+		let base_url = self.0.base_url.clone();
 
 		// On authorization failure, retry after refreshing the authorization header.
 		if response.status() == StatusCode::UNAUTHORIZED {
@@ -162,11 +163,12 @@ impl<V: Send + Sync> Client<V> {
 					request_settings.header(reqwest::header::AUTHORIZATION, auth_value);
 				self.set_request_settings(request_settings.clone());
 				let response = request_settings.make_request(request).await?;
-				return Ok(response);
+
+				return Ok(FhirResponse::new(base_url, response));
 			}
 		}
 
-		Ok(response)
+		Ok(FhirResponse::new(base_url, response))
 	}
 
 	/// Get the URL with the configured base URL and the given path segments.

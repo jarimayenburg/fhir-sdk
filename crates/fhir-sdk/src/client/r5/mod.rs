@@ -3,6 +3,7 @@
 mod paging;
 mod patch;
 mod references;
+mod response;
 mod search;
 mod transaction;
 
@@ -35,7 +36,7 @@ use self::{
 	patch::{PatchViaFhir, PatchViaJson},
 	transaction::BatchTransaction,
 };
-use super::{misc, Client, Error, FhirR5, SearchParameters};
+use super::{misc, response::ParseResponseBody, Client, Error, FhirR5, SearchParameters};
 
 /// FHIR MIME-type this client uses.
 const MIME_TYPE: &str = JSON_MIME_TYPE;
@@ -52,12 +53,8 @@ impl Client<FhirR5> {
 		let request = self.0.client.get(url).header(header::ACCEPT, MIME_TYPE);
 
 		let response = self.run_request(request).await?;
-		if response.status().is_success() {
-			let capability_statement: CapabilityStatement = response.json().await?;
-			Ok(capability_statement)
-		} else {
-			Err(Error::from_response_r5(response).await)
-		}
+
+		response.body().await
 	}
 
 	/// Read any resource from any URL.
@@ -65,17 +62,12 @@ impl Client<FhirR5> {
 		let request = self.0.client.get(url).header(header::ACCEPT, MIME_TYPE);
 
 		let response = self.run_request(request).await?;
-		if response.status().is_success() {
-			let mut resource: Resource = response.json::<R>().await?.into();
 
-			self.populate_reference_targets_resource(&mut resource);
-
-			Ok(Some(resource.try_into().unwrap_or_else(|_| panic!("should never happen"))))
-		} else if [StatusCode::NOT_FOUND, StatusCode::GONE].contains(&response.status()) {
-			Ok(None)
-		} else {
-			Err(Error::from_response_r5(response).await)
+		if [StatusCode::NOT_FOUND, StatusCode::GONE].contains(&response.status()) {
+			return Ok(None);
 		}
+
+		response.body().await.map(Some)
 	}
 
 	/// Read the current version of a specific FHIR resource.
@@ -146,7 +138,7 @@ impl Client<FhirR5> {
 			let version_id = version_id.or(misc::parse_etag(response.headers()).ok());
 			Ok((id, version_id))
 		} else {
-			Err(Error::from_response_r5(response).await)
+			Err(response.successful().await.unwrap_err())
 		}
 	}
 
@@ -185,7 +177,7 @@ impl Client<FhirR5> {
 			let version_id = misc::parse_etag(response.headers())?;
 			Ok((created, version_id))
 		} else {
-			Err(Error::from_response_r5(response).await)
+			Err(response.successful().await.unwrap_err())
 		}
 	}
 
@@ -207,11 +199,8 @@ impl Client<FhirR5> {
 		let request = self.0.client.delete(url).header(header::ACCEPT, MIME_TYPE);
 
 		let response = self.run_request(request).await?;
-		if response.status().is_success() {
-			Ok(())
-		} else {
-			Err(Error::from_response_r5(response).await)
-		}
+
+		response.successful().await
 	}
 
 	/// Search for FHIR resources of a given type given the query parameters.
@@ -247,15 +236,8 @@ impl Client<FhirR5> {
 		let request = self.0.client.get(url).header(header::ACCEPT, MIME_TYPE);
 
 		let response = self.run_request(request).await?;
-		if response.status().is_success() {
-			let mut resource: Bundle = response.json().await?;
 
-			self.populate_reference_targets_bundle(&mut resource);
-
-			Ok(resource)
-		} else {
-			Err(Error::from_response_r5(response).await)
-		}
+		response.body().await
 	}
 
 	/// Operation `$everything` on `Patient`, returning a Bundle with all
@@ -265,15 +247,8 @@ impl Client<FhirR5> {
 		let request = self.0.client.get(url).header(header::ACCEPT, MIME_TYPE);
 
 		let response = self.run_request(request).await?;
-		if response.status().is_success() {
-			let mut resource: Bundle = response.json().await?;
 
-			self.populate_reference_targets_bundle(&mut resource);
-
-			Ok(resource)
-		} else {
-			Err(Error::from_response_r5(response).await)
-		}
+		response.body().await
 	}
 
 	/// Operation `$match` on `Patient`, returning matches for Patient records
@@ -322,15 +297,8 @@ impl Client<FhirR5> {
 			.json(&parameters);
 
 		let response = self.run_request(request).await?;
-		if response.status().is_success() {
-			let mut resource: Bundle = response.json().await?;
 
-			self.populate_reference_targets_bundle(&mut resource);
-
-			Ok(resource)
-		} else {
-			Err(Error::from_response_r5(response).await)
-		}
+		response.body().await
 	}
 
 	/// Operation `$status` on `Subscription`, returning the
@@ -343,23 +311,17 @@ impl Client<FhirR5> {
 		let request = self.0.client.get(url.clone()).header(header::ACCEPT, MIME_TYPE);
 
 		let response = self.run_request(request).await?;
-		if response.status().is_success() {
-			let mut bundle: Bundle = response.json().await?;
 
-			self.populate_reference_targets_bundle(&mut bundle);
+		let bundle: Bundle = response.body().await?;
 
-			let resource = bundle
-				.0
-				.entry
-				.into_iter()
-				.flatten()
-				.filter_map(|entry| entry.resource)
-				.find_map(|res| SubscriptionStatus::try_from(res).ok())
-				.ok_or_else(|| Error::ResourceNotFound(url.to_string()))?;
-			Ok(resource)
-		} else {
-			Err(Error::from_response_r5(response).await)
-		}
+		bundle
+			.0
+			.entry
+			.into_iter()
+			.flatten()
+			.filter_map(|entry| entry.resource)
+			.find_map(|res| SubscriptionStatus::try_from(res).ok())
+			.ok_or_else(|| Error::ResourceNotFound(url.to_string()))
 	}
 
 	/// Operation `$events` on `Subscription`, returning the previous
@@ -386,14 +348,7 @@ impl Client<FhirR5> {
 		let request = self.0.client.get(url).query(&queries).header(header::ACCEPT, MIME_TYPE);
 
 		let response = self.run_request(request).await?;
-		if response.status().is_success() {
-			let mut bundle: Bundle = response.json().await?;
 
-			self.populate_reference_targets_bundle(&mut bundle);
-
-			Ok(bundle)
-		} else {
-			Err(Error::from_response_r5(response).await)
-		}
+		response.body().await
 	}
 }

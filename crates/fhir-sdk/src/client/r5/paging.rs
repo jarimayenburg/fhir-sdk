@@ -9,6 +9,8 @@ use fhir_model::r5::{
 use futures::{future::BoxFuture, ready, FutureExt, Stream, StreamExt};
 use reqwest::Url;
 
+use crate::client::r5::references::populate_reference_targets;
+
 use super::{Client, DeserializableResource, Error, FhirR5};
 
 /// Results of a query that can be paged or given via URL only. The resources
@@ -224,7 +226,12 @@ where
 					tracing::trace!("Next `fullUrl` fetched resource ready");
 
 					self.future_resource = None;
-					self.client.populate_reference_targets(&mut resource, Some(&self.bundle), None);
+					populate_reference_targets(
+						&self.client.0.base_url,
+						&mut resource,
+						Some(&self.bundle),
+						None,
+					);
 
 					Poll::Ready(Some(Ok(resource)))
 				}
@@ -242,7 +249,12 @@ where
 					Error::WrongResourceType(resource_type.to_string(), R::TYPE.to_string())
 				})?;
 
-				self.client.populate_reference_targets(&mut r, Some(&self.bundle), None);
+				populate_reference_targets(
+					&self.client.0.base_url,
+					&mut r,
+					Some(&self.bundle),
+					None,
+				);
 
 				return Poll::Ready(Some(Ok(r)));
 			} else if let Some(url) = entry.full_url {

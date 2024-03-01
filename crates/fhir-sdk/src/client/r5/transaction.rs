@@ -8,6 +8,8 @@ use fhir_model::r5::{
 use reqwest::header::{self, HeaderValue};
 use uuid::Uuid;
 
+use crate::client::response::ParseResponseBody;
+
 use super::{Client, Error, FhirR5, MIME_TYPE};
 
 /// A batch/transaction request builder.
@@ -150,12 +152,7 @@ impl BatchTransaction {
 			.json(&bundle);
 
 		let response = self.client.run_request(request).await?;
-		if response.status().is_success() {
-			let mut bundle: Bundle = response.json().await?;
-			self.client.populate_reference_targets_bundle(&mut bundle);
-			Ok(bundle)
-		} else {
-			Err(Error::from_response_r5(response).await)
-		}
+
+		response.body().await
 	}
 }
