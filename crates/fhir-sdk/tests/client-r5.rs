@@ -353,7 +353,7 @@ async fn paging_with_includes_inner() -> Result<()> {
 	println!("Preparing..");
 	let mut batch = client.transaction();
 
-	let birthdate = "5123-05-10";
+	let birthdate = "5123-05-15";
 
 	let patient = Patient::builder()
 		.active(false)
