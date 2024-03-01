@@ -6,10 +6,9 @@ use crate::client::response::{FhirResponse, ParseResponseBody};
 use crate::client::Error;
 
 use super::references::populate_reference_targets_resource;
-use super::DeserializableResource;
 
 #[async_trait]
-impl<R: DeserializableResource> ParseResponseBody<R> for FhirResponse {
+impl<R: TryFrom<Resource>> ParseResponseBody<R> for FhirResponse {
 	async fn body(self) -> Result<R, Error> {
 		let status = self.status();
 		let body = self.response.text().await?;
@@ -47,7 +46,7 @@ impl FhirResponse {
 	}
 }
 
-fn parse<R: DeserializableResource>(base_url: &Url, body: &str) -> Result<R, Error> {
+fn parse<R: TryFrom<Resource>>(base_url: &Url, body: &str) -> Result<R, Error> {
 	let mut resource: Resource = serde_json::from_str(body)?;
 	let resource_type = resource.resource_type();
 
