@@ -9,15 +9,19 @@ use std::{env, str::FromStr};
 use eyre::Result;
 use fhir_sdk::{
 	client::{
-		stu3::{DateSearch, TokenSearch},
+		stu3::{DateSearch, ReferenceSearch, TokenSearch},
 		Client, FhirStu3, ResourceWrite, SearchParameters,
 	},
 	stu3::{
-		codes::{AdministrativeGender, EncounterStatus, IssueSeverity, SearchComparator},
+		codes::{
+			AdministrativeGender, EncounterStatus, IssueSeverity, ObservationStatus,
+			SearchComparator,
+		},
 		reference_to,
 		resources::{
-			BaseResource, Bundle, Encounter, OperationOutcome, ParametersParameter,
-			ParametersParameterValue, Patient, Resource, ResourceType,
+			BaseResource, Bundle, Encounter, Observation, ObservationSubjectReferenceTarget,
+			OperationOutcome, ParametersParameter, ParametersParameterValue, Patient, Resource,
+			ResourceType,
 		},
 		types::{Coding, HumanName, Identifier, Reference},
 	},
@@ -339,6 +343,98 @@ async fn paging_inner() -> Result<()> {
 	let mut batch = client.batch();
 	for patient in patients {
 		batch.delete(ResourceType::Patient, patient.id.as_ref().expect("Patient.id"));
+	}
+	ensure_batch_succeeded(batch.send().await?);
+	Ok(())
+}
+
+#[test]
+fn paging_with_includes() -> Result<()> {
+	common::RUNTIME.block_on(paging_with_includes_inner())
+}
+
+async fn paging_with_includes_inner() -> Result<()> {
+	let client = client().await?;
+
+	println!("Preparing..");
+	let mut batch = client.transaction();
+
+	let birthdate = "5123-05-15";
+
+	let patient = Patient::builder()
+		.active(false)
+		.birth_date(Date::from_str(birthdate).expect("parse Date"))
+		.build()
+		.unwrap();
+
+	let patient_uuid = batch.create(patient.clone());
+
+	let observation = Observation::builder()
+		.status(ObservationStatus::Final)
+		.subject(Reference::builder().reference(patient_uuid).build().unwrap().into())
+		.code(CodeableConcept::builder().text("Test observation".to_string()).build().unwrap())
+		.build()
+		.unwrap();
+
+	// Create enough Observations to fill multiple pages
+	let n = 50;
+
+	for _ in 0..n {
+		batch.create(observation.clone());
+	}
+
+	let resources = batch.send().await?;
+	ensure_batch_succeeded(resources.clone());
+
+	println!("Starting search..");
+	let observations: Vec<Observation> = client
+		.search::<Observation>(
+			SearchParameters::empty()
+				.and(ReferenceSearch::Chaining {
+					name: "subject",
+					resource_type: Some(ResourceType::Patient),
+					target_name: "birthdate",
+					value: birthdate,
+				})
+				.and_raw("_include", "Observation:subject"),
+		)
+		.try_collect()
+		.await?;
+
+	assert_eq!(observations.len(), n);
+
+	let mut patients: Vec<Patient> = client
+		.search::<Patient>(SearchParameters::empty().and(DateSearch {
+			name: "birthdate",
+			comparator: Some(SearchComparator::Eq),
+			value: birthdate,
+		}))
+		.try_collect()
+		.await?;
+
+	if patients.len() > 1 {
+		panic!("More than one Patient resource with that birthdate. Unable to run test.")
+	}
+
+	let patient = patients.pop().unwrap();
+
+	let expected_subject_target = Box::new(ObservationSubjectReferenceTarget::Patient(patient));
+
+	for observation in observations.iter() {
+		assert_eq!(
+			observation.subject.as_ref().and_then(|s| s.target.as_ref()),
+			Some(&expected_subject_target)
+		);
+	}
+
+	let mut batch = client.batch();
+	for entry in resources.entry.iter().flatten() {
+		if let Some(resource) = &entry.resource {
+			batch.delete(
+				resource.resource_type(),
+				resource.as_base_resource().id().as_ref().expect("Resource.id"),
+			);
+		}
 	}
 	ensure_batch_succeeded(batch.send().await?);
 	Ok(())
