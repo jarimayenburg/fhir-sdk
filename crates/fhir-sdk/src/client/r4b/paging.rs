@@ -9,7 +9,7 @@ use fhir_model::r4b::{
 use futures::{future::BoxFuture, ready, FutureExt, Stream, StreamExt};
 use reqwest::Url;
 
-use crate::client::r4b::references::populate_reference_targets;
+use crate::client::r4b::references::populate_reference_targets_internal;
 
 use super::{Client, Error, FhirR4B};
 
@@ -221,7 +221,7 @@ where
 					tracing::trace!("Next `fullUrl` fetched resource ready");
 
 					self.future_resource = None;
-					populate_reference_targets(
+					populate_reference_targets_internal(
 						&self.client.0.base_url,
 						&mut resource,
 						Some(&self.bundle),
@@ -244,7 +244,7 @@ where
 					Error::WrongResourceType(resource_type.to_string(), R::TYPE.to_string())
 				})?;
 
-				populate_reference_targets(
+				populate_reference_targets_internal(
 					&self.client.0.base_url,
 					&mut r,
 					Some(&self.bundle),
