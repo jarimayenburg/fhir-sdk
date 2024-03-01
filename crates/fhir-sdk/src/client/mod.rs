@@ -143,7 +143,10 @@ impl<V: Send + Sync> Client<V> {
 	/// Run a request using the internal request settings, calling the auth
 	/// callback to retrieve a new Authorization header on `unauthtorized`
 	/// responses.
-	async fn run_request(&self, request: reqwest::RequestBuilder) -> Result<FhirResponse, Error> {
+	async fn run_request(
+		&self,
+		request: reqwest::RequestBuilder,
+	) -> Result<FhirResponse<V>, Error> {
 		// Try running the request
 		let mut request_settings = self.request_settings();
 		let response = request_settings

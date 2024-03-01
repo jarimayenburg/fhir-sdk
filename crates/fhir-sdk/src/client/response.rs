@@ -1,19 +1,21 @@
+use std::marker::PhantomData;
 use std::ops::Deref;
 
 use reqwest::Url;
 
-pub struct FhirResponse {
+pub struct FhirResponse<V> {
 	pub(super) base_url: Url,
 	pub(super) response: reqwest::Response,
+	version: PhantomData<V>,
 }
 
-impl FhirResponse {
+impl<V> FhirResponse<V> {
 	pub fn new(base_url: Url, response: reqwest::Response) -> Self {
-		FhirResponse { base_url, response }
+		FhirResponse { base_url, response, version: PhantomData::default() }
 	}
 }
 
-impl Deref for FhirResponse {
+impl<V> Deref for FhirResponse<V> {
 	type Target = reqwest::Response;
 
 	fn deref(&self) -> &Self::Target {
