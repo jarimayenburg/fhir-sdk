@@ -18,17 +18,19 @@ use fhir_sdk::{
 			AdministrativeGender, EncounterStatus, IssueSeverity, ObservationStatus,
 			SearchComparator,
 		},
-		reference_to,
+		local_reference_to, reference_to,
 		resources::{
 			BaseResource, Bundle, Encounter, Observation, ObservationSubjectReferenceTarget,
-			OperationOutcome, ParametersParameter, ParametersParameterValue, Patient, Resource,
-			ResourceType, TypedResource,
+			OperationOutcome, ParametersParameter, ParametersParameterValue, Patient,
+			PatientGeneralPractitionerReferenceTarget, Practitioner, Resource, ResourceType,
+			TypedResource,
 		},
 		types::{CodeableConcept, HumanName, Identifier, Reference},
 	},
 	Date,
 };
 use futures::TryStreamExt;
+use uuid::Uuid;
 
 /// Set up a client for testing with the (local) FHIR server.
 async fn client() -> Result<Client<FhirR4B>> {
@@ -41,7 +43,7 @@ async fn client() -> Result<Client<FhirR4B>> {
 /// Go through all entries of the bundle, extracting the outcomes and search for
 /// errors inside. Fail if there is any of severity error or fatal.
 fn ensure_batch_succeeded(bundle: Bundle) {
-	let batch_errors = bundle
+	let batch_errors: Vec<&String> = bundle
 		.entry
 		.iter()
 		.flatten()
@@ -49,8 +51,11 @@ fn ensure_batch_succeeded(bundle: Bundle) {
 		.filter_map(|response| response.outcome.as_ref())
 		.filter_map(|resource| <&OperationOutcome>::try_from(resource).ok())
 		.flat_map(|outcome| outcome.issue.iter().flatten())
-		.any(|issue| matches!(issue.severity, IssueSeverity::Error | IssueSeverity::Fatal));
-	assert!(!batch_errors);
+		.filter(|issue| matches!(issue.severity, IssueSeverity::Error | IssueSeverity::Fatal))
+		.flat_map(|issue| issue.diagnostics.as_ref())
+		.collect();
+
+	assert!(batch_errors.is_empty(), "batch failed, diagnostics {:#?}", batch_errors);
 }
 
 #[test]
@@ -79,6 +84,40 @@ async fn crud_inner() -> Result<()> {
 	patient.delete(&client).await?;
 	let resource = client.read::<Patient>(&id).await?;
 	assert_eq!(resource, None);
+
+	Ok(())
+}
+
+#[test]
+fn read() -> Result<()> {
+	common::RUNTIME.block_on(read_inner())
+}
+
+async fn read_inner() -> Result<()> {
+	let client = client().await?;
+
+	let practitioner: Practitioner =
+		Practitioner::builder().id(Uuid::new_v4().to_string()).build().unwrap();
+	let practitioner_ref = local_reference_to(&practitioner).unwrap();
+
+	let mut patient = Patient::builder()
+		.contained(vec![practitioner.clone().into()])
+		.general_practitioner(vec![Some(practitioner_ref.into())])
+		.build()
+		.unwrap();
+	patient.create(&client).await?;
+
+	let read: Patient =
+		client.read(patient.id.as_deref().unwrap()).await?.expect("created patient not found");
+
+	// Check the read ID
+	assert_eq!(read.id, patient.id);
+
+	let gp_targets: Vec<&PatientGeneralPractitionerReferenceTarget> =
+		read.general_practitioner.iter().flatten().filter_map(|r| r.target.as_deref()).collect();
+
+	// Check the Patient.general_practitioner reference target
+	assert_eq!(gp_targets, vec![&practitioner.into()]);
 
 	Ok(())
 }
