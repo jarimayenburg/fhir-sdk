@@ -3,6 +3,7 @@
 mod paging;
 mod patch;
 mod references;
+mod response;
 mod search;
 mod transaction;
 
@@ -23,7 +24,7 @@ use reqwest::{
 	header::{self, HeaderValue},
 	StatusCode, Url,
 };
-use serde::{de::DeserializeOwned, Serialize};
+use serde::Serialize;
 
 pub use self::search::{
 	DateSearch, MissingSearch, NumberSearch, QuantitySearch, ReferenceSearch, StringSearch,
@@ -47,31 +48,25 @@ impl Client<FhirR4B> {
 		let request = self.0.client.get(url).header(header::ACCEPT, MIME_TYPE);
 
 		let response = self.run_request(request).await?;
-		if response.status().is_success() {
-			let capability_statement: CapabilityStatement = response.json().await?;
-			Ok(capability_statement)
-		} else {
-			Err(Error::from_response_r4b(response).await)
-		}
+
+		response.body().await
 	}
 
 	/// Read any resource from any URL.
-	async fn read_generic<R: DeserializeOwned>(&self, url: Url) -> Result<Option<R>, Error> {
+	async fn read_generic<R: TryFrom<Resource>>(&self, url: Url) -> Result<Option<R>, Error> {
 		let request = self.0.client.get(url).header(header::ACCEPT, MIME_TYPE);
 
 		let response = self.run_request(request).await?;
-		if response.status().is_success() {
-			let resource: R = response.json().await?;
-			Ok(Some(resource))
-		} else if [StatusCode::NOT_FOUND, StatusCode::GONE].contains(&response.status()) {
-			Ok(None)
-		} else {
-			Err(Error::from_response_r4b(response).await)
+
+		if [StatusCode::NOT_FOUND, StatusCode::GONE].contains(&response.status()) {
+			return Ok(None);
 		}
+
+		response.body().await.map(Some)
 	}
 
 	/// Read the current version of a specific FHIR resource.
-	pub async fn read<R: NamedResource + DeserializeOwned>(
+	pub async fn read<R: NamedResource + TryFrom<Resource>>(
 		&self,
 		id: &str,
 	) -> Result<Option<R>, Error> {
@@ -80,7 +75,7 @@ impl Client<FhirR4B> {
 	}
 
 	/// Read a specific version of a specific FHIR resource.
-	pub async fn read_version<R: NamedResource + DeserializeOwned>(
+	pub async fn read_version<R: NamedResource + TryFrom<Resource>>(
 		&self,
 		id: &str,
 		version_id: &str,
@@ -92,14 +87,16 @@ impl Client<FhirR4B> {
 	/// Read the resource that is targeted in the reference.
 	pub async fn read_referenced(&self, reference: &Reference) -> Result<Resource, Error> {
 		let parsed_reference = reference.parse().ok_or(Error::MissingReference)?;
-		let url: Url = match parsed_reference {
-			ParsedReference::Local { .. } => return Err(Error::LocalReference),
-			other => {
-				let url = other.to_string();
 
-				url.parse().map_err(|_| Error::UrlParse(url))?
+		let absolute: String = match parsed_reference {
+			ParsedReference::Local { .. } => return Err(Error::LocalReference),
+			ParsedReference::Relative { .. } => {
+				parsed_reference.with_base_url(self.0.base_url.as_str()).to_string()
 			}
+			absolute => absolute.to_string(),
 		};
+
+		let url: Url = absolute.parse().map_err(|_| Error::UrlParse(absolute))?;
 
 		let resource: Resource = self
 			.read_generic(url.clone())
@@ -138,7 +135,7 @@ impl Client<FhirR4B> {
 			let version_id = version_id.or(misc::parse_etag(response.headers()).ok());
 			Ok((id, version_id))
 		} else {
-			Err(Error::from_response_r4b(response).await)
+			Err(response.successful().await.unwrap_err())
 		}
 	}
 
@@ -177,7 +174,7 @@ impl Client<FhirR4B> {
 			let version_id = misc::parse_etag(response.headers())?;
 			Ok((created, version_id))
 		} else {
-			Err(Error::from_response_r4b(response).await)
+			Err(response.successful().await.unwrap_err())
 		}
 	}
 
@@ -199,11 +196,8 @@ impl Client<FhirR4B> {
 		let request = self.0.client.delete(url).header(header::ACCEPT, MIME_TYPE);
 
 		let response = self.run_request(request).await?;
-		if response.status().is_success() {
-			Ok(())
-		} else {
-			Err(Error::from_response_r4b(response).await)
-		}
+
+		response.successful().await
 	}
 
 	/// Search for FHIR resources of a given type given the query parameters.
@@ -214,7 +208,7 @@ impl Client<FhirR4B> {
 		queries: SearchParameters,
 	) -> impl Stream<Item = Result<R, Error>> + Send + 'static
 	where
-		R: NamedResource + DomainResource + TryFrom<Resource> + DeserializeOwned + 'static,
+		R: NamedResource + DomainResource + TryFrom<Resource> + 'static,
 	{
 		let mut url = self.url(&[R::TYPE.as_str()]);
 		url.query_pairs_mut().extend_pairs(queries.into_queries()).finish();
@@ -239,12 +233,8 @@ impl Client<FhirR4B> {
 		let request = self.0.client.get(url).header(header::ACCEPT, MIME_TYPE);
 
 		let response = self.run_request(request).await?;
-		if response.status().is_success() {
-			let resource: Bundle = response.json().await?;
-			Ok(resource)
-		} else {
-			Err(Error::from_response_r4b(response).await)
-		}
+
+		response.body().await
 	}
 
 	/// Operation `$everything` on `Patient`, returning a Bundle with all
@@ -254,12 +244,8 @@ impl Client<FhirR4B> {
 		let request = self.0.client.get(url).header(header::ACCEPT, MIME_TYPE);
 
 		let response = self.run_request(request).await?;
-		if response.status().is_success() {
-			let resource: Bundle = response.json().await?;
-			Ok(resource)
-		} else {
-			Err(Error::from_response_r4b(response).await)
-		}
+
+		response.body().await
 	}
 
 	/// Operation `$match` on `Patient`, returning matches for Patient records
@@ -308,11 +294,7 @@ impl Client<FhirR4B> {
 			.json(&parameters);
 
 		let response = self.run_request(request).await?;
-		if response.status().is_success() {
-			let resource: Bundle = response.json().await?;
-			Ok(resource)
-		} else {
-			Err(Error::from_response_r4b(response).await)
-		}
+
+		response.body().await
 	}
 }
