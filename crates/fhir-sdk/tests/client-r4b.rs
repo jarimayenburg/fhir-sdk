@@ -7,7 +7,6 @@ mod common;
 use std::{env, str::FromStr};
 
 use eyre::Result;
-use fhir_model::r4b::resources::TypedResource;
 use fhir_sdk::{
 	client::{
 		r4b::{DateSearch, ReferenceSearch, TokenSearch},
@@ -25,7 +24,7 @@ use fhir_sdk::{
 			PatientGeneralPractitionerReferenceTarget, Practitioner, Resource, ResourceType,
 			TypedResource,
 		},
-		types::{CodeableConcept, HumanName, Identifier, Reference},
+		types::{CodeableConcept, Coding, HumanName, Identifier, Reference},
 	},
 	Date,
 };
