@@ -22,7 +22,7 @@ use fhir_sdk::{
 		resources::{
 			BaseResource, Bundle, Encounter, Observation, ObservationSubjectReferenceTarget,
 			OperationOutcome, ParametersParameter, ParametersParameterValue, Patient, Resource,
-			ResourceType,
+			ResourceType, TypedResource,
 		},
 		types::{CodeableConcept, HumanName, Identifier, Reference},
 	},
