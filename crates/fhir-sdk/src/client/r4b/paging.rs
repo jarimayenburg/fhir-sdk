@@ -8,7 +8,8 @@ use fhir_model::r4b::{
 };
 use futures::{future::BoxFuture, ready, FutureExt, Stream, StreamExt};
 use reqwest::Url;
-use serde::de::DeserializeOwned;
+
+use crate::client::r4b::references::populate_reference_targets;
 
 use super::{Client, Error, FhirR4B};
 
@@ -37,7 +38,7 @@ impl<R: NamedResource> Paged<R> {
 
 impl<R> Stream for Paged<R>
 where
-	R: NamedResource + DomainResource + TryFrom<Resource> + DeserializeOwned + 'static,
+	R: NamedResource + DomainResource + TryFrom<Resource> + 'static,
 {
 	type Item = Result<R, Error>;
 
@@ -50,7 +51,7 @@ where
 
 		// If there are still matches left, get the next one
 		if let Some(matches) = self.matches.as_mut() {
-			tracing::debug!("Paged::matches is set, polling for next match");
+			tracing::trace!("Paged::matches is set, polling for next match");
 			if let Poll::Ready(res) = matches.poll_next_unpin(cx) {
 				if let Some(r) = res {
 					tracing::debug!("Next match in Paged::matches available");
@@ -62,7 +63,7 @@ where
 			}
 		// If there are no more matches and there is a next page future, check if it's ready
 		} else if let Some(future_next_page) = self.future_next_page.as_mut() {
-			tracing::debug!("Paged::future_next_page is set, polling for next page");
+			tracing::trace!("Paged::future_next_page is set, polling for next page");
 			if let Poll::Ready(next_page) = future_next_page.as_mut().poll(cx) {
 				self.future_next_page = None;
 				tracing::debug!("Next page fetched and ready");
@@ -96,15 +97,15 @@ where
 		// Else check if all resources were consumed or if we are waiting for new
 		// resources to arrive.
 		if self.matches.is_some() {
-			tracing::debug!("Paged results waiting for remaining resources in current page");
+			tracing::trace!("Paged results waiting for remaining resources in current page");
 			cx.waker().wake_by_ref();
 			Poll::Pending
 		} else if self.future_next_page.is_some() {
-			tracing::debug!("Paged results waiting for response to next URL fetch");
+			tracing::trace!("Paged results waiting for response to next URL fetch");
 			cx.waker().wake_by_ref();
 			Poll::Pending
 		} else if self.next_url.is_some() {
-			tracing::debug!("Paged results waiting to fetch next URL");
+			tracing::trace!("Paged results waiting to fetch next URL");
 			cx.waker().wake_by_ref();
 			Poll::Pending
 		} else {
@@ -134,7 +135,7 @@ fn find_next_page_url(bundle: &Bundle) -> Option<&String> {
 }
 
 /// Query a resource from a given URL.
-async fn fetch_resource<R: DeserializeOwned>(
+async fn fetch_resource<R: TryFrom<Resource>>(
 	client: Client<FhirR4B>,
 	url: Url,
 ) -> Result<R, Error> {
@@ -202,7 +203,7 @@ where
 
 impl<R> Stream for SearchMatches<R>
 where
-	R: NamedResource + DomainResource + TryFrom<Resource> + DeserializeOwned + 'static,
+	R: NamedResource + DomainResource + TryFrom<Resource> + 'static,
 {
 	type Item = Result<R, Error>;
 
@@ -220,7 +221,12 @@ where
 					tracing::trace!("Next `fullUrl` fetched resource ready");
 
 					self.future_resource = None;
-					self.client.populate_reference_targets(&self.bundle, &mut resource);
+					populate_reference_targets(
+						&self.client.0.base_url,
+						&mut resource,
+						Some(&self.bundle),
+						None,
+					);
 
 					Poll::Ready(Some(Ok(resource)))
 				}
@@ -238,7 +244,12 @@ where
 					Error::WrongResourceType(resource_type.to_string(), R::TYPE.to_string())
 				})?;
 
-				self.client.populate_reference_targets(&self.bundle, &mut r);
+				populate_reference_targets(
+					&self.client.0.base_url,
+					&mut r,
+					Some(&self.bundle),
+					None,
+				);
 
 				return Poll::Ready(Some(Ok(r)));
 			} else if let Some(url) = entry.full_url {
