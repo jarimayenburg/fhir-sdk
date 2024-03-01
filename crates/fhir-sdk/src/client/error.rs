@@ -110,28 +110,4 @@ impl Error {
 			_ => false,
 		}
 	}
-
-	#[cfg(feature = "r4b")]
-	/// Extract the error from a response.
-	pub(crate) async fn from_response_r4b(response: reqwest::Response) -> Self {
-		let status = response.status();
-		let body = response.text().await.unwrap_or_default();
-		if let Ok(outcome) = serde_json::from_str(&body) {
-			Self::OperationOutcomeR4B(status, outcome)
-		} else {
-			Self::Response(status, body)
-		}
-	}
-
-	#[cfg(feature = "stu3")]
-	/// Extract the error from a response.
-	pub(crate) async fn from_response_stu3(response: reqwest::Response) -> Self {
-		let status = response.status();
-		let body = response.text().await.unwrap_or_default();
-		if let Ok(outcome) = serde_json::from_str(&body) {
-			Self::OperationOutcomeStu3(status, outcome)
-		} else {
-			Self::Response(status, body)
-		}
-	}
 }
