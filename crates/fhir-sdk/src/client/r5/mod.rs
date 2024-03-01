@@ -36,7 +36,7 @@ use self::{
 	patch::{PatchViaFhir, PatchViaJson},
 	transaction::BatchTransaction,
 };
-use super::{misc, response::ParseResponseBody, Client, Error, FhirR5, SearchParameters};
+use super::{misc, Client, Error, FhirR5, SearchParameters};
 
 /// FHIR MIME-type this client uses.
 const MIME_TYPE: &str = JSON_MIME_TYPE;

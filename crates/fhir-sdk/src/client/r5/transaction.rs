@@ -8,8 +8,6 @@ use fhir_model::r5::{
 use reqwest::header::{self, HeaderValue};
 use uuid::Uuid;
 
-use crate::client::response::ParseResponseBody;
-
 use super::{Client, Error, FhirR5, MIME_TYPE};
 
 /// A batch/transaction request builder.
