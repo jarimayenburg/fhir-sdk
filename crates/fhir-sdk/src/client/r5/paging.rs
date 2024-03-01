@@ -51,7 +51,7 @@ where
 
 		// If there are still matches left, get the next one
 		if let Some(matches) = self.matches.as_mut() {
-			tracing::debug!("Paged::matches is set, polling for next match");
+			tracing::trace!("Paged::matches is set, polling for next match");
 			if let Poll::Ready(res) = matches.poll_next_unpin(cx) {
 				if let Some(r) = res {
 					tracing::debug!("Next match in Paged::matches available");
@@ -63,7 +63,7 @@ where
 			}
 		// If there are no more matches and there is a next page future, check if it's ready
 		} else if let Some(future_next_page) = self.future_next_page.as_mut() {
-			tracing::debug!("Paged::future_next_page is set, polling for next page");
+			tracing::trace!("Paged::future_next_page is set, polling for next page");
 			if let Poll::Ready(next_page) = future_next_page.as_mut().poll(cx) {
 				self.future_next_page = None;
 				tracing::debug!("Next page fetched and ready");
@@ -97,15 +97,15 @@ where
 		// Else check if all resources were consumed or if we are waiting for new
 		// resources to arrive.
 		if self.matches.is_some() {
-			tracing::debug!("Paged results waiting for remaining resources in current page");
+			tracing::trace!("Paged results waiting for remaining resources in current page");
 			cx.waker().wake_by_ref();
 			Poll::Pending
 		} else if self.future_next_page.is_some() {
-			tracing::debug!("Paged results waiting for response to next URL fetch");
+			tracing::trace!("Paged results waiting for response to next URL fetch");
 			cx.waker().wake_by_ref();
 			Poll::Pending
 		} else if self.next_url.is_some() {
-			tracing::debug!("Paged results waiting to fetch next URL");
+			tracing::trace!("Paged results waiting to fetch next URL");
 			cx.waker().wake_by_ref();
 			Poll::Pending
 		} else {
