@@ -2,11 +2,11 @@ use fhir_model::r4b::resources::{OperationOutcome, Resource, TypedResource};
 use reqwest::Url;
 
 use crate::client::response::FhirResponse;
-use crate::client::Error;
+use crate::client::{Error, FhirR4B};
 
 use super::references::populate_reference_targets;
 
-impl FhirResponse {
+impl FhirResponse<FhirR4B> {
 	/// Attempts to parse the response body as a FHIR resource.
 	/// Returns an [Error] if the request failed or the body could not be
 	/// parsed as `R`.
