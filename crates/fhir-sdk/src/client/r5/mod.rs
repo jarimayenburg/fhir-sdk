@@ -89,8 +89,6 @@ impl Client<FhirR5> {
 	pub async fn read_referenced(&self, reference: &Reference) -> Result<Resource, Error> {
 		let parsed_reference = reference.parse().ok_or(Error::MissingReference)?;
 
-		tracing::debug!("parsed_reference: {:?}", parsed_reference);
-
 		let absolute: String = match parsed_reference {
 			ParsedReference::Local { .. } => return Err(Error::LocalReference),
 			ParsedReference::Relative { .. } => {
