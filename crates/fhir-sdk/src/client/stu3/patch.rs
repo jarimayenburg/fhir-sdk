@@ -239,11 +239,8 @@ impl<'a> PatchViaFhir<'a> {
 			.json(&parameters);
 
 		let response = self.client.run_request(request).await?;
-		if response.status().is_success() {
-			Ok(())
-		} else {
-			Err(Error::from_response_stu3(response).await)
-		}
+
+		response.successful().await
 	}
 }
 
@@ -367,10 +364,7 @@ impl<'a> PatchViaJson<'a> {
 			.json(&self.operations);
 
 		let response = self.client.run_request(request).await?;
-		if response.status().is_success() {
-			Ok(())
-		} else {
-			Err(Error::from_response_stu3(response).await)
-		}
+
+		response.successful().await
 	}
 }
