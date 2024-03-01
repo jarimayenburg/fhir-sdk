@@ -94,6 +94,10 @@ pub enum Error {
 	/// Wrong resource was delivered.
 	#[error("Resource type {0} is not the requested type {1}")]
 	WrongResourceType(String, String),
+
+	/// Unexpected resource type.
+	#[error("Unexpected resource type {0}")]
+	UnexpectedResourceType(String),
 }
 
 impl Error {
@@ -114,18 +118,6 @@ impl Error {
 		let body = response.text().await.unwrap_or_default();
 		if let Ok(outcome) = serde_json::from_str(&body) {
 			Self::OperationOutcomeR4B(status, outcome)
-		} else {
-			Self::Response(status, body)
-		}
-	}
-
-	#[cfg(feature = "r5")]
-	/// Extract the error from a response.
-	pub(crate) async fn from_response_r5(response: reqwest::Response) -> Self {
-		let status = response.status();
-		let body = response.text().await.unwrap_or_default();
-		if let Ok(outcome) = serde_json::from_str(&body) {
-			Self::OperationOutcomeR5(status, outcome)
 		} else {
 			Self::Response(status, body)
 		}
