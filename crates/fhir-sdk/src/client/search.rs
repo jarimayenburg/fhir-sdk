@@ -102,6 +102,14 @@ impl SearchParameters {
 		Self::default()
 	}
 
+	/// Initialize a new [`SearchParameters`] with a parameter
+	pub fn with<P>(parameter: P) -> Self
+	where
+		P: SearchParameter,
+	{
+		Self::empty().and(parameter)
+	}
+
 	/// Add a search parameter.
 	#[must_use]
 	pub fn and<P>(mut self, parameter: P) -> Self
