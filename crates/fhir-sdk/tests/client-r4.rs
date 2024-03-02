@@ -9,8 +9,8 @@ use std::str::FromStr;
 use eyre::Result;
 use fhir_sdk::{
 	client::{
-		r4b::{DateSearch, TokenSearch},
-		Client, FhirR4B, ResourceWrite, SearchParameters,
+		r4b::search::{DateParam, TokenParam},
+		Client, FhirR4B, ResourceWrite,
 	},
 	r4b::{
 		codes::{AdministrativeGender, EncounterStatus, IssueSeverity, SearchComparator},
@@ -200,21 +200,15 @@ async fn search_inner() -> Result<()> {
 	let id = patient.create(&client).await?;
 
 	let patients: Vec<Patient> = client
-		.search(
-			SearchParameters::empty()
-				.and_raw("_id", id)
-				.and(DateSearch {
-					name: "birthdate",
-					comparator: Some(SearchComparator::Eq),
-					value: date_str,
-				})
-				.and(TokenSearch::Standard {
-					name: "active",
-					system: None,
-					code: Some("false"),
-					not: false,
-				}),
-		)
+		.search()
+		.with_raw("_id", id)
+		.and(DateParam {
+			name: "birthdate",
+			comparator: Some(SearchComparator::Eq),
+			value: date_str,
+		})
+		.and(TokenParam::Standard { name: "active", system: None, code: Some("false"), not: false })
+		.send()
 		.try_collect()
 		.await?;
 	assert_eq!(patients.len(), 1);
@@ -318,11 +312,9 @@ async fn paging_inner() -> Result<()> {
 
 	println!("Starting search..");
 	let patients: Vec<Patient> = client
-		.search(SearchParameters::empty().and(DateSearch {
-			name: "birthdate",
-			comparator: Some(SearchComparator::Eq),
-			value: date,
-		}))
+		.search()
+		.with(DateParam { name: "birthdate", comparator: Some(SearchComparator::Eq), value: date })
+		.send()
 		.try_collect()
 		.await?;
 	let patients_len = patients.len();

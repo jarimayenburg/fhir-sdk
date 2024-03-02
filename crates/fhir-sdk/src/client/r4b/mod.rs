@@ -1,16 +1,15 @@
 //! FHIR R4B client implementation.
 
-mod paging;
 mod patch;
 mod references;
 mod response;
-mod search;
+pub mod search;
 mod transaction;
 
 use fhir_model::{
 	r4b::{
 		resources::{
-			BaseResource, Bundle, CapabilityStatement, DomainResource, NamedResource, Parameters,
+			BaseResource, Bundle, CapabilityStatement, NamedResource, Parameters,
 			ParametersParameter, ParametersParameterValue, Patient, Resource, ResourceType,
 			TypedResource,
 		},
@@ -19,23 +18,17 @@ use fhir_model::{
 	},
 	ParsedReference,
 };
-use futures::Stream;
 use reqwest::{
 	header::{self, HeaderValue},
 	StatusCode, Url,
 };
 use serde::Serialize;
 
-pub use self::search::{
-	DateSearch, MissingSearch, NumberSearch, QuantitySearch, ReferenceSearch, StringSearch,
-	TokenSearch, UriSearch,
-};
 use self::{
-	paging::Paged,
 	patch::{PatchViaFhir, PatchViaJson},
 	transaction::BatchTransaction,
 };
-use super::{misc, Client, Error, FhirR4B, SearchParameters};
+use super::{misc, Client, Error, FhirR4B};
 
 /// FHIR MIME-type this client uses.
 const MIME_TYPE: &str = JSON_MIME_TYPE;
@@ -198,22 +191,6 @@ impl Client<FhirR4B> {
 		let response = self.run_request(request).await?;
 
 		response.successful().await
-	}
-
-	/// Search for FHIR resources of a given type given the query parameters.
-	/// This simply ignores resources of the wrong type, e.g. an additional
-	/// OperationOutcome.
-	pub fn search<R>(
-		&self,
-		queries: SearchParameters,
-	) -> impl Stream<Item = Result<R, Error>> + Send + 'static
-	where
-		R: NamedResource + DomainResource + TryFrom<Resource> + 'static,
-	{
-		let mut url = self.url(&[R::TYPE.as_str()]);
-		url.query_pairs_mut().extend_pairs(queries.into_queries()).finish();
-
-		Paged::new(self.clone(), url)
 	}
 
 	/// Start building a new batch request.

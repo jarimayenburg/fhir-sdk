@@ -1,23 +1,23 @@
-//! FHIR paging functionality, e.g. for search results.
+//! FHIR search paging functionality
 
 use std::{collections::VecDeque, pin::Pin, task::Poll};
 
-use fhir_model::r5::{
-	codes::{BundleType, LinkRelationTypes, SearchEntryMode},
+use fhir_model::r4b::{
+	codes::{BundleType, SearchEntryMode},
 	resources::{Bundle, BundleEntry, DomainResource, NamedResource, Resource, TypedResource},
 };
 use futures::{future::BoxFuture, ready, FutureExt, Stream, StreamExt};
 use reqwest::Url;
 
-use crate::client::r5::references::populate_reference_targets_internal;
+use crate::client::r4b::references::populate_reference_targets_internal;
 
-use super::{Client, Error, FhirR5};
+use super::{Client, Error, FhirR4B};
 
 /// Results of a query that can be paged or given via URL only. The resources
 /// can be consumed via the `Stream`/`StreamExt` traits.
 pub struct Paged<R> {
 	/// The FHIR client to make further requests for the next pages.
-	client: Client<FhirR5>,
+	client: Client<FhirR4B>,
 	/// The URL of the next page. This is opaque and can be anything the server
 	/// wants. The client ensures it accesses the same server only.
 	next_url: Option<Url>,
@@ -29,7 +29,7 @@ pub struct Paged<R> {
 
 impl<R: NamedResource> Paged<R> {
 	/// Start up a new Paged<R> stream.
-	pub(crate) fn new(client: Client<FhirR5>, url: Url) -> Self {
+	pub(crate) fn new(client: Client<FhirR4B>, url: Url) -> Self {
 		let future_next_page = Some(fetch_resource(client.clone(), url).boxed());
 
 		Self { client, next_url: None, matches: None, future_next_page }
@@ -131,17 +131,12 @@ where
 
 /// Find the URL of the next page of the results returned in the Bundle.
 fn find_next_page_url(bundle: &Bundle) -> Option<&String> {
-	bundle
-		.link
-		.iter()
-		.flatten()
-		.find(|link| link.relation == LinkRelationTypes::Next)
-		.map(|link| &link.url)
+	bundle.link.iter().flatten().find(|link| link.relation == "next").map(|link| &link.url)
 }
 
 /// Query a resource from a given URL.
 async fn fetch_resource<R: TryFrom<Resource>>(
-	client: Client<FhirR5>,
+	client: Client<FhirR4B>,
 	url: Url,
 ) -> Result<R, Error> {
 	let url_str = url.to_string();
@@ -171,7 +166,7 @@ impl<R> std::fmt::Debug for Paged<R> {
 /// if the resource field is empty. Fills resource reference target fields with the referred to resources,
 /// if available in the Bundle.
 struct SearchMatches<R> {
-	client: Client<FhirR5>,
+	client: Client<FhirR4B>,
 	bundle: Bundle,
 	matches: VecDeque<BundleEntry>,
 	future_resource: Option<BoxFuture<'static, Result<R, Error>>>,
@@ -181,7 +176,7 @@ impl<R> SearchMatches<R>
 where
 	R: NamedResource + DomainResource + TryFrom<Resource>,
 {
-	pub fn from_searchset(client: Client<FhirR5>, bundle: Bundle) -> SearchMatches<R> {
+	pub fn from_searchset(client: Client<FhirR4B>, bundle: Bundle) -> SearchMatches<R> {
 		assert!(
 			bundle.r#type == BundleType::Searchset,
 			"unable to get search matches from non-searchset Bundles"
