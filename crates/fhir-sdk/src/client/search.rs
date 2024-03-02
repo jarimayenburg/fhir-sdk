@@ -34,6 +34,12 @@ where
 		self
 	}
 
+	/// Add an existing set of search parameters
+	pub fn with_params(mut self, parameters: SearchParameters) -> Self {
+		self.params.add_all(parameters);
+		self
+	}
+
 	/// Add a search parameter as a raw string.
 	///
 	/// Prefer [Search::with] if possible.
@@ -131,6 +137,12 @@ impl SearchParameters {
 		let (key, value) = parameter.into_query();
 
 		self.add_raw(key, value);
+	}
+
+	fn add_all(&mut self, parameters: SearchParameters) {
+		for (key, value) in parameters.into_queries() {
+			self.add_raw(key, value);
+		}
 	}
 
 	fn add_raw(&mut self, key: impl Into<String>, value: impl ToString) {
