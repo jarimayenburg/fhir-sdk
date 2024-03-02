@@ -9,8 +9,8 @@ use std::{env, str::FromStr};
 use eyre::Result;
 use fhir_sdk::{
 	client::{
-		r4b::{DateSearch, ReferenceSearch, TokenSearch},
-		Client, FhirR4B, ResourceWrite, SearchParameters,
+		r4b::search::{DateParam, ReferenceParam, TokenParam},
+		Client, FhirR4B, ResourceWrite,
 	},
 	r4b::{
 		codes::{
@@ -251,23 +251,18 @@ async fn search_inner() -> Result<()> {
 	let id = patient.create(&client).await?;
 
 	let patients: Vec<Patient> = client
-		.search(
-			SearchParameters::empty()
-				.and_raw("_id", id)
-				.and(DateSearch {
-					name: "birthdate",
-					comparator: Some(SearchComparator::Eq),
-					value: date_str,
-				})
-				.and(TokenSearch::Standard {
-					name: "active",
-					system: None,
-					code: Some("false"),
-					not: false,
-				}),
-		)
+		.search()
+		.with_raw("_id", id)
+		.and(DateParam {
+			name: "birthdate",
+			comparator: Some(SearchComparator::Eq),
+			value: date_str,
+		})
+		.and(TokenParam::Standard { name: "active", system: None, code: Some("false"), not: false })
+		.send()
 		.try_collect()
 		.await?;
+
 	assert_eq!(patients.len(), 1);
 	assert_eq!(patients[0].active, Some(false));
 	assert_eq!(patients[0].birth_date, Some(date));
@@ -369,11 +364,9 @@ async fn paging_inner() -> Result<()> {
 
 	println!("Starting search..");
 	let patients: Vec<Patient> = client
-		.search(SearchParameters::empty().and(DateSearch {
-			name: "birthdate",
-			comparator: Some(SearchComparator::Eq),
-			value: date,
-		}))
+		.search()
+		.with(DateParam { name: "birthdate", comparator: Some(SearchComparator::Eq), value: date })
+		.send()
 		.try_collect()
 		.await?;
 	assert_eq!(patients.len(), n);
@@ -427,27 +420,28 @@ async fn paging_with_includes_inner() -> Result<()> {
 
 	println!("Starting search..");
 	let observations: Vec<Observation> = client
-		.search::<Observation>(
-			SearchParameters::empty()
-				.and(ReferenceSearch::Chaining {
-					name: "subject",
-					resource_type: Some(ResourceType::Patient),
-					target_name: "birthdate",
-					value: birthdate,
-				})
-				.and_raw("_include", "Observation:subject"),
-		)
+		.search()
+		.with(ReferenceParam::Chaining {
+			name: "subject",
+			resource_type: Some(ResourceType::Patient),
+			target_name: "birthdate",
+			value: birthdate,
+		})
+		.and_raw("_include", "Observation:subject")
+		.send()
 		.try_collect()
 		.await?;
 
 	assert_eq!(observations.len(), n);
 
 	let mut patients: Vec<Patient> = client
-		.search::<Patient>(SearchParameters::empty().and(DateSearch {
+		.search()
+		.with(DateParam {
 			name: "birthdate",
 			comparator: Some(SearchComparator::Eq),
 			value: birthdate,
-		}))
+		})
+		.send()
 		.try_collect()
 		.await?;
 
@@ -518,7 +512,7 @@ async fn operation_encounter_everything_inner() -> Result<()> {
 }
 
 #[test]
-#[ignore = "Server does not support this"]
+#[ignore = "HAPI server does not support this"]
 fn operation_patient_match() -> Result<()> {
 	common::RUNTIME.block_on(operation_patient_match_inner())
 }

@@ -1,15 +1,12 @@
-//! Client search implementation.
-
-use fhir_model::r5::{codes::SearchComparator, resources::ResourceType};
-
-use super::super::search::{escape_value, SearchParameter};
+use crate::client::search::{escape_value, SearchParameter};
+use fhir_model::r4b::{codes::SearchComparator, resources::ResourceType};
 
 /// Number search.
 ///
 /// Only implements most common functionality. Refer to adding raw queries when
 /// this does not suffice.
 #[derive(Debug, Clone)]
-pub struct NumberSearch<'a> {
+pub struct NumberParam<'a> {
 	/// Name of the field.
 	name: &'a str,
 	/// Values encoded as string already (will be comma-separated for
@@ -17,7 +14,7 @@ pub struct NumberSearch<'a> {
 	values: Vec<String>,
 }
 
-impl<'a> NumberSearch<'a> {
+impl<'a> NumberParam<'a> {
 	/// Start with empty values and add values one at a time.
 	#[must_use]
 	pub fn new(name: &'a str) -> Self {
@@ -37,7 +34,7 @@ impl<'a> NumberSearch<'a> {
 	}
 }
 
-impl<'a> SearchParameter for NumberSearch<'a> {
+impl<'a> SearchParameter for NumberParam<'a> {
 	fn into_query(self) -> (String, String) {
 		(self.name.to_owned(), self.values.join(","))
 	}
@@ -48,7 +45,7 @@ impl<'a> SearchParameter for NumberSearch<'a> {
 /// Only implements most common functionality. Refer to adding raw queries when
 /// this does not suffice.
 #[derive(Debug, Clone, Copy)]
-pub struct DateSearch<'a> {
+pub struct DateParam<'a> {
 	/// Name of the field.
 	pub name: &'a str,
 	/// Search comparator to compare the date.
@@ -57,7 +54,7 @@ pub struct DateSearch<'a> {
 	pub value: &'a str,
 }
 
-impl<'a> SearchParameter for DateSearch<'a> {
+impl<'a> SearchParameter for DateParam<'a> {
 	fn into_query(self) -> (String, String) {
 		if let Some(comparator) = self.comparator {
 			(self.name.to_owned(), format!("{}{}", comparator.as_ref(), escape_value(self.value)))
@@ -72,7 +69,7 @@ impl<'a> SearchParameter for DateSearch<'a> {
 /// Only implements most common functionality. Refer to adding raw queries when
 /// this does not suffice.
 #[derive(Debug, Clone, Copy)]
-pub enum StringSearch<'a> {
+pub enum StringParam<'a> {
 	/// Standard string search. This is a case-insensitive starts-with search.
 	Standard {
 		/// Name of the field to search on.
@@ -97,7 +94,7 @@ pub enum StringSearch<'a> {
 	},
 }
 
-impl<'a> SearchParameter for StringSearch<'a> {
+impl<'a> SearchParameter for StringParam<'a> {
 	fn into_query(self) -> (String, String) {
 		let (name, modifier, value) = match self {
 			Self::Standard { name, value } => (name, "", value),
@@ -113,7 +110,7 @@ impl<'a> SearchParameter for StringSearch<'a> {
 /// Only implements most common functionality. Refer to adding raw queries when
 /// this does not suffice.
 #[derive(Debug, Clone, Copy)]
-pub enum TokenSearch<'a> {
+pub enum TokenParam<'a> {
 	/// Standard token search (or `not` search).
 	Standard {
 		/// Name of the field to search on.
@@ -154,7 +151,7 @@ pub enum TokenSearch<'a> {
 	},
 }
 
-impl<'a> SearchParameter for TokenSearch<'a> {
+impl<'a> SearchParameter for TokenParam<'a> {
 	fn into_query(self) -> (String, String) {
 		match self {
 			Self::Standard { name, system, code, not } => {
@@ -193,7 +190,7 @@ impl<'a> SearchParameter for TokenSearch<'a> {
 /// Only implements most common functionality. Refer to adding raw queries when
 /// this does not suffice.
 #[derive(Debug, Clone, Copy)]
-pub enum ReferenceSearch<'a> {
+pub enum ReferenceParam<'a> {
 	/// Standard reference search by relative reference.
 	Standard {
 		/// Name of the field.
@@ -238,7 +235,7 @@ pub enum ReferenceSearch<'a> {
 	},
 }
 
-impl<'a> SearchParameter for ReferenceSearch<'a> {
+impl<'a> SearchParameter for ReferenceParam<'a> {
 	fn into_query(self) -> (String, String) {
 		match self {
 			Self::Standard { name, resource_type, id, version_id } => {
@@ -282,7 +279,7 @@ impl<'a> SearchParameter for ReferenceSearch<'a> {
 /// Only implements most common functionality. Refer to adding raw queries when
 /// this does not suffice.
 #[derive(Debug, Clone, Copy)]
-pub struct QuantitySearch<'a> {
+pub struct QuantityParam<'a> {
 	/// Name of the field.
 	pub name: &'a str,
 	/// Search comparator to compare the date.
@@ -295,7 +292,7 @@ pub struct QuantitySearch<'a> {
 	pub code: Option<&'a str>,
 }
 
-impl<'a> SearchParameter for QuantitySearch<'a> {
+impl<'a> SearchParameter for QuantityParam<'a> {
 	fn into_query(self) -> (String, String) {
 		let value = if let Some(comparator) = self.comparator {
 			format!("{}{}", comparator.as_ref(), escape_value(self.value))
@@ -322,7 +319,7 @@ impl<'a> SearchParameter for QuantitySearch<'a> {
 /// Only implements most common functionality. Refer to adding raw queries when
 /// this does not suffice.
 #[derive(Debug, Clone, Copy)]
-pub enum UriSearch<'a> {
+pub enum UriParam<'a> {
 	/// Standard URI search, that matches exactly.
 	Standard {
 		/// Name of the field.
@@ -348,7 +345,7 @@ pub enum UriSearch<'a> {
 	},
 }
 
-impl<'a> SearchParameter for UriSearch<'a> {
+impl<'a> SearchParameter for UriParam<'a> {
 	fn into_query(self) -> (String, String) {
 		let (name, modifier, uri) = match self {
 			Self::Standard { name, uri } => (name, "", uri),
@@ -362,14 +359,14 @@ impl<'a> SearchParameter for UriSearch<'a> {
 /// Search on any item whether it is a missing field using the `missing`
 /// modifier.
 #[derive(Debug, Clone, Copy)]
-pub struct MissingSearch<'a> {
+pub struct MissingParam<'a> {
 	/// Name of the field.
 	pub name: &'a str,
 	/// Whether to search for the absent field (or the present).
 	pub missing: bool,
 }
 
-impl<'a> SearchParameter for MissingSearch<'a> {
+impl<'a> SearchParameter for MissingParam<'a> {
 	fn into_query(self) -> (String, String) {
 		(format!("{}:missing", self.name), self.missing.to_string())
 	}
@@ -381,7 +378,7 @@ mod tests {
 
 	#[test]
 	fn number() {
-		let number = NumberSearch::new("value-quantity")
+		let number = NumberParam::new("value-quantity")
 			.or(Some(SearchComparator::Lt), 60)
 			.or(Some(SearchComparator::Gt), 100);
 		assert_eq!(number.into_query(), ("value-quantity".to_owned(), "lt60,gt100".to_owned()));
@@ -389,7 +386,7 @@ mod tests {
 
 	#[test]
 	fn token() {
-		let token = TokenSearch::Standard {
+		let token = TokenParam::Standard {
 			name: "identifier",
 			system: None,
 			code: Some("code"),
@@ -397,7 +394,7 @@ mod tests {
 		};
 		assert_eq!(token.into_query(), ("identifier:not".to_owned(), "code".to_owned()));
 
-		let token = TokenSearch::Standard {
+		let token = TokenParam::Standard {
 			name: "identifier",
 			system: Some(""),
 			code: Some("code"),
@@ -405,7 +402,7 @@ mod tests {
 		};
 		assert_eq!(token.into_query(), ("identifier".to_owned(), "|code".to_owned()));
 
-		let token = TokenSearch::Standard {
+		let token = TokenParam::Standard {
 			name: "identifier",
 			system: Some("system"),
 			code: None,
@@ -413,14 +410,13 @@ mod tests {
 		};
 		assert_eq!(token.into_query(), ("identifier".to_owned(), "system|".to_owned()));
 
-		let token =
-			TokenSearch::OfType { type_system: None, type_code: None, value: Some("value") };
+		let token = TokenParam::OfType { type_system: None, type_code: None, value: Some("value") };
 		assert_eq!(token.into_query(), ("identifier:of-type".to_owned(), "||value".to_owned()));
 	}
 
 	#[test]
 	fn reference() {
-		let reference = ReferenceSearch::Chaining {
+		let reference = ReferenceParam::Chaining {
 			name: "focus",
 			resource_type: Some(ResourceType::Encounter),
 			target_name: "status",
@@ -434,7 +430,7 @@ mod tests {
 
 	#[test]
 	fn quantity() {
-		let quantity = QuantitySearch {
+		let quantity = QuantityParam {
 			name: "test",
 			comparator: None,
 			value: "1.0",
@@ -443,7 +439,7 @@ mod tests {
 		};
 		assert_eq!(quantity.into_query(), ("test".to_owned(), "1.0".to_owned()));
 
-		let quantity = QuantitySearch {
+		let quantity = QuantityParam {
 			name: "test",
 			comparator: None,
 			value: "1.0",
@@ -455,7 +451,7 @@ mod tests {
 
 	#[test]
 	fn missing() {
-		let missing = MissingSearch { name: "identifier", missing: true };
+		let missing = MissingParam { name: "identifier", missing: true };
 		assert_eq!(missing.into_query(), ("identifier:missing".to_owned(), "true".to_owned()));
 	}
 }
