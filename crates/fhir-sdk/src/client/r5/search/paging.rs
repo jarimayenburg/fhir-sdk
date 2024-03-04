@@ -13,30 +13,30 @@ use crate::client::{r5::references::populate_reference_targets_internal, search:
 
 use super::{Client, Error, FhirR5};
 
-/// Paged search matches unwrapped into a single stream of resources. The resources
+/// Unwraps search pages into a single stream of resources. The resources
 /// can be consumed via the `Stream`/`StreamExt` traits.
-pub struct Paged<R> {
+pub struct Unpaged<R> {
 	/// The FHIR client to make further requests for the next pages.
 	client: Client<FhirR5>,
 	/// The URL of the next page. This is opaque and can be anything the server
 	/// wants. The client ensures it accesses the same server only.
 	next_url: Option<Url>,
-	/// The current set of search matches.
-	matches: Option<SearchMatches<R>>,
+	/// The current page of matches.
+	page: Option<Page<R>>,
 	/// Current future to retrieve the next page.
 	future_next_page: Option<BoxFuture<'static, Result<Bundle, Error>>>,
 }
 
-impl<R> Paged<R> {
+impl<R> Unpaged<R> {
 	/// Start up a new Paged<R> stream.
 	pub(crate) fn new(client: Client<FhirR5>, url: Url) -> Self {
 		let future_next_page = Some(fetch_resource(client.clone(), url).boxed());
 
-		Self { client, next_url: None, matches: None, future_next_page }
+		Self { client, next_url: None, page: None, future_next_page }
 	}
 }
 
-impl<R> SearchResponse<R> for Paged<R>
+impl<R> SearchResponse<R> for Unpaged<R>
 where
 	R: NamedResource + DomainResource + TryFrom<Resource> + 'static,
 {
@@ -46,7 +46,7 @@ where
 	}
 }
 
-impl<R> Stream for Paged<R>
+impl<R> Stream for Unpaged<R>
 where
 	R: NamedResource + DomainResource + TryFrom<Resource> + 'static,
 {
@@ -60,7 +60,7 @@ where
 		let _span_guard = span.enter();
 
 		// If there are still matches left, get the next one
-		if let Some(matches) = self.matches.as_mut() {
+		if let Some(matches) = self.page.as_mut() {
 			tracing::trace!("Paged::matches is set, polling for next match");
 			if let Poll::Ready(res) = matches.poll_next_unpin(cx) {
 				if let Some(r) = res {
@@ -68,7 +68,7 @@ where
 					return Poll::Ready(Some(r));
 				} else {
 					tracing::debug!("Paged::matches is empty, waiting for next page");
-					self.matches = None;
+					self.page = None;
 				}
 			}
 		// If there are no more matches and there is a next page future, check if it's ready
@@ -94,7 +94,7 @@ where
 				}
 
 				// Save the `BundleEntry`s.
-				self.matches = Some(SearchMatches::from_searchset(self.client.clone(), bundle));
+				self.page = Some(Page::from_searchset(self.client.clone(), bundle));
 			}
 		// Start retrieving the next page if we have a next URL and there is no next page being fetched.
 		} else if let Some(next_url) = self.next_url.as_ref() {
@@ -106,7 +106,7 @@ where
 
 		// Else check if all resources were consumed or if we are waiting for new
 		// resources to arrive.
-		if self.matches.is_some() {
+		if self.page.is_some() {
 			tracing::trace!("Paged results waiting for remaining resources in current page");
 			cx.waker().wake_by_ref();
 			Poll::Pending
@@ -125,7 +125,7 @@ where
 	}
 
 	fn size_hint(&self) -> (usize, Option<usize>) {
-		if let Some(matches) = &self.matches {
+		if let Some(matches) = &self.page {
 			let (page_min, page_max) = matches.size_hint();
 
 			if self.next_url.is_some() {
@@ -165,12 +165,12 @@ async fn fetch_resource<R: TryFrom<Resource>>(
 	resource.ok_or_else(|| Error::ResourceNotFound(url_str))
 }
 
-impl<R> std::fmt::Debug for Paged<R> {
+impl<R> std::fmt::Debug for Unpaged<R> {
 	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
 		f.debug_struct("Paged")
 			.field("client", &self.client)
 			.field("next_url", &self.next_url)
-			.field("matches", &self.matches.as_ref().map(|_| "_"))
+			.field("matches", &self.page.as_ref().map(|_| "_"))
 			.field("future_next_page", &self.future_next_page.as_ref().map(|_| "_"))
 			.finish()
 	}
@@ -179,18 +179,18 @@ impl<R> std::fmt::Debug for Paged<R> {
 /// Stream that yields each match entry in a searchset Bundle. Tries to fetch entries from the fullUrl property
 /// if the resource field is empty. Fills resource reference target fields with the referred to resources,
 /// if available in the Bundle.
-struct SearchMatches<R> {
+struct Page<R> {
 	client: Client<FhirR5>,
 	bundle: Bundle,
 	matches: VecDeque<BundleEntry>,
 	future_resource: Option<BoxFuture<'static, Result<R, Error>>>,
 }
 
-impl<R> SearchMatches<R>
+impl<R> Page<R>
 where
 	R: NamedResource + DomainResource + TryFrom<Resource> + 'static,
 {
-	pub fn from_searchset(client: Client<FhirR5>, bundle: Bundle) -> SearchMatches<R> {
+	pub fn from_searchset(client: Client<FhirR5>, bundle: Bundle) -> Page<R> {
 		assert!(
 			bundle.r#type == BundleType::Searchset,
 			"unable to get search matches from non-searchset Bundles"
@@ -215,7 +215,7 @@ where
 	}
 }
 
-impl<R> Stream for SearchMatches<R>
+impl<R> Stream for Page<R>
 where
 	R: NamedResource + DomainResource + TryFrom<Resource> + 'static,
 {
