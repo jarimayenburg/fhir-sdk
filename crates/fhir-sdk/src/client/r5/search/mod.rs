@@ -5,7 +5,7 @@ use crate::client::{
 	Client, Error, FhirR5, SearchParameters,
 };
 use fhir_model::r5::resources::{DomainResource, NamedResource, Resource};
-use paging::Paged;
+use paging::Unpaged;
 
 #[allow(unused_imports)]
 pub use params::*;
@@ -22,7 +22,7 @@ where
 		url.query_pairs_mut().extend_pairs(params.into_queries()).finish();
 
 		match paging {
-			Paging::Unpaged => Paged::new(self, url),
+			Paging::Unpaged => Unpaged::new(self, url),
 			_ => panic!("Unsupported!"),
 		}
 	}
