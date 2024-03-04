@@ -356,6 +356,43 @@ impl<'a> SearchParameter for UriParam<'a> {
 	}
 }
 
+/// Include referred to resources in the search response
+#[derive(Debug, Clone, Copy)]
+pub struct IncludeParam<'a> {
+	/// Resource type from which the join comes
+	pub source_type: ResourceType,
+
+	/// Field name to join on. Must be a search parameter of type reference for the [IncludeParam::source] resource type.
+	pub name: &'a str,
+
+	/// Type of the target resource in the case the reference field can have multiple target resource types.
+	pub target_type: Option<ResourceType>,
+
+	/// Whether to recursively include.
+	pub recurse: bool,
+
+	/// Whether this is a reverse include.
+	pub reverse: bool,
+}
+
+impl<'a> SearchParameter for IncludeParam<'a> {
+	fn into_query(self) -> (String, String) {
+		let mut name: String = if self.reverse { "_revInclude" } else { "_include" }.to_string();
+
+		if self.recurse {
+			name += ":recurse";
+		}
+
+		let mut value = format!("{}:{}", self.source_type.as_str(), self.name);
+
+		if let Some(target_type) = self.target_type {
+			value = format!("{}:{}", value, target_type.as_str())
+		}
+
+		(name, value)
+	}
+}
+
 /// Search on any item whether it is a missing field using the `missing`
 /// modifier.
 #[derive(Debug, Clone, Copy)]
@@ -453,5 +490,56 @@ mod tests {
 	fn missing() {
 		let missing = MissingParam { name: "identifier", missing: true };
 		assert_eq!(missing.into_query(), ("identifier:missing".to_owned(), "true".to_owned()));
+	}
+
+	#[test]
+	fn include() {
+		let include = IncludeParam {
+			source_type: ResourceType::MedicationRequest,
+			name: "encounter",
+			target_type: None,
+			recurse: false,
+			reverse: false,
+		};
+		assert_eq!(
+			include.into_query(),
+			("_include".to_owned(), "MedicationRequest:encounter".to_owned())
+		);
+
+		let include = IncludeParam {
+			source_type: ResourceType::Observation,
+			name: "subject",
+			target_type: Some(ResourceType::Patient),
+			recurse: false,
+			reverse: false,
+		};
+		assert_eq!(
+			include.into_query(),
+			("_include".to_owned(), "Observation:subject:Patient".to_owned())
+		);
+
+		let include = IncludeParam {
+			source_type: ResourceType::Patient,
+			name: "link",
+			target_type: None,
+			recurse: true,
+			reverse: false,
+		};
+		assert_eq!(
+			include.into_query(),
+			("_include:recurse".to_owned(), "Patient:link".to_owned())
+		);
+
+		let include = IncludeParam {
+			source_type: ResourceType::Encounter,
+			name: "episode-of-care",
+			target_type: None,
+			recurse: false,
+			reverse: true,
+		};
+		assert_eq!(
+			include.into_query(),
+			("_revInclude".to_owned(), "Encounter:episode-of-care".to_owned())
+		);
 	}
 }
