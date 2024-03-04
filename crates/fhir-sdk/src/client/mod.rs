@@ -34,15 +34,33 @@ pub use self::{
 	write::ResourceWrite,
 };
 
+pub(crate) trait FhirVersion {
+	const FHIR_VERSION: &'static str;
+}
+
 /// FHIR client version to use: FHIR STU3.
 #[derive(Debug)]
 pub struct FhirStu3;
+
+impl FhirVersion for FhirStu3 {
+	const FHIR_VERSION: &'static str = "3.0";
+}
+
 /// FHIR client version to use: FHIR R4B.
 #[derive(Debug)]
 pub struct FhirR4B;
+
+impl FhirVersion for FhirR4B {
+	const FHIR_VERSION: &'static str = "4.3";
+}
+
 /// FHIR client version to use: FHIR R5.
 #[derive(Debug)]
 pub struct FhirR5;
+
+impl FhirVersion for FhirR5 {
+	const FHIR_VERSION: &'static str = "5.0";
+}
 
 #[cfg(feature = "r5")]
 /// Default client version.
@@ -82,7 +100,7 @@ impl<V> From<ClientData> for Client<V> {
 	}
 }
 
-impl<V: Send + Sync> Client<V> {
+impl<V: FhirVersion + Send + Sync> Client<V> {
 	/// Start building a new client with custom settings.
 	#[must_use]
 	pub fn builder() -> ClientBuilder<V> {
@@ -172,6 +190,23 @@ impl<V: Send + Sync> Client<V> {
 		}
 
 		Ok(FhirResponse::new(base_url, response))
+	}
+
+	/// Send a HTTP GET to a generic URL. `url` has to be on the same origin as this
+	/// client's base URL.
+	async fn fetch_url(&self, url: Url) -> Result<FhirResponse<V>, Error> {
+		// Make sure we are fetching from the same origin
+		if url.origin() != self.0.base_url.origin() {
+			return Err(Error::DifferentOrigin(url.to_string()));
+		}
+
+		let request = self.0.client.get(url).header(header::ACCEPT, self.mime_type());
+
+		self.run_request(request).await
+	}
+
+	fn mime_type(&self) -> String {
+		format!("application/fhir+json; fhirVersion={}", V::FHIR_VERSION)
 	}
 
 	/// Get the URL with the configured base URL and the given path segments.

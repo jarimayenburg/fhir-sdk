@@ -39,18 +39,19 @@ impl Client<FhirR5> {
 	/// not supported at all.
 	pub async fn capabilities(&self) -> Result<CapabilityStatement, Error> {
 		let url = self.url(&["metadata"]);
-		let request = self.0.client.get(url).header(header::ACCEPT, MIME_TYPE);
 
-		let response = self.run_request(request).await?;
+		self.fetch_resource(url).await
+	}
+
+	async fn fetch_resource<R: TryFrom<Resource>>(&self, url: Url) -> Result<R, Error> {
+		let response = self.fetch_url(url).await?;
 
 		response.body().await
 	}
 
 	/// Read any resource from any URL.
 	async fn read_generic<R: TryFrom<Resource>>(&self, url: Url) -> Result<Option<R>, Error> {
-		let request = self.0.client.get(url).header(header::ACCEPT, MIME_TYPE);
-
-		let response = self.run_request(request).await?;
+		let response = self.fetch_url(url).await?;
 
 		if [StatusCode::NOT_FOUND, StatusCode::GONE].contains(&response.status()) {
 			return Ok(None);
@@ -208,22 +209,16 @@ impl Client<FhirR5> {
 	/// resources for an `Encounter` record.
 	pub async fn operation_encounter_everything(&self, id: &str) -> Result<Bundle, Error> {
 		let url = self.url(&["Encounter", id, "$everything"]);
-		let request = self.0.client.get(url).header(header::ACCEPT, MIME_TYPE);
 
-		let response = self.run_request(request).await?;
-
-		response.body().await
+		self.fetch_resource(url).await
 	}
 
 	/// Operation `$everything` on `Patient`, returning a Bundle with all
 	/// resources for an `Patient` record.
 	pub async fn operation_patient_everything(&self, id: &str) -> Result<Bundle, Error> {
 		let url = self.url(&["Patient", id, "$everything"]);
-		let request = self.0.client.get(url).header(header::ACCEPT, MIME_TYPE);
 
-		let response = self.run_request(request).await?;
-
-		response.body().await
+		self.fetch_resource(url).await
 	}
 
 	/// Operation `$match` on `Patient`, returning matches for Patient records
@@ -283,11 +278,8 @@ impl Client<FhirR5> {
 		id: &str,
 	) -> Result<SubscriptionStatus, Error> {
 		let url = self.url(&["Subscription", id, "$status"]);
-		let request = self.0.client.get(url.clone()).header(header::ACCEPT, MIME_TYPE);
 
-		let response = self.run_request(request).await?;
-
-		let bundle: Bundle = response.body().await?;
+		let bundle: Bundle = self.fetch_resource(url.clone()).await?;
 
 		bundle
 			.0
@@ -320,10 +312,7 @@ impl Client<FhirR5> {
 		}
 
 		let url = self.url(&["Subscription", id, "$events"]);
-		let request = self.0.client.get(url).query(&queries).header(header::ACCEPT, MIME_TYPE);
 
-		let response = self.run_request(request).await?;
-
-		response.body().await
+		self.fetch_resource(url.clone()).await
 	}
 }
