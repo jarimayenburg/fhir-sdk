@@ -14,6 +14,9 @@ pub struct Search<E, R> {
 	/// Search parameters.
 	params: SearchParameters,
 
+	/// Paging information
+	paging: Paging,
+
 	resource_type: PhantomData<R>,
 }
 
@@ -22,7 +25,12 @@ where
 	E: SearchExecutor<R>,
 {
 	pub fn new(executor: E) -> Self {
-		Self { executor, params: SearchParameters::empty(), resource_type: PhantomData }
+		Self {
+			executor,
+			params: SearchParameters::empty(),
+			paging: Paging::default(),
+			resource_type: PhantomData,
+		}
 	}
 
 	/// Add a search parameter
@@ -63,17 +71,41 @@ where
 		self.with_raw(key, value)
 	}
 
+	/// Make the resulting [SearchResponse] paged. Next pages can be fetched using
+	/// [SearchResponse::next_page].
+	pub fn paged(mut self, page_size: u32) -> Self {
+		self.paging = Paging::Paged { page_size };
+		self
+	}
+
 	/// Execute the search
-	pub fn send(self) -> impl Stream<Item = Result<R, Error>> + Send + 'static {
-		self.executor.execute_search(self.params)
+	pub fn send(self) -> impl SearchResponse<R> {
+		self.executor.execute_search(self.params, self.paging)
 	}
 }
 
+/// Describes how to handle paging in the search response
+#[derive(Clone, Debug, Default)]
+pub enum Paging {
+	/// Pages from the resulting [SearchResponse] should be resolved as the stream is consumed
+	/// automatically fetching next pages and putting the matches on the stream
+	#[default]
+	Unpaged,
+
+	/// The resulting [SearchResponse] should be paged. The stream will be limited to the size
+	/// of the page and [SearchResponse::next_page] should be called to fetch the next page.
+	Paged { page_size: u32 },
+}
+
+/// Stream of resources returned by [Search::send].
+pub trait SearchResponse<R>: Stream<Item = Result<R, Error>> + Send + Sized {
+	/// If the search is paged, returns the next page. Returns `None` if the [SearchResponse] is
+	/// unpaged or if there is no next page available.
+	fn next_page(&self) -> Option<Self>;
+}
+
 pub trait SearchExecutor<R>: Sized {
-	fn execute_search(
-		self,
-		params: SearchParameters,
-	) -> impl Stream<Item = Result<R, Error>> + Send + 'static;
+	fn execute_search(self, params: SearchParameters, paging: Paging) -> impl SearchResponse<R>;
 }
 
 impl<V> Client<V> {
