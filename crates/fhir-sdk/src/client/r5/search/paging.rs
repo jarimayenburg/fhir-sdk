@@ -9,11 +9,11 @@ use fhir_model::r5::{
 use futures::{future::BoxFuture, ready, FutureExt, Stream, StreamExt};
 use reqwest::Url;
 
-use crate::client::r5::references::populate_reference_targets_internal;
+use crate::client::{r5::references::populate_reference_targets_internal, search::SearchResponse};
 
 use super::{Client, Error, FhirR5};
 
-/// Results of a query that can be paged or given via URL only. The resources
+/// Paged search matches unwrapped into a single stream of resources. The resources
 /// can be consumed via the `Stream`/`StreamExt` traits.
 pub struct Paged<R> {
 	/// The FHIR client to make further requests for the next pages.
@@ -27,12 +27,22 @@ pub struct Paged<R> {
 	future_next_page: Option<BoxFuture<'static, Result<Bundle, Error>>>,
 }
 
-impl<R: NamedResource> Paged<R> {
+impl<R> Paged<R> {
 	/// Start up a new Paged<R> stream.
 	pub(crate) fn new(client: Client<FhirR5>, url: Url) -> Self {
 		let future_next_page = Some(fetch_resource(client.clone(), url).boxed());
 
 		Self { client, next_url: None, matches: None, future_next_page }
+	}
+}
+
+impl<R> SearchResponse<R> for Paged<R>
+where
+	R: NamedResource + DomainResource + TryFrom<Resource> + 'static,
+{
+	/// [Paged] doesn't have any next pages
+	fn next_page(&self) -> Option<Self> {
+		None
 	}
 }
 
@@ -139,7 +149,6 @@ fn find_next_page_url(bundle: &Bundle) -> Option<&String> {
 		.map(|link| &link.url)
 }
 
-/// Query a resource from a given URL.
 async fn fetch_resource<R: TryFrom<Resource>>(
 	client: Client<FhirR5>,
 	url: Url,
@@ -179,7 +188,7 @@ struct SearchMatches<R> {
 
 impl<R> SearchMatches<R>
 where
-	R: NamedResource + DomainResource + TryFrom<Resource>,
+	R: NamedResource + DomainResource + TryFrom<Resource> + 'static,
 {
 	pub fn from_searchset(client: Client<FhirR5>, bundle: Bundle) -> SearchMatches<R> {
 		assert!(
