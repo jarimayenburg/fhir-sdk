@@ -260,6 +260,7 @@ async fn search_inner() -> Result<()> {
 		})
 		.and(TokenParam::Standard { name: "active", system: None, code: Some("false"), not: false })
 		.send()
+		.await?
 		.try_collect()
 		.await?;
 
@@ -333,11 +334,11 @@ async fn transaction_inner() -> Result<()> {
 }
 
 #[test]
-fn paging() -> Result<()> {
-	common::RUNTIME.block_on(paging_inner())
+fn unpaged() -> Result<()> {
+	common::RUNTIME.block_on(unpaged_inner())
 }
 
-async fn paging_inner() -> Result<()> {
+async fn unpaged_inner() -> Result<()> {
 	let client = client().await?;
 
 	let date = "5123-05-10";
@@ -360,6 +361,7 @@ async fn paging_inner() -> Result<()> {
 		.search()
 		.with(DateParam { name: "birthdate", comparator: Some(SearchComparator::Eq), value: date })
 		.send()
+		.await?
 		.try_collect()
 		.await?;
 	assert_eq!(patients.len(), n);
@@ -367,6 +369,58 @@ async fn paging_inner() -> Result<()> {
 	println!("Cleaning up..");
 	let mut batch = client.batch();
 	for patient in patients {
+		batch.delete(ResourceType::Patient, patient.id.as_ref().expect("Patient.id"));
+	}
+	ensure_batch_succeeded(batch.send().await?);
+	Ok(())
+}
+
+#[test]
+fn paged() -> Result<()> {
+	common::RUNTIME.block_on(paged_inner())
+}
+
+async fn paged_inner() -> Result<()> {
+	let client = client().await?;
+
+	let date = "5123-06-10";
+	let n = 30;
+	let page_size = 20;
+
+	println!("Preparing..");
+	let patient = Patient::builder()
+		.active(false)
+		.birth_date(Date::from_str(date).expect("parse Date"))
+		.build()
+		.unwrap();
+	let mut batch = client.batch();
+	for _ in 0..n {
+		batch.create(patient.clone());
+	}
+
+	let patients = batch.send().await?;
+	ensure_batch_succeeded(patients.clone());
+
+	println!("Starting searches..");
+	let (page1, next) = client
+		.search::<Patient>()
+		.with(DateParam { name: "birthdate", comparator: Some(SearchComparator::Eq), value: date })
+		.paged(Some(page_size))
+		.send()
+		.await?;
+
+	let patients1: Vec<Patient> = page1.try_collect().await?;
+	assert_eq!(patients1.len() as u32, page_size);
+
+	let (page2, next) = next.expect("second page not found").next_page().await?;
+	let patients2: Vec<Patient> = page2.try_collect().await?;
+
+	assert_eq!(patients2.len() as u32, n - page_size);
+	assert!(next.is_none());
+
+	println!("Cleaning up..");
+	let mut batch = client.batch();
+	for patient in patients1.iter().chain(patients2.iter()) {
 		batch.delete(ResourceType::Patient, patient.id.as_ref().expect("Patient.id"));
 	}
 	ensure_batch_succeeded(batch.send().await?);
@@ -422,6 +476,7 @@ async fn paging_with_includes_inner() -> Result<()> {
 		})
 		.and_raw("_include", "Observation:subject")
 		.send()
+		.await?
 		.try_collect()
 		.await?;
 
@@ -435,6 +490,7 @@ async fn paging_with_includes_inner() -> Result<()> {
 			value: birthdate,
 		})
 		.send()
+		.await?
 		.try_collect()
 		.await?;
 
