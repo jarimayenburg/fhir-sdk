@@ -34,9 +34,11 @@ pub use self::{
 	write::ResourceWrite,
 };
 
-pub(crate) trait FhirVersion {
+/// Trait implemented by the FHIR version markers to provide some version specific
+/// constants
+pub trait FhirVersion {
+	/// MIME type used in Accept and Content-Type headers
 	const JSON_MIME_TYPE: &'static str;
-	const VERSION: &'static str;
 }
 
 /// FHIR client version to use: FHIR STU3.
@@ -45,7 +47,6 @@ pub struct FhirStu3;
 
 impl FhirVersion for FhirStu3 {
 	const JSON_MIME_TYPE: &'static str = "application/fhir+json; fhirVersion=3.0";
-	const VERSION: &'static str = "3.0";
 }
 
 /// FHIR client version to use: FHIR R4B.
@@ -54,7 +55,6 @@ pub struct FhirR4B;
 
 impl FhirVersion for FhirR4B {
 	const JSON_MIME_TYPE: &'static str = "application/fhir+json; fhirVersion=4.3";
-	const VERSION: &'static str = "4.3";
 }
 
 /// FHIR client version to use: FHIR R5.
@@ -63,7 +63,6 @@ pub struct FhirR5;
 
 impl FhirVersion for FhirR5 {
 	const JSON_MIME_TYPE: &'static str = "application/fhir+json; fhirVersion=5.0";
-	const VERSION: &'static str = "5.0";
 }
 
 #[cfg(feature = "r5")]
