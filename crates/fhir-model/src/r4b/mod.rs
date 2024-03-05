@@ -9,11 +9,6 @@ use self::{
 	types::{Reference, ReferenceInner},
 };
 
-/// Numeric version string of this FHIR version (e.g. or mime-type).
-pub const VERSION: &str = "4.3";
-/// FHIR MIME-type this version uses for JSON.
-pub const JSON_MIME_TYPE: &str = "application/fhir+json; fhirVersion=4.3";
-
 /// Create relative [`Reference`] to the given resource.
 pub fn reference_to<R>(resource: &R) -> Option<Reference>
 where
