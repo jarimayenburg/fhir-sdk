@@ -2,35 +2,29 @@
 
 use std::marker::PhantomData;
 
-use futures::Stream;
+use async_trait::async_trait;
+use futures::{Future, Stream};
+use reqwest::Url;
 
 use super::{Client, Error};
 
 #[derive(Debug, Clone)]
-pub struct Search<E, R> {
+pub struct UnpagedSearch<E, R> {
 	/// The executor of the search (e.g. the [Client])
 	executor: E,
 
 	/// Search parameters.
 	params: SearchParameters,
 
-	/// Paging information
-	paging: Paging,
-
 	resource_type: PhantomData<R>,
 }
 
-impl<E, R> Search<E, R>
+impl<E, R> UnpagedSearch<E, R>
 where
-	E: SearchExecutor<R>,
+	E: SearchExecutor<R> + 'static,
 {
 	pub fn new(executor: E) -> Self {
-		Self {
-			executor,
-			params: SearchParameters::empty(),
-			paging: Paging::default(),
-			resource_type: PhantomData,
-		}
+		Self { executor, params: SearchParameters::empty(), resource_type: PhantomData }
 	}
 
 	/// Add a search parameter
@@ -71,52 +65,103 @@ where
 		self.with_raw(key, value)
 	}
 
-	/// Make the resulting [SearchResponse] paged. Next pages can be fetched using
+	/// Make this a paged search. Next pages can be fetched using
 	/// [SearchResponse::next_page].
-	pub fn paged(mut self, page_size: u32) -> Self {
-		self.paging = Paging::Paged { page_size };
-		self
+	pub fn paged(self, page_size: Option<u32>) -> PagedSearch<E, R> {
+		let Self { executor, params, resource_type } = self;
+
+		PagedSearch { executor, params, resource_type, page_size }
 	}
 
 	/// Execute the search
-	pub fn send(self) -> impl SearchResponse<R> {
-		self.executor.execute_search(self.params, self.paging)
+	pub async fn send(self) -> Result<impl Stream<Item = Result<R, Error>>, Error> {
+		self.executor.search_unpaged(self.params).await
 	}
 }
 
-/// Describes how to handle paging in the search response
-#[derive(Clone, Debug, Default)]
-pub enum Paging {
-	/// Pages from the resulting [SearchResponse] should be resolved as the stream is consumed
-	/// automatically fetching next pages and putting the matches on the stream
-	#[default]
-	Unpaged,
+#[derive(Debug)]
+pub struct PagedSearch<E, R> {
+	/// The executor of the search (e.g. the [Client])
+	executor: E,
 
-	/// The resulting [SearchResponse] should be paged. The stream will be limited to the size
-	/// of the page and [SearchResponse::next_page] should be called to fetch the next page.
-	Paged { page_size: u32 },
+	/// Search parameters.
+	params: SearchParameters,
+
+	/// Preferred page size
+	page_size: Option<u32>,
+
+	resource_type: PhantomData<R>,
+}
+
+impl<E, R> PagedSearch<E, R>
+where
+	E: SearchExecutor<R> + 'static,
+{
+	/// Execute the search
+	pub async fn send(
+		self,
+	) -> Result<(impl Stream<Item = Result<R, Error>>, Option<NextPageCursor<E, R>>), Error> {
+		self.executor.search_paged(self.params, self.page_size).await
+	}
 }
 
 /// Stream of resources returned by [Search::send].
-pub trait SearchResponse<R>: Stream<Item = Result<R, Error>> + Send + Sized {
+pub trait Paged<R>: Stream<Item = Result<R, Error>> + Send + Sized {
 	/// If the search is paged, returns the next page. Returns `None` if the [SearchResponse] is
 	/// unpaged or if there is no next page available.
-	fn next_page(&self) -> Option<Self>;
+	fn next_page(&self) -> Option<impl Future<Output = Result<Self, Error>> + 'static>;
 }
 
+#[derive(Debug)]
+pub struct NextPageCursor<E, R> {
+	executor: E,
+	next_page_url: Url,
+	resource_type: PhantomData<R>,
+}
+
+impl<E, R> NextPageCursor<E, R>
+where
+	E: SearchExecutor<R> + 'static,
+{
+	pub fn new(executor: E, next_page_url: Url) -> Self {
+		Self { executor, next_page_url, resource_type: PhantomData }
+	}
+
+	pub async fn next_page(
+		self,
+	) -> Result<(impl Stream<Item = Result<R, Error>>, Option<Self>), Error> {
+		self.executor.fetch_next_page(self.next_page_url).await
+	}
+}
+
+#[async_trait]
 pub trait SearchExecutor<R>: Sized {
-	fn execute_search(self, params: SearchParameters, paging: Paging) -> impl SearchResponse<R>;
+	async fn search_unpaged(
+		self,
+		params: SearchParameters,
+	) -> Result<impl Stream<Item = Result<R, Error>>, Error>;
+
+	async fn search_paged(
+		self,
+		params: SearchParameters,
+		page_size: Option<u32>,
+	) -> Result<(impl Stream<Item = Result<R, Error>>, Option<NextPageCursor<Self, R>>), Error>;
+
+	async fn fetch_next_page(
+		self,
+		next_page_url: Url,
+	) -> Result<(impl Stream<Item = Result<R, Error>>, Option<NextPageCursor<Self, R>>), Error>;
 }
 
-impl<V> Client<V> {
+impl<V: 'static> Client<V> {
 	/// Start constructing a search for FHIR resources of a given type.
 	/// Only returns matches. Populates reference target fields with any
 	/// matching included resources.
-	pub fn search<R>(&self) -> Search<Self, R>
+	pub fn search<R>(&self) -> UnpagedSearch<Self, R>
 	where
 		Self: SearchExecutor<R>,
 	{
-		Search::new(self.clone())
+		UnpagedSearch::new(self.clone())
 	}
 }
 

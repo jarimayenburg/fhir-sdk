@@ -30,7 +30,10 @@ pub use reqwest::{
 
 use self::response::FhirResponse;
 pub use self::{
-	builder::ClientBuilder, error::Error, request::RequestSettings, search::SearchParameters,
+	builder::ClientBuilder,
+	error::Error,
+	request::RequestSettings,
+	search::{Paged, SearchParameters},
 	write::ResourceWrite,
 };
 

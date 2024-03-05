@@ -3,46 +3,36 @@
 use std::{collections::VecDeque, pin::Pin, task::Poll};
 
 use fhir_model::r5::{
-	codes::{BundleType, LinkRelationTypes, SearchEntryMode},
+	codes::{BundleType, SearchEntryMode},
 	resources::{Bundle, BundleEntry, DomainResource, NamedResource, Resource, TypedResource},
 };
-use futures::{future::BoxFuture, ready, FutureExt, Stream, StreamExt};
+use futures::{future::BoxFuture, ready, Future, FutureExt, Stream, StreamExt};
 use reqwest::Url;
 
-use crate::client::{r5::references::populate_reference_targets_internal, search::SearchResponse};
+use crate::client::{r5::references::populate_reference_targets_internal, search::Paged};
 
-use super::{Client, Error, FhirR5};
+use super::{find_next_page_url, Client, Error, FhirR5};
 
 /// Unwraps search pages into a single stream of resources. The resources
 /// can be consumed via the `Stream`/`StreamExt` traits.
 pub struct Unpaged<R> {
 	/// The FHIR client to make further requests for the next pages.
 	client: Client<FhirR5>,
-	/// The URL of the next page. This is opaque and can be anything the server
-	/// wants. The client ensures it accesses the same server only.
-	next_url: Option<Url>,
 	/// The current page of matches.
-	page: Option<Page<R>>,
+	page: Page<R>,
 	/// Current future to retrieve the next page.
-	future_next_page: Option<BoxFuture<'static, Result<Bundle, Error>>>,
+	future_next_page: Option<BoxFuture<'static, Result<Page<R>, Error>>>,
 }
 
-impl<R> Unpaged<R> {
-	/// Start up a new Paged<R> stream.
-	pub(crate) fn new(client: Client<FhirR5>, url: Url) -> Self {
-		let future_next_page = Some(fetch_resource(client.clone(), url).boxed());
-
-		Self { client, next_url: None, page: None, future_next_page }
-	}
-}
-
-impl<R> SearchResponse<R> for Unpaged<R>
+impl<R> Unpaged<R>
 where
 	R: NamedResource + DomainResource + TryFrom<Resource> + 'static,
 {
-	/// [Paged] doesn't have any next pages
-	fn next_page(&self) -> Option<Self> {
-		None
+	/// Start up a new Unpaged<R> stream.
+	pub fn from_searchset(client: Client<FhirR5>, searchset: Bundle) -> Self {
+		let page = Page::from_searchset(client.clone(), searchset);
+
+		Self { client, page, future_next_page: None }
 	}
 }
 
@@ -56,97 +46,68 @@ where
 		mut self: Pin<&mut Self>,
 		cx: &mut std::task::Context<'_>,
 	) -> Poll<Option<Self::Item>> {
-		let span = tracing::trace_span!("Paged::poll_next");
+		let span = tracing::trace_span!("Unpaged::poll_next");
 		let _span_guard = span.enter();
 
 		// If there are still matches left, get the next one
-		if let Some(matches) = self.page.as_mut() {
-			tracing::trace!("Paged::matches is set, polling for next match");
-			if let Poll::Ready(res) = matches.poll_next_unpin(cx) {
+		if !self.page.is_empty() {
+			tracing::trace!("Unpaged::page is not empty, polling for next match");
+			if let Poll::Ready(res) = self.page.poll_next_unpin(cx) {
 				if let Some(r) = res {
-					tracing::debug!("Next match in Paged::matches available");
+					tracing::debug!("Next match in Unpaged::matches available");
 					return Poll::Ready(Some(r));
 				} else {
-					tracing::debug!("Paged::matches is empty, waiting for next page");
-					self.page = None;
+					tracing::debug!("Unpaged::matches is empty, waiting for next page");
 				}
 			}
-		// If there are no more matches and there is a next page future, check if it's ready
-		} else if let Some(future_next_page) = self.future_next_page.as_mut() {
-			tracing::trace!("Paged::future_next_page is set, polling for next page");
+		}
+
+		if let Some(future_next_page) = self.future_next_page.as_mut() {
+			tracing::trace!("Unpaged::future_next_page is set, polling for next page");
 			if let Poll::Ready(next_page) = future_next_page.as_mut().poll(cx) {
 				self.future_next_page = None;
 				tracing::debug!("Next page fetched and ready");
 
-				// Get the Bundle or error out.
-				let bundle = match next_page {
-					Ok(bundle) => bundle,
-					Err(err) => return Poll::Ready(Some(Err(err))),
+				self.page = match next_page {
+					Ok(page) => page,
+					Err(e) => {
+						tracing::error!("Fetching next page returned error: {}", e);
+
+						return Poll::Ready(Some(Err(e)));
+					}
 				};
-
-				// Parse the next page's URL or error out.
-				if let Some(next_url_string) = find_next_page_url(&bundle) {
-					let Ok(next_url) = Url::parse(next_url_string) else {
-						tracing::error!("Could not parse next page URL");
-						return Poll::Ready(Some(Err(Error::UrlParse(next_url_string.clone()))));
-					};
-					self.next_url = Some(next_url);
-				}
-
-				// Save the `BundleEntry`s.
-				self.page = Some(Page::from_searchset(self.client.clone(), bundle));
 			}
 		// Start retrieving the next page if we have a next URL and there is no next page being fetched.
-		} else if let Some(next_url) = self.next_url.as_ref() {
+		} else if let Some(next_page) = self.page.next_page() {
 			tracing::debug!("Current page has next URL, starting to fetch next page");
-			self.future_next_page =
-				Some(fetch_resource(self.client.clone(), next_url.clone()).boxed());
-			self.next_url = None;
+			self.future_next_page = Some(next_page.boxed());
 		}
 
 		// Else check if all resources were consumed or if we are waiting for new
 		// resources to arrive.
-		if self.page.is_some() {
-			tracing::trace!("Paged results waiting for remaining resources in current page");
+		if !self.page.is_empty() {
+			tracing::trace!("Unpaged results waiting for remaining resources in current page");
 			cx.waker().wake_by_ref();
 			Poll::Pending
 		} else if self.future_next_page.is_some() {
-			tracing::trace!("Paged results waiting for response to next URL fetch");
-			cx.waker().wake_by_ref();
-			Poll::Pending
-		} else if self.next_url.is_some() {
-			tracing::trace!("Paged results waiting to fetch next URL");
+			tracing::trace!("Unpaged results waiting for response to next URL fetch");
 			cx.waker().wake_by_ref();
 			Poll::Pending
 		} else {
-			tracing::debug!("Paged results exhausted");
+			tracing::debug!("Unpaged results exhausted");
 			Poll::Ready(None)
 		}
 	}
 
 	fn size_hint(&self) -> (usize, Option<usize>) {
-		if let Some(matches) = &self.page {
-			let (page_min, page_max) = matches.size_hint();
+		let (page_min, page_max) = self.page.size_hint();
 
-			if self.next_url.is_some() {
-				return (page_min, None);
-			} else {
-				return (page_min, page_max);
-			}
+		if self.page.next_page().is_some() {
+			(page_min, None)
+		} else {
+			(page_min, page_max)
 		}
-
-		(0, None)
 	}
-}
-
-/// Find the URL of the next page of the results returned in the Bundle.
-fn find_next_page_url(bundle: &Bundle) -> Option<&String> {
-	bundle
-		.link
-		.iter()
-		.flatten()
-		.find(|link| link.relation == LinkRelationTypes::Next)
-		.map(|link| &link.url)
 }
 
 async fn fetch_resource<R: TryFrom<Resource>>(
@@ -167,10 +128,9 @@ async fn fetch_resource<R: TryFrom<Resource>>(
 
 impl<R> std::fmt::Debug for Unpaged<R> {
 	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-		f.debug_struct("Paged")
+		f.debug_struct("Unpaged")
 			.field("client", &self.client)
-			.field("next_url", &self.next_url)
-			.field("matches", &self.page.as_ref().map(|_| "_"))
+			.field("page", &self.page)
 			.field("future_next_page", &self.future_next_page.as_ref().map(|_| "_"))
 			.finish()
 	}
@@ -179,7 +139,7 @@ impl<R> std::fmt::Debug for Unpaged<R> {
 /// Stream that yields each match entry in a searchset Bundle. Tries to fetch entries from the fullUrl property
 /// if the resource field is empty. Fills resource reference target fields with the referred to resources,
 /// if available in the Bundle.
-struct Page<R> {
+pub struct Page<R> {
 	client: Client<FhirR5>,
 	bundle: Bundle,
 	matches: VecDeque<BundleEntry>,
@@ -212,6 +172,28 @@ where
 			.collect();
 
 		Self { client, bundle, matches, future_resource: None }
+	}
+
+	fn is_empty(&self) -> bool {
+		self.matches.is_empty()
+	}
+}
+
+impl<R> Paged<R> for Page<R>
+where
+	R: NamedResource + DomainResource + TryFrom<Resource> + 'static,
+{
+	fn next_page(&self) -> Option<impl Future<Output = Result<Self, Error>> + 'static> {
+		let next_url = find_next_page_url(&self.bundle)?;
+		let client = self.client.clone();
+
+		let fut = async move {
+			let searchset: Bundle = client.fetch_resource(next_url?).await?;
+
+			Ok(Page::from_searchset(client, searchset))
+		};
+
+		Some(fut.boxed())
 	}
 }
 
@@ -290,5 +272,16 @@ where
 		let size = self.matches.len();
 
 		(size, Some(size))
+	}
+}
+
+impl<R> std::fmt::Debug for Page<R> {
+	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+		f.debug_struct("Page")
+			.field("client", &self.client)
+			.field("bundle", &self.bundle)
+			.field("matches", &self.matches)
+			.field("future_resource", &self.future_resource.as_ref().map(|_| "_"))
+			.finish()
 	}
 }
