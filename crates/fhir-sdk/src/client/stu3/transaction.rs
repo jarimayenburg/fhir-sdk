@@ -8,7 +8,9 @@ use fhir_model::stu3::{
 use reqwest::header::{self, HeaderValue};
 use uuid::Uuid;
 
-use super::{Client, Error, FhirStu3, MIME_TYPE};
+use crate::client::FhirVersion;
+
+use super::{Client, Error, FhirStu3};
 
 /// A batch/transaction request builder.
 #[derive(Debug, Clone)]
@@ -145,8 +147,8 @@ impl BatchTransaction {
 			.0
 			.client
 			.post(url)
-			.header(header::ACCEPT, MIME_TYPE)
-			.header(header::CONTENT_TYPE, HeaderValue::from_static(MIME_TYPE))
+			.header(header::ACCEPT, FhirStu3::JSON_MIME_TYPE)
+			.header(header::CONTENT_TYPE, HeaderValue::from_static(FhirStu3::JSON_MIME_TYPE))
 			.json(&bundle);
 
 		let response = self.client.run_request(request).await?;
