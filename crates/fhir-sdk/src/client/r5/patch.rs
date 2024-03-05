@@ -6,7 +6,9 @@ use fhir_model::r5::resources::{
 use reqwest::header::{self, HeaderValue};
 use serde::Serialize;
 
-use super::{Client, Error, FhirR5, MIME_TYPE};
+use crate::client::FhirVersion;
+
+use super::{Client, Error, FhirR5};
 
 /// Builder for a PATCH request via FHIRPath for a FHIR resource.
 #[derive(Debug, Clone)]
@@ -234,8 +236,8 @@ impl<'a> PatchViaFhir<'a> {
 			.0
 			.client
 			.patch(url)
-			.header(header::ACCEPT, MIME_TYPE)
-			.header(header::CONTENT_TYPE, HeaderValue::from_static(MIME_TYPE))
+			.header(header::ACCEPT, FhirR5::JSON_MIME_TYPE)
+			.header(header::CONTENT_TYPE, HeaderValue::from_static(FhirR5::JSON_MIME_TYPE))
 			.json(&parameters);
 
 		let response = self.client.run_request(request).await?;
@@ -359,7 +361,7 @@ impl<'a> PatchViaJson<'a> {
 			.0
 			.client
 			.patch(url)
-			.header(header::ACCEPT, MIME_TYPE)
+			.header(header::ACCEPT, FhirR5::JSON_MIME_TYPE)
 			.header(header::CONTENT_TYPE, HeaderValue::from_static("application/json-patch+json"))
 			.json(&self.operations);
 

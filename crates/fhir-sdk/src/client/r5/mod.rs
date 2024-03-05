@@ -15,7 +15,6 @@ use fhir_model::{
 			SubscriptionStatus, TypedResource,
 		},
 		types::Reference,
-		JSON_MIME_TYPE,
 	},
 	ParsedReference,
 };
@@ -29,10 +28,7 @@ use self::{
 	patch::{PatchViaFhir, PatchViaJson},
 	transaction::BatchTransaction,
 };
-use super::{misc, Client, Error, FhirR5};
-
-/// FHIR MIME-type this client uses.
-const MIME_TYPE: &str = JSON_MIME_TYPE;
+use super::{misc, Client, Error, FhirR5, FhirVersion};
 
 impl Client<FhirR5> {
 	/// Get the server's capabilities. Fails if the respective FHIR version is
@@ -120,8 +116,8 @@ impl Client<FhirR5> {
 			.0
 			.client
 			.post(url)
-			.header(header::ACCEPT, MIME_TYPE)
-			.header(header::CONTENT_TYPE, MIME_TYPE)
+			.header(header::ACCEPT, FhirR5::JSON_MIME_TYPE)
+			.header(header::CONTENT_TYPE, FhirR5::JSON_MIME_TYPE)
 			.json(resource);
 
 		let response = self.run_request(request).await?;
@@ -149,8 +145,8 @@ impl Client<FhirR5> {
 			.0
 			.client
 			.put(url)
-			.header(header::ACCEPT, MIME_TYPE)
-			.header(header::CONTENT_TYPE, MIME_TYPE)
+			.header(header::ACCEPT, FhirR5::JSON_MIME_TYPE)
+			.header(header::CONTENT_TYPE, FhirR5::JSON_MIME_TYPE)
 			.json(resource);
 		if conditional {
 			let version_id = resource
@@ -188,7 +184,7 @@ impl Client<FhirR5> {
 	/// Delete a FHIR resource on the server.
 	pub async fn delete(&self, resource_type: ResourceType, id: &str) -> Result<(), Error> {
 		let url = self.url(&[resource_type.as_str(), id]);
-		let request = self.0.client.delete(url).header(header::ACCEPT, MIME_TYPE);
+		let request = self.0.client.delete(url).header(header::ACCEPT, FhirR5::JSON_MIME_TYPE);
 
 		let response = self.run_request(request).await?;
 
@@ -262,8 +258,8 @@ impl Client<FhirR5> {
 			.0
 			.client
 			.post(url)
-			.header(header::ACCEPT, MIME_TYPE)
-			.header(header::CONTENT_TYPE, MIME_TYPE)
+			.header(header::ACCEPT, FhirR5::JSON_MIME_TYPE)
+			.header(header::CONTENT_TYPE, FhirR5::JSON_MIME_TYPE)
 			.json(&parameters);
 
 		let response = self.run_request(request).await?;
