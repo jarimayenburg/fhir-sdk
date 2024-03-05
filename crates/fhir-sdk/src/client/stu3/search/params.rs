@@ -356,6 +356,22 @@ impl<'a> SearchParameter for UriParam<'a> {
 	}
 }
 
+/// Search on any item whether it is a missing field using the `missing`
+/// modifier.
+#[derive(Debug, Clone, Copy)]
+pub struct MissingParam<'a> {
+	/// Name of the field.
+	pub name: &'a str,
+	/// Whether to search for the absent field (or the present).
+	pub missing: bool,
+}
+
+impl<'a> SearchParameter for MissingParam<'a> {
+	fn into_query(self) -> (String, String) {
+		(format!("{}:missing", self.name), self.missing.to_string())
+	}
+}
+
 /// Include referred to resources in the search response
 #[derive(Debug, Clone, Copy)]
 pub struct IncludeParam<'a> {
@@ -390,22 +406,6 @@ impl<'a> SearchParameter for IncludeParam<'a> {
 		}
 
 		(name, value)
-	}
-}
-
-/// Search on any item whether it is a missing field using the `missing`
-/// modifier.
-#[derive(Debug, Clone, Copy)]
-pub struct MissingParam<'a> {
-	/// Name of the field.
-	pub name: &'a str,
-	/// Whether to search for the absent field (or the present).
-	pub missing: bool,
-}
-
-impl<'a> SearchParameter for MissingParam<'a> {
-	fn into_query(self) -> (String, String) {
-		(format!("{}:missing", self.name), self.missing.to_string())
 	}
 }
 

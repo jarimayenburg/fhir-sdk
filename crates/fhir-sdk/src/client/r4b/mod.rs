@@ -14,7 +14,6 @@ use fhir_model::{
 			TypedResource,
 		},
 		types::Reference,
-		JSON_MIME_TYPE,
 	},
 	ParsedReference,
 };
@@ -28,28 +27,26 @@ use self::{
 	patch::{PatchViaFhir, PatchViaJson},
 	transaction::BatchTransaction,
 };
-use super::{misc, Client, Error, FhirR4B};
-
-/// FHIR MIME-type this client uses.
-const MIME_TYPE: &str = JSON_MIME_TYPE;
+use super::{misc, Client, Error, FhirR4B, FhirVersion};
 
 impl Client<FhirR4B> {
 	/// Get the server's capabilities. Fails if the respective FHIR version is
 	/// not supported at all.
 	pub async fn capabilities(&self) -> Result<CapabilityStatement, Error> {
 		let url = self.url(&["metadata"]);
-		let request = self.0.client.get(url).header(header::ACCEPT, MIME_TYPE);
 
-		let response = self.run_request(request).await?;
+		self.fetch_resource(url).await
+	}
+
+	async fn fetch_resource<R: TryFrom<Resource>>(&self, url: Url) -> Result<R, Error> {
+		let response = self.fetch_url(url).await?;
 
 		response.body().await
 	}
 
 	/// Read any resource from any URL.
 	async fn read_generic<R: TryFrom<Resource>>(&self, url: Url) -> Result<Option<R>, Error> {
-		let request = self.0.client.get(url).header(header::ACCEPT, MIME_TYPE);
-
-		let response = self.run_request(request).await?;
+		let response = self.fetch_url(url).await?;
 
 		if [StatusCode::NOT_FOUND, StatusCode::GONE].contains(&response.status()) {
 			return Ok(None);
@@ -118,8 +115,8 @@ impl Client<FhirR4B> {
 			.0
 			.client
 			.post(url)
-			.header(header::ACCEPT, MIME_TYPE)
-			.header(header::CONTENT_TYPE, MIME_TYPE)
+			.header(header::ACCEPT, FhirR4B::JSON_MIME_TYPE)
+			.header(header::CONTENT_TYPE, FhirR4B::JSON_MIME_TYPE)
 			.json(resource);
 
 		let response = self.run_request(request).await?;
@@ -147,8 +144,8 @@ impl Client<FhirR4B> {
 			.0
 			.client
 			.put(url)
-			.header(header::ACCEPT, MIME_TYPE)
-			.header(header::CONTENT_TYPE, MIME_TYPE)
+			.header(header::ACCEPT, FhirR4B::JSON_MIME_TYPE)
+			.header(header::CONTENT_TYPE, FhirR4B::JSON_MIME_TYPE)
 			.json(resource);
 		if conditional {
 			let version_id = resource
@@ -186,7 +183,7 @@ impl Client<FhirR4B> {
 	/// Delete a FHIR resource on the server.
 	pub async fn delete(&self, resource_type: ResourceType, id: &str) -> Result<(), Error> {
 		let url = self.url(&[resource_type.as_str(), id]);
-		let request = self.0.client.delete(url).header(header::ACCEPT, MIME_TYPE);
+		let request = self.0.client.delete(url).header(header::ACCEPT, FhirR4B::JSON_MIME_TYPE);
 
 		let response = self.run_request(request).await?;
 
@@ -207,22 +204,16 @@ impl Client<FhirR4B> {
 	/// resources for an `Encounter` record.
 	pub async fn operation_encounter_everything(&self, id: &str) -> Result<Bundle, Error> {
 		let url = self.url(&["Encounter", id, "$everything"]);
-		let request = self.0.client.get(url).header(header::ACCEPT, MIME_TYPE);
 
-		let response = self.run_request(request).await?;
-
-		response.body().await
+		self.fetch_resource(url).await
 	}
 
 	/// Operation `$everything` on `Patient`, returning a Bundle with all
 	/// resources for an `Patient` record.
 	pub async fn operation_patient_everything(&self, id: &str) -> Result<Bundle, Error> {
 		let url = self.url(&["Patient", id, "$everything"]);
-		let request = self.0.client.get(url).header(header::ACCEPT, MIME_TYPE);
 
-		let response = self.run_request(request).await?;
-
-		response.body().await
+		self.fetch_resource(url).await
 	}
 
 	/// Operation `$match` on `Patient`, returning matches for Patient records
@@ -266,8 +257,8 @@ impl Client<FhirR4B> {
 			.0
 			.client
 			.post(url)
-			.header(header::ACCEPT, MIME_TYPE)
-			.header(header::CONTENT_TYPE, MIME_TYPE)
+			.header(header::ACCEPT, FhirR4B::JSON_MIME_TYPE)
+			.header(header::CONTENT_TYPE, FhirR4B::JSON_MIME_TYPE)
 			.json(&parameters);
 
 		let response = self.run_request(request).await?;
