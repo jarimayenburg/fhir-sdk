@@ -35,7 +35,8 @@ pub use self::{
 };
 
 pub(crate) trait FhirVersion {
-	const FHIR_VERSION: &'static str;
+	const JSON_MIME_TYPE: &'static str;
+	const VERSION: &'static str;
 }
 
 /// FHIR client version to use: FHIR STU3.
@@ -43,7 +44,8 @@ pub(crate) trait FhirVersion {
 pub struct FhirStu3;
 
 impl FhirVersion for FhirStu3 {
-	const FHIR_VERSION: &'static str = "3.0";
+	const JSON_MIME_TYPE: &'static str = "application/fhir+json; fhirVersion=3.0";
+	const VERSION: &'static str = "3.0";
 }
 
 /// FHIR client version to use: FHIR R4B.
@@ -51,7 +53,8 @@ impl FhirVersion for FhirStu3 {
 pub struct FhirR4B;
 
 impl FhirVersion for FhirR4B {
-	const FHIR_VERSION: &'static str = "4.3";
+	const JSON_MIME_TYPE: &'static str = "application/fhir+json; fhirVersion=4.3";
+	const VERSION: &'static str = "4.3";
 }
 
 /// FHIR client version to use: FHIR R5.
@@ -59,7 +62,8 @@ impl FhirVersion for FhirR4B {
 pub struct FhirR5;
 
 impl FhirVersion for FhirR5 {
-	const FHIR_VERSION: &'static str = "5.0";
+	const JSON_MIME_TYPE: &'static str = "application/fhir+json; fhirVersion=5.0";
+	const VERSION: &'static str = "5.0";
 }
 
 #[cfg(feature = "r5")]
@@ -200,13 +204,9 @@ impl<V: FhirVersion + Send + Sync> Client<V> {
 			return Err(Error::DifferentOrigin(url.to_string()));
 		}
 
-		let request = self.0.client.get(url).header(header::ACCEPT, self.mime_type());
+		let request = self.0.client.get(url).header(header::ACCEPT, V::JSON_MIME_TYPE);
 
 		self.run_request(request).await
-	}
-
-	fn mime_type(&self) -> String {
-		format!("application/fhir+json; fhirVersion={}", V::FHIR_VERSION)
 	}
 
 	/// Get the URL with the configured base URL and the given path segments.
