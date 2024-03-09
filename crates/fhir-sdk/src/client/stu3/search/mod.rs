@@ -1,7 +1,10 @@
 //! Client search implementation.
 
 use crate::client::search::NextPageCursor;
-use crate::client::{search::SearchExecutor, Client, Error, FhirStu3, SearchParameters};
+use crate::client::{
+	search::PagedSearchExecutor, search::UnpagedSearchExecutor, Client, Error, FhirStu3,
+	SearchParameters,
+};
 use async_trait::async_trait;
 use fhir_model::stu3::resources::{Bundle, DomainResource, NamedResource, Resource};
 use paging::{Page, Unpaged};
@@ -15,10 +18,12 @@ mod paging;
 mod params;
 
 #[async_trait]
-impl<R> SearchExecutor<R> for Client<FhirStu3>
+impl<R> PagedSearchExecutor<R> for Client<FhirStu3>
 where
 	R: NamedResource + DomainResource + TryFrom<Resource> + 'static,
 {
+	type Stream = Page<R>;
+
 	#[allow(refining_impl_trait)]
 	async fn search_paged(
 		self,
@@ -56,6 +61,14 @@ where
 
 		Ok((page, cursor))
 	}
+}
+
+#[async_trait]
+impl<R> UnpagedSearchExecutor<R> for Client<FhirStu3>
+where
+	R: NamedResource + DomainResource + TryFrom<Resource> + 'static,
+{
+	type Stream = Unpaged<R>;
 
 	#[allow(refining_impl_trait)]
 	async fn search_unpaged(self, params: SearchParameters) -> Result<Unpaged<R>, Error> {
@@ -74,4 +87,26 @@ pub(self) fn find_next_page_url(bundle: &Bundle) -> Option<Result<Url, Error>> {
 		bundle.link.iter().flatten().find(|link| link.relation == "next").map(|link| &link.url)?;
 
 	Some(Url::parse(url_str).map_err(|_| Error::UrlParse(url_str.to_string())))
+}
+
+#[cfg(test)]
+mod tests {
+	use fhir_model::stu3::resources::Observation;
+
+	use crate::client::{Client, FhirStu3};
+
+	/// The search code is prone to run into rustc bugs [rust-lang/rust#100013](https://github.com/rust-lang/rust/issues/100013) and
+	/// [rust-lang/rust#102211](https://github.com/rust-lang/rust/issues/102211). We implemented a workaround for it.
+	/// This test is just there to prevent regressions. It doesn't actually test anything, we just need to make sure this compiles
+	#[allow(dead_code)]
+	async fn rustc_bug_workaround_inner() {
+		let client: Client<FhirStu3> = Client::builder().build().unwrap();
+
+		fn assert_send<T: Send>(v: T) -> T {
+			v
+		}
+
+		// We don't actually test anything here, we just need to make sure this compiles
+		let _ = assert_send(client.search::<Observation>().send());
+	}
 }
