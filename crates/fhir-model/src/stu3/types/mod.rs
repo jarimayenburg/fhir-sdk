@@ -3,6 +3,9 @@
 #[rustfmt::skip] // Too much for rustfmt
 mod generated;
 
+use itertools::Itertools;
+use std::fmt::Display;
+
 pub use generated::*;
 
 use super::resources::ResourceType;
@@ -31,9 +34,43 @@ impl CodeableConcept {
 	}
 }
 
+impl Display for CodeableConcept {
+	/// Finds the right display value for a CodeableConcept.
+	///
+	/// Arguably opinionated, but mostly in accordance with [the spec](https://www.hl7.org/fhir/stu3/datatypes.html#codeableconcept)
+	///
+	/// Uses the following steps to find the appropriate display value
+	/// 1. If any `coding` fields are marked as user selected through `userSelected`, use their `display` value. If multiple
+	///    are found, comma separate them.
+	/// 2. Otherwise, if a `text` field is present, use that.
+	/// 3. Otherwise, use the first `coding` field with a `display` value.
+	/// 4. Otherwise, return an empty string
+	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+		let user_selected: Vec<_> =
+			self.coding.iter().flatten().filter(|c| c.user_selected.unwrap_or_default()).collect();
+
+		let display = if !user_selected.is_empty() {
+			user_selected.iter().join(", ")
+		} else if let Some(text) = &self.text {
+			text.to_string()
+		} else {
+			self.coding.iter().flatten().find_map(|c| c.display.clone()).unwrap_or_default()
+		};
+
+		write!(f, "{display}")
+	}
+}
+
+impl Display for Coding {
+	/// Uses the `Coding.display` value if present, otherwise an empty string
+	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+		write!(f, "{}", self.display.as_deref().unwrap_or_default())
+	}
+}
+
 impl Reference {
 	/// Parse the [`Reference`] into a [`ParsedReference`]. Returns `None` if
-	/// the `reference` field is empty..
+	/// the `reference` field is empty.
 	#[must_use]
 	pub fn parse(&self) -> Option<ParsedReference<'_>> {
 		let url = self.reference.as_ref()?;
@@ -44,5 +81,42 @@ impl Reference {
 impl From<ParsedReference<'_>> for Reference {
 	fn from(parsed: ParsedReference<'_>) -> Self {
 		Self::builder().reference(parsed.to_string()).build().unwrap()
+	}
+}
+
+#[cfg(test)]
+mod tests {
+	use super::super::types::{CodeableConcept, Coding};
+
+	#[test]
+	fn display_coding() {
+		let display = "test";
+		let with_display = Coding::builder().display(display.to_string()).build().unwrap();
+		assert_eq!(with_display.to_string(), display.to_string());
+
+		let without_display = Coding::builder().build().unwrap();
+		assert_eq!(without_display.to_string(), String::new());
+	}
+
+	#[test]
+	fn display_codeable_concept() {
+		let display = "test";
+
+		let user_selected =
+			Coding::builder().display(display.to_string()).user_selected(true).build().unwrap();
+		let with_user_selected =
+			CodeableConcept::builder().coding(vec![Some(user_selected)]).build().unwrap();
+		assert_eq!(with_user_selected.to_string(), display.to_string());
+
+		let with_text = CodeableConcept::builder().text(display.to_string()).build().unwrap();
+		assert_eq!(with_text.to_string(), display);
+
+		let not_user_selected = Coding::builder().display(display.to_string()).build().unwrap();
+		let without_user_selected =
+			CodeableConcept::builder().coding(vec![Some(not_user_selected)]).build().unwrap();
+		assert_eq!(without_user_selected.to_string(), display.to_string());
+
+		let without_display = CodeableConcept::builder().build().unwrap();
+		assert_eq!(without_display.to_string(), String::new());
 	}
 }
