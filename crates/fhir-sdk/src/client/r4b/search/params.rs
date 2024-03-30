@@ -1,5 +1,8 @@
-use crate::client::search::{escape_value, SearchParameter};
-use fhir_model::r4b::{codes::SearchComparator, resources::ResourceType};
+use crate::client::search::{escape_value, IntoQuery, SearchParameter};
+use fhir_model::r4b::{
+	codes::{SearchComparator, SearchModifierCode},
+	resources::ResourceType,
+};
 
 /// Number search.
 ///
@@ -7,36 +10,21 @@ use fhir_model::r4b::{codes::SearchComparator, resources::ResourceType};
 /// this does not suffice.
 #[derive(Debug, Clone)]
 pub struct NumberParam<'a> {
-	/// Name of the field.
-	name: &'a str,
-	/// Values encoded as string already (will be comma-separated for
-	/// OR-joining).
-	values: Vec<String>,
-}
-
-impl<'a> NumberParam<'a> {
-	/// Start with empty values and add values one at a time.
-	#[must_use]
-	pub fn new(name: &'a str) -> Self {
-		Self { name, values: Vec::new() }
-	}
-
-	/// Add a value to the number search.
-	#[must_use]
-	pub fn or(mut self, comparator: Option<SearchComparator>, value: impl ToString) -> Self {
-		let value = escape_value(&value.to_string());
-		if let Some(comparator) = comparator {
-			self.values.push(format!("{}{value}", comparator.as_ref()));
-		} else {
-			self.values.push(value);
-		}
-		self
-	}
+	/// How to compare the value
+	pub comparator: Option<SearchComparator>,
+	/// The numeric value
+	pub value: &'a str,
 }
 
 impl<'a> SearchParameter for NumberParam<'a> {
-	fn into_query(self) -> (String, String) {
-		(self.name.to_owned(), self.values.join(","))
+	fn query_value(&self) -> String {
+		let value = escape_value(self.value);
+
+		if let Some(comparator) = self.comparator {
+			format!("{}{}", comparator.as_ref(), value)
+		} else {
+			value
+		}
 	}
 }
 
@@ -46,8 +34,6 @@ impl<'a> SearchParameter for NumberParam<'a> {
 /// this does not suffice.
 #[derive(Debug, Clone, Copy)]
 pub struct DateParam<'a> {
-	/// Name of the field.
-	pub name: &'a str,
 	/// Search comparator to compare the date.
 	pub comparator: Option<SearchComparator>,
 	/// Value to search for.
@@ -55,11 +41,13 @@ pub struct DateParam<'a> {
 }
 
 impl<'a> SearchParameter for DateParam<'a> {
-	fn into_query(self) -> (String, String) {
+	fn query_value(&self) -> String {
+		let value = escape_value(self.value);
+
 		if let Some(comparator) = self.comparator {
-			(self.name.to_owned(), format!("{}{}", comparator.as_ref(), escape_value(self.value)))
+			format!("{}{}", comparator.as_ref(), value)
 		} else {
-			(self.name.to_owned(), escape_value(self.value))
+			value
 		}
 	}
 }
@@ -71,37 +59,29 @@ impl<'a> SearchParameter for DateParam<'a> {
 #[derive(Debug, Clone, Copy)]
 pub enum StringParam<'a> {
 	/// Standard string search. This is a case-insensitive starts-with search.
-	Standard {
-		/// Name of the field to search on.
-		name: &'a str,
-		/// Value of the field.
-		value: &'a str,
-	},
+	Standard(&'a str),
 	/// Search a string that contains the given value.
-	Contains {
-		/// Name of the field to search on.
-		name: &'a str,
-		/// Value of the field.
-		value: &'a str,
-	},
+	Contains(&'a str),
 	/// Search a string that matches exactly the value, including casing and
 	/// accents.
-	Exact {
-		/// Name of the field to search on.
-		name: &'a str,
-		/// Value of the field.
-		value: &'a str,
-	},
+	Exact(&'a str),
 }
 
 impl<'a> SearchParameter for StringParam<'a> {
-	fn into_query(self) -> (String, String) {
-		let (name, modifier, value) = match self {
-			Self::Standard { name, value } => (name, "", value),
-			Self::Contains { name, value } => (name, ":contains", value),
-			Self::Exact { name, value } => (name, ":exact", value),
-		};
-		(format!("{name}{modifier}"), escape_value(value))
+	fn modifier(&self) -> Option<&str> {
+		match self {
+			Self::Contains(_) => Some(SearchModifierCode::Contains.as_ref()),
+			Self::Exact(_) => Some(SearchModifierCode::Exact.as_ref()),
+			_ => None,
+		}
+	}
+
+	fn query_value(&self) -> String {
+		match self {
+			Self::Standard(v) => v.to_string(),
+			Self::Contains(v) => v.to_string(),
+			Self::Exact(v) => v.to_string(),
+		}
 	}
 }
 
@@ -113,8 +93,6 @@ impl<'a> SearchParameter for StringParam<'a> {
 pub enum TokenParam<'a> {
 	/// Standard token search (or `not` search).
 	Standard {
-		/// Name of the field to search on.
-		name: &'a str,
 		/// System for the value to search on. If this is given as empty string,
 		/// the system must not be present.
 		system: Option<&'a str>,
@@ -135,51 +113,47 @@ pub enum TokenParam<'a> {
 	},
 	/// Token search whether the value is `in` or `not-in` a given `ValueSet`.
 	In {
-		/// Name of the field to search on.
-		name: &'a str,
 		/// `ValueSet` reference URI.
 		value_set: &'a str,
 		/// Whether to switch to `not-in` search.
 		not: bool,
 	},
 	/// Tests the `text` or `display` values.
-	CodeText {
-		/// Name of the field to search on.
-		name: &'a str,
+	Text {
 		/// Text to search for (is a starts-with search).
 		text: &'a str,
 	},
 }
 
 impl<'a> SearchParameter for TokenParam<'a> {
-	fn into_query(self) -> (String, String) {
+	fn modifier(&self) -> Option<&str> {
 		match self {
-			Self::Standard { name, system, code, not } => {
-				let key = if not { format!("{name}:not") } else { name.to_owned() };
-				let value = if let Some(system) = system {
+			TokenParam::Standard { not, .. } if *not => Some(SearchModifierCode::Not.as_ref()),
+			TokenParam::OfType { .. } => Some(SearchModifierCode::OfType.as_ref()),
+			TokenParam::In { not, .. } if *not => Some(SearchModifierCode::NotIn.as_ref()),
+			TokenParam::In { .. } => Some(SearchModifierCode::In.as_ref()),
+			TokenParam::Text { .. } => Some(SearchModifierCode::Text.as_ref()),
+			_ => None,
+		}
+	}
+
+	fn query_value(&self) -> String {
+		match self {
+			TokenParam::Standard { system, code, .. } => {
+				if let Some(system) = system {
 					format!("{}|{}", escape_value(system), escape_value(code.unwrap_or_default()))
 				} else {
 					escape_value(code.unwrap_or_default())
-				};
-				(key, value)
-			}
-			Self::OfType { type_system, type_code, value } => (
-				"identifier:of-type".to_owned(),
-				format!(
-					"{}|{}|{}",
-					escape_value(type_system.unwrap_or_default()),
-					escape_value(type_code.unwrap_or_default()),
-					escape_value(value.unwrap_or_default())
-				),
-			),
-			Self::In { name, value_set, not } => {
-				if not {
-					(format!("{name}:not-in"), escape_value(value_set))
-				} else {
-					(format!("{name}:in"), escape_value(value_set))
 				}
 			}
-			Self::CodeText { name, text } => (format!("{name}:code-text"), escape_value(text)),
+			TokenParam::OfType { type_system, type_code, value } => format!(
+				"{}|{}|{}",
+				escape_value(type_system.unwrap_or_default()),
+				escape_value(type_code.unwrap_or_default()),
+				escape_value(value.unwrap_or_default())
+			),
+			TokenParam::In { value_set, .. } => escape_value(value_set),
+			TokenParam::Text { text } => escape_value(text),
 		}
 	}
 }
@@ -193,8 +167,6 @@ impl<'a> SearchParameter for TokenParam<'a> {
 pub enum ReferenceParam<'a> {
 	/// Standard reference search by relative reference.
 	Standard {
-		/// Name of the field.
-		name: &'a str,
 		/// Resource type of the resource.
 		resource_type: ResourceType,
 		/// ID of the resource the reference should point to.
@@ -204,8 +176,6 @@ pub enum ReferenceParam<'a> {
 	},
 	/// Standard reference search by absolute URL.
 	Url {
-		/// Name of the field.
-		name: &'a str,
 		/// Reference URL.
 		url: &'a str,
 		/// Specific version id to search for.
@@ -213,63 +183,38 @@ pub enum ReferenceParam<'a> {
 	},
 	/// Reference search by the `.identifier` field.
 	Identifier {
-		/// Name of the field.
-		name: &'a str,
 		/// Identifier system.
 		system: Option<&'a str>,
 		/// Idenfifier value.
 		value: Option<&'a str>,
 	},
-	/// Reference search with chaining. This means the server searches for
-	/// references that target a resource with the given field and value.
-	Chaining {
-		/// Name of the field.
-		name: &'a str,
-		/// Resource type of the reference.
-		resource_type: Option<ResourceType>,
-		/// Target resource field name.
-		target_name: &'a str,
-		/// (Raw) value of the target value. Might be any of the ways of search,
-		/// so could be token search including pipes.
-		value: &'a str,
-	},
 }
 
 impl<'a> SearchParameter for ReferenceParam<'a> {
-	fn into_query(self) -> (String, String) {
+	fn modifier(&self) -> Option<&str> {
 		match self {
-			Self::Standard { name, resource_type, id, version_id } => {
-				let value = if let Some(version_id) = version_id {
-					escape_value(&format!("{resource_type}/{id}/_history/{version_id}"))
-				} else {
-					escape_value(&format!("{resource_type}/{id}"))
-				};
-				(name.to_owned(), value)
+			ReferenceParam::Identifier { .. } => Some(SearchModifierCode::Identifier.as_ref()),
+			_ => None,
+		}
+	}
+
+	fn query_value(&self) -> String {
+		match self {
+			Self::Standard { resource_type, id, version_id: Some(version_id) } => {
+				escape_value(&format!("{resource_type}/{id}/_history/{version_id}"))
 			}
-			Self::Url { name, url, version_id } => {
-				let value = if let Some(version_id) = version_id {
-					format!("{}|{}", escape_value(url), escape_value(version_id))
-				} else {
-					escape_value(url)
-				};
-				(name.to_owned(), value)
+			Self::Standard { resource_type, id, version_id: None } => {
+				escape_value(&format!("{resource_type}/{id}"))
 			}
-			Self::Identifier { name, system, value } => (
-				name.to_owned(),
-				format!(
-					"{}|{}",
-					escape_value(system.unwrap_or_default()),
-					escape_value(value.unwrap_or_default()),
-				),
+			Self::Url { url, version_id: Some(version_id) } => {
+				format!("{}|{}", escape_value(url), escape_value(version_id))
+			}
+			Self::Url { url, version_id: None } => escape_value(url),
+			Self::Identifier { system, value } => format!(
+				"{}|{}",
+				escape_value(system.unwrap_or_default()),
+				escape_value(value.unwrap_or_default()),
 			),
-			Self::Chaining { name, resource_type, target_name, value } => {
-				let key = if let Some(resource_type) = resource_type {
-					format!("{name}:{resource_type}.{target_name}")
-				} else {
-					format!("{name}.{target_name}")
-				};
-				(key, value.to_owned())
-			}
 		}
 	}
 }
@@ -280,8 +225,6 @@ impl<'a> SearchParameter for ReferenceParam<'a> {
 /// this does not suffice.
 #[derive(Debug, Clone, Copy)]
 pub struct QuantityParam<'a> {
-	/// Name of the field.
-	pub name: &'a str,
 	/// Search comparator to compare the date.
 	pub comparator: Option<SearchComparator>,
 	/// Value to search for.
@@ -293,14 +236,14 @@ pub struct QuantityParam<'a> {
 }
 
 impl<'a> SearchParameter for QuantityParam<'a> {
-	fn into_query(self) -> (String, String) {
+	fn query_value(&self) -> String {
 		let value = if let Some(comparator) = self.comparator {
 			format!("{}{}", comparator.as_ref(), escape_value(self.value))
 		} else {
 			escape_value(self.value)
 		};
 
-		let query_value = if self.system.is_some() || self.code.is_some() {
+		if self.system.is_some() || self.code.is_some() {
 			format!(
 				"{value}|{}|{}",
 				escape_value(self.system.unwrap_or_default()),
@@ -308,9 +251,7 @@ impl<'a> SearchParameter for QuantityParam<'a> {
 			)
 		} else {
 			value
-		};
-
-		(self.name.to_owned(), query_value)
+		}
 	}
 }
 
@@ -321,54 +262,47 @@ impl<'a> SearchParameter for QuantityParam<'a> {
 #[derive(Debug, Clone, Copy)]
 pub enum UriParam<'a> {
 	/// Standard URI search, that matches exactly.
-	Standard {
-		/// Name of the field.
-		name: &'a str,
-		/// URI.
-		uri: &'a str,
-	},
+	Standard(&'a str),
 	/// Match any URL that is below the given URL path, so contains more URL
 	/// segments.
-	Below {
-		/// Name of the field.
-		name: &'a str,
-		/// URI.
-		uri: &'a str,
-	},
+	Below(&'a str),
 	/// Match any URL that is above the given URL path, so contains less URL
 	/// segments.
-	Above {
-		/// Name of the field.
-		name: &'a str,
-		/// URI.
-		uri: &'a str,
-	},
+	Above(&'a str),
 }
 
 impl<'a> SearchParameter for UriParam<'a> {
-	fn into_query(self) -> (String, String) {
-		let (name, modifier, uri) = match self {
-			Self::Standard { name, uri } => (name, "", uri),
-			Self::Below { name, uri } => (name, ":below", uri),
-			Self::Above { name, uri } => (name, ":above", uri),
+	fn modifier(&self) -> Option<&str> {
+		match self {
+			UriParam::Below(_) => Some(SearchModifierCode::Below.as_ref()),
+			UriParam::Above(_) => Some(SearchModifierCode::Above.as_ref()),
+			_ => None,
+		}
+	}
+
+	fn query_value(&self) -> String {
+		let uri = match self {
+			Self::Standard(u) => u,
+			Self::Below(u) => u,
+			Self::Above(u) => u,
 		};
-		(format!("{name}{modifier}"), escape_value(uri))
+
+		escape_value(uri)
 	}
 }
 
 /// Search on any item whether it is a missing field using the `missing`
 /// modifier.
 #[derive(Debug, Clone, Copy)]
-pub struct MissingParam<'a> {
-	/// Name of the field.
-	pub name: &'a str,
-	/// Whether to search for the absent field (or the present).
-	pub missing: bool,
-}
+pub struct MissingParam(bool);
 
-impl<'a> SearchParameter for MissingParam<'a> {
-	fn into_query(self) -> (String, String) {
-		(format!("{}:missing", self.name), self.missing.to_string())
+impl SearchParameter for MissingParam {
+	fn modifier(&self) -> Option<&str> {
+		Some(SearchModifierCode::Missing.as_ref())
+	}
+
+	fn query_value(&self) -> String {
+		self.0.to_string()
 	}
 }
 
@@ -379,7 +313,7 @@ pub struct IncludeParam<'a> {
 	pub source_type: ResourceType,
 
 	/// Field name to join on. Must be a search parameter of type reference for the [IncludeParam::source] resource type.
-	pub name: &'a str,
+	pub field: &'a str,
 
 	/// Type of the target resource in the case the reference field can have multiple target resource types.
 	pub target_type: Option<ResourceType>,
@@ -391,7 +325,7 @@ pub struct IncludeParam<'a> {
 	pub reverse: bool,
 }
 
-impl<'a> SearchParameter for IncludeParam<'a> {
+impl<'a> IntoQuery for IncludeParam<'a> {
 	fn into_query(self) -> (String, String) {
 		let mut name: String = if self.reverse { "_revInclude" } else { "_include" }.to_string();
 
@@ -399,7 +333,7 @@ impl<'a> SearchParameter for IncludeParam<'a> {
 			name += ":iterate";
 		}
 
-		let mut value = format!("{}:{}", self.source_type.as_str(), self.name);
+		let mut value = format!("{}:{}", self.source_type.as_str(), self.field);
 
 		if let Some(target_type) = self.target_type {
 			value = format!("{}:{}", value, target_type.as_str())
@@ -415,88 +349,46 @@ mod tests {
 
 	#[test]
 	fn number() {
-		let number = NumberParam::new("value-quantity")
-			.or(Some(SearchComparator::Lt), 60)
-			.or(Some(SearchComparator::Gt), 100);
-		assert_eq!(number.into_query(), ("value-quantity".to_owned(), "lt60,gt100".to_owned()));
+		let number = NumberParam { comparator: Some(SearchComparator::Lt), value: "60" };
+		assert_eq!(number.query_value(), "lt60".to_owned());
 	}
 
 	#[test]
 	fn token() {
-		let token = TokenParam::Standard {
-			name: "identifier",
-			system: None,
-			code: Some("code"),
-			not: true,
-		};
-		assert_eq!(token.into_query(), ("identifier:not".to_owned(), "code".to_owned()));
+		let token = TokenParam::Standard { system: None, code: Some("code"), not: true };
+		assert_eq!(token.query_value(), "code".to_owned());
 
-		let token = TokenParam::Standard {
-			name: "identifier",
-			system: Some(""),
-			code: Some("code"),
-			not: false,
-		};
-		assert_eq!(token.into_query(), ("identifier".to_owned(), "|code".to_owned()));
+		let token = TokenParam::Standard { system: Some(""), code: Some("code"), not: false };
+		assert_eq!(token.query_value(), "|code".to_owned());
 
-		let token = TokenParam::Standard {
-			name: "identifier",
-			system: Some("system"),
-			code: None,
-			not: false,
-		};
-		assert_eq!(token.into_query(), ("identifier".to_owned(), "system|".to_owned()));
+		let token = TokenParam::Standard { system: Some("system"), code: None, not: false };
+		assert_eq!(token.query_value(), "system|".to_owned());
 
 		let token = TokenParam::OfType { type_system: None, type_code: None, value: Some("value") };
-		assert_eq!(token.into_query(), ("identifier:of-type".to_owned(), "||value".to_owned()));
-	}
-
-	#[test]
-	fn reference() {
-		let reference = ReferenceParam::Chaining {
-			name: "focus",
-			resource_type: Some(ResourceType::Encounter),
-			target_name: "status",
-			value: "in-progress",
-		};
-		assert_eq!(
-			reference.into_query(),
-			("focus:Encounter.status".to_owned(), "in-progress".to_owned())
-		);
+		assert_eq!(token.query_value(), "||value".to_owned());
 	}
 
 	#[test]
 	fn quantity() {
-		let quantity = QuantityParam {
-			name: "test",
-			comparator: None,
-			value: "1.0",
-			system: None,
-			code: None,
-		};
-		assert_eq!(quantity.into_query(), ("test".to_owned(), "1.0".to_owned()));
+		let quantity = QuantityParam { comparator: None, value: "1.0", system: None, code: None };
+		assert_eq!(quantity.query_value(), "1.0".to_owned());
 
-		let quantity = QuantityParam {
-			name: "test",
-			comparator: None,
-			value: "1.0",
-			system: None,
-			code: Some("g"),
-		};
-		assert_eq!(quantity.into_query(), ("test".to_owned(), "1.0||g".to_owned()));
+		let quantity =
+			QuantityParam { comparator: None, value: "1.0", system: None, code: Some("g") };
+		assert_eq!(quantity.query_value(), "1.0||g".to_owned());
 	}
 
 	#[test]
 	fn missing() {
-		let missing = MissingParam { name: "identifier", missing: true };
-		assert_eq!(missing.into_query(), ("identifier:missing".to_owned(), "true".to_owned()));
+		let missing = MissingParam(true);
+		assert_eq!(missing.query_value(), ("true".to_owned()));
 	}
 
 	#[test]
 	fn include() {
 		let include = IncludeParam {
 			source_type: ResourceType::MedicationRequest,
-			name: "encounter",
+			field: "encounter",
 			target_type: None,
 			iterate: false,
 			reverse: false,
@@ -508,7 +400,7 @@ mod tests {
 
 		let include = IncludeParam {
 			source_type: ResourceType::Observation,
-			name: "subject",
+			field: "subject",
 			target_type: Some(ResourceType::Patient),
 			iterate: false,
 			reverse: false,
@@ -520,7 +412,7 @@ mod tests {
 
 		let include = IncludeParam {
 			source_type: ResourceType::Patient,
-			name: "link",
+			field: "link",
 			target_type: None,
 			iterate: true,
 			reverse: false,
@@ -532,7 +424,7 @@ mod tests {
 
 		let include = IncludeParam {
 			source_type: ResourceType::Encounter,
-			name: "episode-of-care",
+			field: "episode-of-care",
 			target_type: None,
 			iterate: false,
 			reverse: true,

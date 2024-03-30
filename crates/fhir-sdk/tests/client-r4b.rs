@@ -9,7 +9,7 @@ use std::{env, str::FromStr};
 use eyre::Result;
 use fhir_sdk::{
 	client::{
-		r4b::search::{DateParam, ReferenceParam, TokenParam},
+		r4b::search::{DateParam, TokenParam},
 		Client, FhirR4B, ResourceWrite,
 	},
 	r4b::{
@@ -253,12 +253,8 @@ async fn search_inner() -> Result<()> {
 	let patients: Vec<Patient> = client
 		.search()
 		.with_raw("_id", id)
-		.and(DateParam {
-			name: "birthdate",
-			comparator: Some(SearchComparator::Eq),
-			value: date_str,
-		})
-		.and(TokenParam::Standard { name: "active", system: None, code: Some("false"), not: false })
+		.and("birthdate", DateParam { comparator: Some(SearchComparator::Eq), value: date_str })
+		.and("active", TokenParam::Standard { system: None, code: Some("false"), not: false })
 		.send()
 		.await?
 		.try_collect()
@@ -366,7 +362,7 @@ async fn unpaged_inner() -> Result<()> {
 	println!("Starting search..");
 	let patients: Vec<Patient> = client
 		.search()
-		.with(DateParam { name: "birthdate", comparator: Some(SearchComparator::Eq), value: date })
+		.with("birthdate", DateParam { comparator: Some(SearchComparator::Eq), value: date })
 		.send()
 		.await?
 		.try_collect()
@@ -411,7 +407,7 @@ async fn paged_inner() -> Result<()> {
 	println!("Starting searches..");
 	let (page1, next) = client
 		.search::<Patient>()
-		.with(DateParam { name: "birthdate", comparator: Some(SearchComparator::Eq), value: date })
+		.with("birthdate", DateParam { comparator: Some(SearchComparator::Eq), value: date })
 		.paged(Some(page_size))
 		.send()
 		.await?;
@@ -475,12 +471,7 @@ async fn paging_with_includes_inner() -> Result<()> {
 	println!("Starting search..");
 	let observations: Vec<Observation> = client
 		.search()
-		.with(ReferenceParam::Chaining {
-			name: "subject",
-			resource_type: Some(ResourceType::Patient),
-			target_name: "birthdate",
-			value: birthdate,
-		})
+		.with("subject.birthdate", DateParam { comparator: None, value: birthdate })
 		.and_raw("_include", "Observation:subject")
 		.send()
 		.await?
@@ -491,11 +482,7 @@ async fn paging_with_includes_inner() -> Result<()> {
 
 	let mut patients: Vec<Patient> = client
 		.search()
-		.with(DateParam {
-			name: "birthdate",
-			comparator: Some(SearchComparator::Eq),
-			value: birthdate,
-		})
+		.with("birthdate", DateParam { comparator: None, value: birthdate })
 		.send()
 		.await?
 		.try_collect()
