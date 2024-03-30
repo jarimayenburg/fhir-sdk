@@ -33,7 +33,7 @@ pub use self::{
 	builder::ClientBuilder,
 	error::Error,
 	request::RequestSettings,
-	search::{Paged, SearchParameters},
+	search::{Paged, SearchParameterOrList, SearchParameters},
 	write::ResourceWrite,
 };
 
