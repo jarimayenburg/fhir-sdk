@@ -28,11 +28,11 @@ where
 	}
 
 	/// Add a search parameter
-	pub fn with<P>(mut self, parameter: P) -> Self
+	pub fn with<P>(mut self, field: &str, parameter: P) -> Self
 	where
 		P: SearchParameter,
 	{
-		self.params.add(parameter);
+		self.params.add(field, parameter);
 		self
 	}
 
@@ -51,11 +51,20 @@ where
 	}
 
 	/// Add a search parameter. Alias of [Search::with].
-	pub fn and<P>(self, parameter: P) -> Self
+	pub fn and<P>(self, field: &str, parameter: P) -> Self
 	where
 		P: SearchParameter,
 	{
-		self.with(parameter)
+		self.with(field, parameter)
+	}
+
+	/// Include other query parameters
+	pub fn include<Q>(mut self, query: Q) -> Self
+	where
+		Q: IntoQuery,
+	{
+		self.params.add_query(query);
+		self
 	}
 
 	/// Add a search parameter as a string. Alias of [Search::with_raw].
@@ -184,20 +193,29 @@ impl SearchParameters {
 	}
 
 	/// Initialize a new [`SearchParameters`] with a parameter
-	pub fn with<P>(parameter: P) -> Self
+	pub fn with<P>(field: &str, parameter: P) -> Self
 	where
 		P: SearchParameter,
 	{
-		Self::empty().and(parameter)
+		Self::empty().and(field, parameter)
 	}
 
 	/// Add a search parameter.
 	#[must_use]
-	pub fn and<P>(mut self, parameter: P) -> Self
+	pub fn and<P>(mut self, key: &str, parameter: P) -> Self
 	where
 		P: SearchParameter,
 	{
-		self.add(parameter);
+		self.add(key, parameter);
+		self
+	}
+
+	/// Add other types of parameters to the query string
+	pub fn include<Q>(mut self, query: Q) -> Self
+	where
+		Q: IntoQuery,
+	{
+		self.add_query(query);
 		self
 	}
 
@@ -219,11 +237,18 @@ impl SearchParameters {
 		self.queries
 	}
 
-	fn add<P>(&mut self, parameter: P)
+	fn add<P>(&mut self, key: &str, parameter: P)
 	where
 		P: SearchParameter,
 	{
-		let (key, value) = parameter.into_query();
+		self.add_query((key, parameter))
+	}
+
+	fn add_query<Q>(&mut self, query: Q)
+	where
+		Q: IntoQuery,
+	{
+		let (key, value) = query.into_query();
 
 		self.add_raw(key, value);
 	}
@@ -239,13 +264,111 @@ impl SearchParameters {
 	}
 }
 
-/// Functionality to convert a SearchParameter to the URL query.
-pub trait SearchParameter {
+/// Functionality to convert a search parameter to the URL query.
+pub trait IntoQuery {
 	/// Convert this search parameter into the query pair (key, value).
 	fn into_query(self) -> (String, String);
+}
+
+impl<S: SearchParameter> IntoQuery for (&str, S) {
+	fn into_query(self) -> (String, String) {
+		let (key, param) = self;
+
+		let key = if let Some(modifier) = param.modifier() {
+			format!("{key}:{modifier}")
+		} else {
+			key.to_string()
+		};
+
+		(key, param.query_value())
+	}
+}
+
+pub trait SearchParameter: Sized {
+	/// URL safe query string value of the parameter
+	fn query_value(&self) -> String;
+
+	/// Modifier of the parameter, like :in, :not-in. Without the :
+	fn modifier(&self) -> Option<&str> {
+		None
+	}
+
+	/// Or this parameter with another parameter
+	fn or(self, param: Self) -> SearchParameterOrList<Self> {
+		SearchParameterOrList::new(self).or(param)
+	}
+}
+
+#[derive(Debug)]
+pub struct SearchParameterOrList<P> {
+	// Used to validate that every added parameter has the same modifier
+	modifier: Option<String>,
+
+	// The parameters that should be OR'ed
+	params: Vec<P>,
+}
+
+impl<P: SearchParameter> SearchParameterOrList<P> {
+	pub fn new(param: P) -> Self {
+		Self { modifier: param.modifier().map(|m| m.to_string()), params: vec![param] }
+	}
+
+	pub fn or(mut self, param: P) -> Self {
+		if self.modifier.as_deref() != param.modifier() {
+			panic!("cannot OR two search parameters with different modifiers");
+		}
+
+		self.params.push(param);
+		self
+	}
+}
+
+impl<P: SearchParameter> SearchParameter for SearchParameterOrList<P> {
+	fn modifier(&self) -> Option<&str> {
+		self.modifier.as_deref()
+	}
+
+	fn query_value(&self) -> String {
+		self.params.iter().map(|p| p.query_value()).collect::<Vec<String>>().join(",")
+	}
 }
 
 /// Escape a search parameter value.
 pub(crate) fn escape_value(value: &str) -> String {
 	value.replace('\\', "\\\\").replace('|', "\\|").replace('$', "\\$").replace(',', "\\,")
+}
+
+#[cfg(test)]
+mod tests {
+	use super::*;
+
+	struct MyParam<'a> {
+		modifier: Option<&'a str>,
+		value: &'a str,
+	}
+
+	impl SearchParameter for MyParam<'_> {
+		fn modifier(&self) -> Option<&str> {
+			self.modifier
+		}
+
+		fn query_value(&self) -> String {
+			self.value.to_string()
+		}
+	}
+
+	#[test]
+	fn or() {
+		let params =
+			MyParam { modifier: None, value: "bla" }.or(MyParam { modifier: None, value: "ble" });
+
+		assert_eq!(params.query_value(), "bla,ble");
+	}
+
+	#[test]
+	#[should_panic]
+	fn or_different_modifiers() {
+		MyParam { modifier: None, value: "bla" }
+			.or(MyParam { modifier: Some("mod"), value: "ble" });
+	}
 }

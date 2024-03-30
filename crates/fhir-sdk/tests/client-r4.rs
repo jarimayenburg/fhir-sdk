@@ -202,12 +202,8 @@ async fn search_inner() -> Result<()> {
 	let patients: Vec<Patient> = client
 		.search()
 		.with_raw("_id", id)
-		.and(DateParam {
-			name: "birthdate",
-			comparator: Some(SearchComparator::Eq),
-			value: date_str,
-		})
-		.and(TokenParam::Standard { name: "active", system: None, code: Some("false"), not: false })
+		.and("birthdate", DateParam { comparator: Some(SearchComparator::Eq), value: date_str })
+		.and("active", TokenParam::Standard { system: None, code: Some("false"), not: false })
 		.send()
 		.try_collect()
 		.await?;
@@ -313,7 +309,7 @@ async fn paging_inner() -> Result<()> {
 	println!("Starting search..");
 	let patients: Vec<Patient> = client
 		.search()
-		.with(DateParam { name: "birthdate", comparator: Some(SearchComparator::Eq), value: date })
+		.with("birthdate", DateParam { comparator: Some(SearchComparator::Eq), value: date })
 		.send()
 		.try_collect()
 		.await?;
