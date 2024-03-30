@@ -16,6 +16,19 @@ pub struct NumberParam<'a> {
 	pub value: &'a str,
 }
 
+impl<'a> NumberParam<'a> {
+	/// Create a new `[NumberParam]`
+	pub fn new(value: &'a str) -> Self {
+		Self { comparator: None, value }
+	}
+
+	/// Set a comparator
+	pub fn comparator(mut self, comparator: SearchComparator) -> Self {
+		self.comparator = Some(comparator);
+		self
+	}
+}
+
 impl<'a> SearchParameter for NumberParam<'a> {
 	fn query_value(&self) -> String {
 		let value = escape_value(self.value);
@@ -38,6 +51,19 @@ pub struct DateParam<'a> {
 	pub comparator: Option<SearchComparator>,
 	/// Value to search for.
 	pub value: &'a str,
+}
+
+impl<'a> DateParam<'a> {
+	/// Create a new `[DateParam]`
+	pub fn new(value: &'a str) -> Self {
+		Self { comparator: None, value }
+	}
+
+	/// Set a comparator
+	pub fn comparator(mut self, comparator: SearchComparator) -> Self {
+		self.comparator = Some(comparator);
+		self
+	}
 }
 
 impl<'a> SearchParameter for DateParam<'a> {
@@ -125,6 +151,23 @@ pub enum TokenParam<'a> {
 	},
 }
 
+impl<'a> TokenParam<'a> {
+	/// Token param for a code within a specific system
+	pub fn new(system: &'a str, code: &'a str) -> Self {
+		Self::Standard { system: Some(system), code: Some(code), not: false }
+	}
+
+	/// Token param for any code within the given system
+	pub fn in_system(system: &'a str) -> Self {
+		Self::Standard { system: Some(system), code: None, not: false }
+	}
+
+	/// Token param for a specific code without specifying system
+	pub fn code(code: &'a str) -> Self {
+		Self::Standard { system: None, code: Some(code), not: false }
+	}
+}
+
 impl<'a> SearchParameter for TokenParam<'a> {
 	fn modifier(&self) -> Option<&str> {
 		match self {
@@ -190,6 +233,13 @@ pub enum ReferenceParam<'a> {
 	},
 }
 
+impl<'a> ReferenceParam<'a> {
+	/// Reference to the resource with the given ID
+	pub fn new(resource_type: ResourceType, id: &'a str) -> Self {
+		Self::Standard { resource_type, id, version_id: None }
+	}
+}
+
 impl<'a> SearchParameter for ReferenceParam<'a> {
 	fn modifier(&self) -> Option<&str> {
 		match self {
@@ -235,6 +285,19 @@ pub struct QuantityParam<'a> {
 	pub code: Option<&'a str>,
 }
 
+impl<'a> QuantityParam<'a> {
+	/// Quantity with a given value
+	pub fn new(value: &'a str) -> Self {
+		Self { comparator: None, value, system: None, code: None }
+	}
+
+	/// Quantity with a given value
+	pub fn with_comparator(mut self, comparator: SearchComparator) -> Self {
+		self.comparator = Some(comparator);
+		self
+	}
+}
+
 impl<'a> SearchParameter for QuantityParam<'a> {
 	fn query_value(&self) -> String {
 		let value = if let Some(comparator) = self.comparator {
@@ -269,6 +332,13 @@ pub enum UriParam<'a> {
 	/// Match any URL that is above the given URL path, so contains less URL
 	/// segments.
 	Above(&'a str),
+}
+
+impl<'a> UriParam<'a> {
+	/// Create a new URI search parameter
+	pub fn new(value: &'a str) -> Self {
+		Self::Standard(value)
+	}
 }
 
 impl<'a> SearchParameter for UriParam<'a> {
@@ -323,6 +393,24 @@ pub struct IncludeParam<'a> {
 
 	/// Whether this is a reverse include.
 	pub reverse: bool,
+}
+
+impl<'a> IncludeParam<'a> {
+	/// Create a new `_include` parameter
+	pub fn new(source_type: ResourceType, field: &'a str) -> Self {
+		Self { source_type, field, target_type: None, iterate: false, reverse: false }
+	}
+
+	/// Create a new `_revInclude` parameter
+	pub fn reverse(source_type: ResourceType, field: &'a str) -> Self {
+		Self { source_type, field, target_type: None, iterate: false, reverse: true }
+	}
+
+	/// Add the `:iterate` modifier
+	pub fn iterate(mut self) -> Self {
+		self.iterate = true;
+		self
+	}
 }
 
 impl<'a> IntoQuery for IncludeParam<'a> {
