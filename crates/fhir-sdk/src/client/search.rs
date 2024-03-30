@@ -264,6 +264,15 @@ impl SearchParameters {
 	}
 }
 
+impl<Q> FromIterator<Q> for SearchParameters
+where
+	Q: IntoQuery,
+{
+	fn from_iter<T: IntoIterator<Item = Q>>(iter: T) -> Self {
+		iter.into_iter().fold(SearchParameters::empty(), |params, param| params.include(param))
+	}
+}
+
 /// Functionality to convert a search parameter to the URL query.
 pub trait IntoQuery {
 	/// Convert this search parameter into the query pair (key, value).
@@ -309,6 +318,10 @@ pub struct SearchParameterOrList<P> {
 }
 
 impl<P: SearchParameter> SearchParameterOrList<P> {
+	fn empty() -> Self {
+		Self { modifier: None, params: Vec::new() }
+	}
+
 	pub fn new(param: P) -> Self {
 		Self { modifier: param.modifier().map(|m| m.to_string()), params: vec![param] }
 	}
@@ -330,6 +343,15 @@ impl<P: SearchParameter> SearchParameter for SearchParameterOrList<P> {
 
 	fn query_value(&self) -> String {
 		self.params.iter().map(|p| p.query_value()).collect::<Vec<String>>().join(",")
+	}
+}
+
+impl<P> FromIterator<P> for SearchParameterOrList<P>
+where
+	P: SearchParameter,
+{
+	fn from_iter<T: IntoIterator<Item = P>>(iter: T) -> Self {
+		iter.into_iter().fold(SearchParameterOrList::empty(), |ors, param| ors.or(param))
 	}
 }
 
