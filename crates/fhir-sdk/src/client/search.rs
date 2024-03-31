@@ -301,16 +301,12 @@ pub trait SearchParameter: Sized {
 	fn modifier(&self) -> Option<&str> {
 		None
 	}
-}
 
-trait SearchParameterOr: SearchParameter {
 	/// Or this parameter with another parameter
 	fn or(self, param: Self) -> SearchParameterOrList<Self> {
 		SearchParameterOrList::new(self).or(param)
 	}
 }
-
-impl<P: SearchParameter> SearchParameterOr for P {}
 
 #[derive(Debug)]
 pub struct SearchParameterOrList<P> {
