@@ -23,6 +23,26 @@ pub enum Date {
 	Date(time::Date),
 }
 
+/// Returned when the date did not contain enough information to form a [`time::Date`]
+pub struct InsufficientDatePrecision;
+
+impl std::fmt::Display for InsufficientDatePrecision {
+	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+		write!(f, "insufficient date precision for conversion to time::Date")
+	}
+}
+
+impl TryFrom<Date> for time::Date {
+	type Error = InsufficientDatePrecision;
+
+	fn try_from(date: Date) -> Result<Self, Self::Error> {
+		match date {
+			Date::Date(d) => Ok(d),
+			_ => Err(InsufficientDatePrecision),
+		}
+	}
+}
+
 /// FHIR dateTime type: <https://hl7.org/fhir/datatypes.html#dateTime>
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 #[serde(untagged)]
@@ -31,6 +51,17 @@ pub enum DateTime {
 	Date(Date),
 	/// Full date and time
 	DateTime(Instant),
+}
+
+impl TryFrom<DateTime> for time::Date {
+	type Error = <Self as TryFrom<Date>>::Error;
+
+	fn try_from(datetime: DateTime) -> Result<Self, Self::Error> {
+		match datetime {
+			DateTime::Date(d) => d.try_into(),
+			DateTime::DateTime(dt) => Ok(dt.0.date()),
+		}
+	}
 }
 
 /// FHIR time type: <https://hl7.org/fhir/datatypes.html#time>
