@@ -24,6 +24,7 @@ pub enum Date {
 }
 
 /// Returned when the date did not contain enough information to form a [`time::Date`]
+#[derive(Debug)]
 pub struct InsufficientDatePrecision;
 
 impl std::fmt::Display for InsufficientDatePrecision {
