@@ -1,5 +1,7 @@
 //! Client errors.
 
+use std::sync::Arc;
+
 #[cfg(feature = "r4b")]
 use fhir_model::r4b;
 #[cfg(feature = "r5")]
@@ -10,7 +12,7 @@ use reqwest::StatusCode;
 use thiserror::Error;
 
 /// FHIR REST Client Error.
-#[derive(Debug, Error)]
+#[derive(Debug, Clone, Error)]
 pub enum Error {
 	/// Builder is missing a field to construct the client.
 	#[error("Builder is missing field `{0}` to construct the client")]
@@ -54,11 +56,11 @@ pub enum Error {
 
 	/// Serialization/Deserialization error.
 	#[error("JSON error: {0}")]
-	Json(#[from] serde_json::Error),
+	Json(Arc<serde_json::Error>),
 
 	/// HTTP Request error.
 	#[error("Request error: {0}")]
-	Request(#[from] reqwest::Error),
+	Request(Arc<reqwest::Error>),
 
 	/// HTTP error response.
 	#[error("Got error response ({0}): {1}")]
@@ -98,6 +100,18 @@ pub enum Error {
 	/// Unexpected resource type.
 	#[error("Unexpected resource type {0}")]
 	UnexpectedResourceType(String),
+}
+
+impl From<serde_json::Error> for Error {
+	fn from(error: serde_json::Error) -> Self {
+		Self::Json(Arc::new(error))
+	}
+}
+
+impl From<reqwest::Error> for Error {
+	fn from(error: reqwest::Error) -> Self {
+		Self::Request(Arc::new(error))
+	}
 }
 
 impl Error {
