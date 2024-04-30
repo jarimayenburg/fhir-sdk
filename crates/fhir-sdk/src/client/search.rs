@@ -8,7 +8,7 @@ use reqwest::Url;
 
 use super::{Client, Error};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct UnpagedSearch<E, R> {
 	/// The executor of the search (e.g. the [Client])
 	executor: E,
@@ -179,7 +179,7 @@ impl<V: 'static> Client<V> {
 }
 
 /// A collection of AND-joined search parameters.
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Default, Clone, PartialEq, Eq, Hash)]
 pub struct SearchParameters {
 	/// List of search queries.
 	queries: Vec<(String, String)>,
