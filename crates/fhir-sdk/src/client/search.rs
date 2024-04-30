@@ -8,6 +8,7 @@ use reqwest::Url;
 
 use super::{Client, Error};
 
+/// A FHIR search that automatically resolves next pages
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct UnpagedSearch<E, R> {
 	/// The executor of the search (e.g. the [Client])
@@ -84,6 +85,7 @@ impl<E, R> UnpagedSearch<E, R>
 where
 	E: UnpagedSearchExecutor<R> + PagedSearchExecutor<R>,
 {
+	/// Transform this search into a paged search
 	pub fn paged(self, page_size: Option<u32>) -> PagedSearch<E, R> {
 		let Self { executor, params, resource_type } = self;
 
@@ -142,15 +144,20 @@ where
 	}
 }
 
+/// Executor of unpaged FHIR searches (e.g. [Client])
 #[async_trait]
 pub trait UnpagedSearchExecutor<R>: Sized {
+	/// The stream of FHIR resources that will be returned
 	type Stream: Stream<Item = Result<R, Error>>;
 
+	/// Execute an unpaged search
 	async fn search_unpaged(self, params: SearchParameters) -> Result<Self::Stream, Error>;
 }
 
+/// Executor of paged FHIR searches (e.g. [Client])
 #[async_trait]
 pub trait PagedSearchExecutor<R>: Sized {
+	/// The stream of FHIR resources that will be returned
 	type Stream: Stream<Item = Result<R, Error>>;
 
 	async fn search_paged(
@@ -293,6 +300,7 @@ impl<S: SearchParameter> IntoQuery for (&str, S) {
 	}
 }
 
+/// A FHIR search parameter
 pub trait SearchParameter: Sized {
 	/// URL safe query string value of the parameter
 	fn query_value(&self) -> String;
@@ -308,6 +316,7 @@ pub trait SearchParameter: Sized {
 	}
 }
 
+/// A set of OR-ed FHIR search parameters
 #[derive(Debug)]
 pub struct SearchParameterOrList<P> {
 	// Used to validate that every added parameter has the same modifier
@@ -322,10 +331,12 @@ impl<P: SearchParameter> SearchParameterOrList<P> {
 		Self { modifier: None, params: Vec::new() }
 	}
 
+	/// Create a new [SearchParameterOrList]
 	pub fn new(param: P) -> Self {
 		Self { modifier: param.modifier().map(|m| m.to_string()), params: vec![param] }
 	}
 
+	/// Add an OR search parameter
 	pub fn or(mut self, param: P) -> Self {
 		if self.modifier.as_deref() != param.modifier() {
 			panic!("cannot OR two search parameters with different modifiers");
