@@ -12,7 +12,7 @@ use super::{Client, Error};
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct UnpagedSearch<E, R> {
 	/// The executor of the search (e.g. the [Client])
-	executor: E,
+	executor: Option<E>,
 
 	/// Search parameters.
 	params: SearchParameters,
@@ -24,8 +24,19 @@ impl<E, R> UnpagedSearch<E, R>
 where
 	E: UnpagedSearchExecutor<R>,
 {
-	pub fn new(executor: E) -> Self {
-		Self { executor, params: SearchParameters::empty(), resource_type: PhantomData }
+	/// Creates a new [UnpagedSearch] without an executor. An executor needs to be set with [UnpagedSearch::with_executor] before calling [UnpagedSearch::send].
+	/// If [UnpagedSearch::send] is called without an executor being set, it will panic.
+	///
+	/// An [UnpagedSearch] is useful if you're looking for a way to represent a search that can be executed on an arbitrary or currently unknown [Client].
+	/// If you just want to have your [Client] do a search, you are probably looking for [Client::search] instead.
+	pub fn new() -> Self {
+		Self { executor: None, params: SearchParameters::empty(), resource_type: PhantomData }
+	}
+
+	/// Sets a search executor (i.e. a [Client])
+	pub fn with_executor(mut self, executor: E) -> Self {
+		self.executor = Some(executor);
+		self
 	}
 
 	/// Add a search parameter
@@ -77,7 +88,7 @@ where
 
 	/// Execute the search
 	pub async fn send(self) -> Result<E::Stream, Error> {
-		self.executor.search_unpaged(self.params).await
+		self.executor.expect("no search executor set").search_unpaged(self.params).await
 	}
 }
 
@@ -96,7 +107,7 @@ where
 #[derive(Debug)]
 pub struct PagedSearch<E, R> {
 	/// The executor of the search (e.g. the [Client])
-	executor: E,
+	executor: Option<E>,
 
 	/// Search parameters.
 	params: SearchParameters,
@@ -113,7 +124,10 @@ where
 {
 	/// Execute the search
 	pub async fn send(self) -> Result<(E::Stream, Option<NextPageCursor<E, R>>), Error> {
-		self.executor.search_paged(self.params, self.page_size).await
+		self.executor
+			.expect("no search executor set")
+			.search_paged(self.params, self.page_size)
+			.await
 	}
 }
 
@@ -181,7 +195,7 @@ impl<V: 'static> Client<V> {
 		Self: UnpagedSearchExecutor<R>,
 		R: Send,
 	{
-		UnpagedSearch::new(self.clone())
+		UnpagedSearch::new().with_executor(self.clone())
 	}
 }
 
