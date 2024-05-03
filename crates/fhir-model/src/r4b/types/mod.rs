@@ -68,6 +68,25 @@ impl Display for Coding {
 	}
 }
 
+impl Display for HumanName {
+	/// A very basic display implementation for [HumanName]. Uses `HumanName.name` if available. If not,
+	/// appends the first `HumanName.given` and the `HumanName.family` separated by a space. Note that
+	/// the output could be e.g. an empty string or just initials or just a last name.
+	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+		if let Some(ref text) = self.text {
+			write!(f, "{text}")
+		} else {
+			let name = format!(
+				"{} {}",
+				self.given.iter().flatten().next().cloned().as_deref().unwrap_or_default(),
+				self.family.as_deref().unwrap_or_default()
+			);
+
+			write!(f, "{}", name.trim())
+		}
+	}
+}
+
 impl Reference {
 	/// Parse the [`Reference`] into a [`ParsedReference`]. Returns `None` if
 	/// the `reference` field is empty.
