@@ -45,7 +45,7 @@ where
 		self,
 		url: Url,
 	) -> Result<(Page<R>, Option<NextPageCursor<Self, R>>), Error> {
-		let searchset: Bundle = self.fetch_resource(url).await?;
+		let searchset: Bundle = dbg!(self.fetch_resource(url).await)?;
 
 		let cursor = match find_next_page_url(&searchset) {
 			Some(Ok(u)) => Some(NextPageCursor::new(self.clone(), u)),
@@ -75,7 +75,7 @@ where
 		let mut url = self.url(&[R::TYPE.as_str()]);
 		url.query_pairs_mut().extend_pairs(params.into_queries()).finish();
 
-		let searchset: Bundle = self.fetch_resource(url.clone()).await?;
+		let searchset: Bundle = self.fetch_resource(dbg!(url.clone())).await?;
 
 		Ok(Unpaged::from_searchset(self, searchset))
 	}

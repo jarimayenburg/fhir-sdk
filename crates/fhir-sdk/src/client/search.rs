@@ -88,6 +88,7 @@ where
 
 	/// Execute the search
 	pub async fn send(self) -> Result<E::Stream, Error> {
+        dbg!(&self.params);
 		self.executor.expect("no search executor set").search_unpaged(self.params).await
 	}
 }
