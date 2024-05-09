@@ -254,7 +254,7 @@ async fn search_inner() -> Result<()> {
 		.search()
 		.with_raw("_id", id)
 		.and("birthdate", DateParam { comparator: Some(SearchComparator::Eq), value: date_str })
-		.and("active", TokenParam::Standard { system: None, code: Some("false"), not: false })
+		.and("active", TokenParam::CodeWithoutSystem { code: "false", not: false })
 		.send()
 		.await?
 		.try_collect()
