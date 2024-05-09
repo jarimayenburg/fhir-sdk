@@ -1,8 +1,12 @@
+use std::str::FromStr;
+
 use crate::client::search::{escape_value, IntoQuery, SearchParameter};
 use fhir_model::stu3::{
 	codes::{SearchComparator, SearchModifierCode},
 	resources::ResourceType,
 };
+use fhir_model::ParsedReference;
+use thiserror::Error;
 
 /// Number search.
 ///
@@ -117,14 +121,34 @@ impl<'a> SearchParameter for StringParam<'a> {
 /// this does not suffice.
 #[derive(Debug, Clone, Copy)]
 pub enum TokenParam<'a> {
-	/// Standard token search (or `not` search).
-	Standard {
-		/// System for the value to search on. If this is given as empty string,
-		/// the system must not be present.
-		system: Option<&'a str>,
-		/// Value of the code to search on.
-		code: Option<&'a str>,
-		/// Whether to switch to the `not` modifier.
+	/// Match a specific code in a specific system
+	CodeInSystem {
+		/// The system
+		system: &'a str,
+		/// The code
+		code: &'a str,
+		/// Whether to negate the search
+		not: bool,
+	},
+	/// Match a specific code in any system
+	CodeInAnySystem {
+		/// The code
+		code: &'a str,
+		/// Whether to negate the match
+		not: bool,
+	},
+	/// Match a code that does not have a system
+	CodeWithoutSystem {
+		/// The code
+		code: &'a str,
+		/// Whether to negate the search
+		not: bool,
+	},
+	/// Match any code in a specific system
+	InSystem {
+		/// The system
+		system: &'a str,
+		/// Whether to negate the search
 		not: bool,
 	},
 	/// Token search whether the value is `in` or `not-in` a given `ValueSet`.
@@ -143,25 +167,37 @@ pub enum TokenParam<'a> {
 
 impl<'a> TokenParam<'a> {
 	/// Token param for a code within a specific system
-	pub fn new(system: &'a str, code: &'a str) -> Self {
-		Self::Standard { system: Some(system), code: Some(code), not: false }
+	pub fn code_in_system(system: &'a str, code: &'a str) -> Self {
+		Self::CodeInSystem { system, code, not: false }
 	}
 
 	/// Token param for any code within the given system
 	pub fn in_system(system: &'a str) -> Self {
-		Self::Standard { system: Some(system), code: None, not: false }
+		Self::InSystem { system, not: false }
 	}
 
 	/// Token param for a specific code without specifying system
-	pub fn code(code: &'a str) -> Self {
-		Self::Standard { system: None, code: Some(code), not: false }
+	pub fn code_in_any_system(code: &'a str) -> Self {
+		Self::CodeInAnySystem { code, not: false }
+	}
+
+	/// Match a specific code that does not have a system
+	pub fn code_without_system(code: &'a str) -> Self {
+		Self::CodeWithoutSystem { code, not: false }
 	}
 }
 
 impl<'a> SearchParameter for TokenParam<'a> {
 	fn modifier(&self) -> Option<&str> {
 		match self {
-			TokenParam::Standard { not, .. } if *not => Some(SearchModifierCode::Not.as_ref()),
+			TokenParam::CodeInSystem { not, .. }
+			| TokenParam::CodeWithoutSystem { not, .. }
+			| TokenParam::CodeInAnySystem { not, .. }
+			| TokenParam::CodeInSystem { not, .. }
+				if *not =>
+			{
+				Some(SearchModifierCode::Not.as_ref())
+			}
 			TokenParam::In { not, .. } if *not => Some(SearchModifierCode::NotIn.as_ref()),
 			TokenParam::In { .. } => Some(SearchModifierCode::In.as_ref()),
 			TokenParam::Text { .. } => Some(SearchModifierCode::Text.as_ref()),
@@ -171,13 +207,10 @@ impl<'a> SearchParameter for TokenParam<'a> {
 
 	fn query_value(&self) -> String {
 		match self {
-			TokenParam::Standard { system, code, .. } => {
-				if let Some(system) = system {
-					format!("{}|{}", escape_value(system), escape_value(code.unwrap_or_default()))
-				} else {
-					escape_value(code.unwrap_or_default())
-				}
-			}
+			TokenParam::CodeInSystem { system, code, .. } => format!("{system}|{code}"),
+			TokenParam::CodeInAnySystem { code, .. } => format!("|{code}"),
+			TokenParam::CodeWithoutSystem { code, .. } => format!("{code}"),
+			TokenParam::InSystem { system, .. } => format!("{system}|"),
 			TokenParam::In { value_set, .. } => escape_value(value_set),
 			TokenParam::Text { text } => escape_value(text),
 		}
@@ -202,8 +235,13 @@ pub enum ReferenceParam<'a> {
 	},
 	/// Standard reference search by absolute URL.
 	Url {
-		/// Reference URL.
-		url: &'a str,
+		/// The FHIR base URL for FHIR server references, or the whole
+		/// URL for non-FHIR server URLs or URNs
+		base_url: &'a str,
+		/// Resource type
+		resource_type: Option<&'a str>,
+		/// Resource ID
+		id: Option<&'a str>,
 		/// Specific version id to search for.
 		version_id: Option<&'a str>,
 	},
@@ -212,7 +250,41 @@ pub enum ReferenceParam<'a> {
 impl<'a> ReferenceParam<'a> {
 	/// Reference to the resource with the given ID
 	pub fn new(resource_type: ResourceType, id: &'a str) -> Self {
-		Self::Standard { resource_type, id, version_id: None }
+		Self::versioned(resource_type, id, None)
+	}
+
+	/// Create a new versioned reference parameter
+	pub fn versioned(
+		resource_type: ResourceType,
+		id: &'a str,
+		version_id: Option<&'a str>,
+	) -> Self {
+		Self::Standard { resource_type, id, version_id }
+	}
+}
+
+/// Local references (to contained resources) cannot be used as search parameters
+#[derive(Debug, Error)]
+#[error("local references cannot be used as FHIR search parameters")]
+pub struct LocalReferenceUnusableAsParameter;
+
+impl<'a> TryFrom<ParsedReference<'a>> for ReferenceParam<'a> {
+	type Error = LocalReferenceUnusableAsParameter;
+
+	fn try_from(reference: ParsedReference<'a>) -> Result<Self, Self::Error> {
+		match reference {
+			ParsedReference::Local { .. } => Err(LocalReferenceUnusableAsParameter),
+			ParsedReference::Relative { resource_type, id, version_id } => {
+				Ok(ReferenceParam::versioned(
+					ResourceType::from_str(resource_type).unwrap(),
+					id,
+					version_id,
+				))
+			}
+			ParsedReference::Absolute { base_url, resource_type, id, version_id } => {
+				Ok(ReferenceParam::Url { base_url, resource_type, id, version_id })
+			}
+		}
 	}
 }
 
@@ -225,10 +297,22 @@ impl<'a> SearchParameter for ReferenceParam<'a> {
 			Self::Standard { resource_type, id, version_id: None } => {
 				escape_value(&format!("{resource_type}/{id}"))
 			}
-			Self::Url { url, version_id: Some(version_id) } => {
-				format!("{}|{}", escape_value(url), escape_value(version_id))
+			Self::Url { base_url, resource_type: None, id: None, version_id: None } => {
+				escape_value(base_url)
 			}
-			Self::Url { url, version_id: None } => escape_value(url),
+			Self::Url {
+				base_url,
+				resource_type: Some(resource_type),
+				id: Some(id),
+				version_id: None,
+			} => escape_value(&format!("{base_url}/{resource_type}/{id}")),
+			Self::Url {
+				base_url,
+				resource_type: Some(resource_type),
+				id: Some(id),
+				version_id: Some(version_id),
+			} => escape_value(&format!("{base_url}/{resource_type}/{id}/_history/{version_id}")),
+			_ => panic!("Invalid reference parameter"),
 		}
 	}
 }
@@ -407,13 +491,16 @@ mod tests {
 
 	#[test]
 	fn token() {
-		let token = TokenParam::Standard { system: None, code: Some("code"), not: true };
+		let token = TokenParam::CodeInSystem { system: "system", code: "code", not: false };
+		assert_eq!(token.query_value(), "system|code".to_owned());
+
+		let token = TokenParam::CodeInAnySystem { code: "code", not: false };
 		assert_eq!(token.query_value(), "code".to_owned());
 
-		let token = TokenParam::Standard { system: Some(""), code: Some("code"), not: false };
+		let token = TokenParam::CodeWithoutSystem { code: "code", not: false };
 		assert_eq!(token.query_value(), "|code".to_owned());
 
-		let token = TokenParam::Standard { system: Some("system"), code: None, not: false };
+		let token = TokenParam::InSystem { system: "system", not: false };
 		assert_eq!(token.query_value(), "system|".to_owned());
 	}
 
