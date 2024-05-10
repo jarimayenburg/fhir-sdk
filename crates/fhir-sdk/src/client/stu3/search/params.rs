@@ -208,8 +208,8 @@ impl<'a> SearchParameter for TokenParam<'a> {
 	fn query_value(&self) -> String {
 		match self {
 			TokenParam::CodeInSystem { system, code, .. } => format!("{system}|{code}"),
-			TokenParam::CodeInAnySystem { code, .. } => format!("|{code}"),
-			TokenParam::CodeWithoutSystem { code, .. } => format!("{code}"),
+			TokenParam::CodeInAnySystem { code, .. } => format!("{code}"),
+			TokenParam::CodeWithoutSystem { code, .. } => format!("|{code}"),
 			TokenParam::InSystem { system, .. } => format!("{system}|"),
 			TokenParam::In { value_set, .. } => escape_value(value_set),
 			TokenParam::Text { text } => escape_value(text),
