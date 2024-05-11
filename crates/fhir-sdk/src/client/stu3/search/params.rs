@@ -177,7 +177,7 @@ impl<'a> TokenParam<'a> {
 	}
 
 	/// Token param for a specific code without specifying system
-	pub fn code_in_any_system(code: &'a str) -> Self {
+	pub fn code(code: &'a str) -> Self {
 		Self::CodeInAnySystem { code, not: false }
 	}
 
