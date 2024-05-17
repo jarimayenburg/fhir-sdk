@@ -16,7 +16,7 @@ version = "0.9.0"
 workspace = true
 
 [features]
-default = ["r5", "builders", "client", "docs"]
+default = ["stu3", "builders", "client", "docs"]
 client = [
 	"builders",
 	"dep:async-trait",
