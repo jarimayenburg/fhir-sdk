@@ -204,6 +204,12 @@ pub struct SearchParameters<R> {
 	resource_type: PhantomData<R>,
 }
 
+impl<R> Default for SearchParameters<R> {
+	fn default() -> Self {
+		Self::empty()
+	}
+}
+
 impl<R> SearchParameters<R> {
 	/// Create a new list of [`SearchParameters`].
 	#[must_use]
