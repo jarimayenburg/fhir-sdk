@@ -20,14 +20,14 @@ mod params;
 #[async_trait]
 impl<R> PagedSearchExecutor<R> for Client<FhirStu3>
 where
-	R: NamedResource + DomainResource + TryFrom<Resource> + 'static,
+	R: NamedResource + DomainResource + TryFrom<Resource> + Send + 'static,
 {
 	type Stream = Page<R>;
 
 	#[allow(refining_impl_trait)]
 	async fn search_paged(
 		self,
-		params: SearchParameters,
+		params: SearchParameters<R>,
 		page_size: Option<u32>,
 	) -> Result<(Page<R>, Option<NextPageCursor<Self, R>>), Error> {
 		let mut url = self.url(&[R::TYPE.as_str()]);
@@ -66,12 +66,12 @@ where
 #[async_trait]
 impl<R> UnpagedSearchExecutor<R> for Client<FhirStu3>
 where
-	R: NamedResource + DomainResource + TryFrom<Resource> + 'static,
+	R: NamedResource + DomainResource + TryFrom<Resource> + Send + 'static,
 {
 	type Stream = Unpaged<R>;
 
 	#[allow(refining_impl_trait)]
-	async fn search_unpaged(self, params: SearchParameters) -> Result<Unpaged<R>, Error> {
+	async fn search_unpaged(self, params: SearchParameters<R>) -> Result<Unpaged<R>, Error> {
 		let mut url = self.url(&[R::TYPE.as_str()]);
 		url.query_pairs_mut().extend_pairs(params.into_queries()).finish();
 
