@@ -15,9 +15,7 @@ pub struct UnpagedSearch<E, R> {
 	executor: Option<E>,
 
 	/// Search parameters.
-	params: SearchParameters,
-
-	resource_type: PhantomData<R>,
+	params: SearchParameters<R>,
 }
 
 impl<E, R> UnpagedSearch<E, R>
@@ -30,7 +28,7 @@ where
 	/// An [UnpagedSearch] is useful if you're looking for a way to represent a search that can be executed on an arbitrary or currently unknown [Client].
 	/// If you just want to have your [Client] do a search, you are probably looking for [Client::search] instead.
 	pub fn new() -> Self {
-		Self { executor: None, params: SearchParameters::empty(), resource_type: PhantomData }
+		Self { executor: None, params: SearchParameters::empty() }
 	}
 
 	/// Sets a search executor (i.e. a [Client])
@@ -49,7 +47,7 @@ where
 	}
 
 	/// Add an existing set of search parameters
-	pub fn with_params(mut self, parameters: SearchParameters) -> Self {
+	pub fn with_params(mut self, parameters: SearchParameters<R>) -> Self {
 		self.params.add_all(parameters);
 		self
 	}
@@ -98,9 +96,9 @@ where
 {
 	/// Transform this search into a paged search
 	pub fn paged(self, page_size: Option<u32>) -> PagedSearch<E, R> {
-		let Self { executor, params, resource_type } = self;
+		let Self { executor, params } = self;
 
-		PagedSearch { executor, params, resource_type, page_size }
+		PagedSearch { executor, params, page_size }
 	}
 }
 
@@ -110,12 +108,10 @@ pub struct PagedSearch<E, R> {
 	executor: Option<E>,
 
 	/// Search parameters.
-	params: SearchParameters,
+	params: SearchParameters<R>,
 
 	/// Preferred page size
 	page_size: Option<u32>,
-
-	resource_type: PhantomData<R>,
 }
 
 impl<E, R> PagedSearch<E, R>
@@ -165,7 +161,7 @@ pub trait UnpagedSearchExecutor<R>: Sized {
 	type Stream: Stream<Item = Result<R, Error>>;
 
 	/// Execute an unpaged search
-	async fn search_unpaged(self, params: SearchParameters) -> Result<Self::Stream, Error>;
+	async fn search_unpaged(self, params: SearchParameters<R>) -> Result<Self::Stream, Error>;
 }
 
 /// Executor of paged FHIR searches (e.g. [Client])
@@ -176,7 +172,7 @@ pub trait PagedSearchExecutor<R>: Sized {
 
 	async fn search_paged(
 		self,
-		params: SearchParameters,
+		params: SearchParameters<R>,
 		page_size: Option<u32>,
 	) -> Result<(Self::Stream, Option<NextPageCursor<Self, R>>), Error>;
 
@@ -200,17 +196,19 @@ impl<V: 'static> Client<V> {
 }
 
 /// A collection of AND-joined search parameters.
-#[derive(Debug, Default, Clone, PartialEq, Eq, Hash)]
-pub struct SearchParameters {
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct SearchParameters<R> {
 	/// List of search queries.
 	queries: Vec<(String, String)>,
+
+	resource_type: PhantomData<R>,
 }
 
-impl SearchParameters {
+impl<R> SearchParameters<R> {
 	/// Create a new list of [`SearchParameters`].
 	#[must_use]
 	pub fn empty() -> Self {
-		Self::default()
+		Self { queries: Vec::new(), resource_type: PhantomData }
 	}
 
 	/// Initialize a new [`SearchParameters`] with a parameter
@@ -274,7 +272,7 @@ impl SearchParameters {
 		self.add_raw(key, value);
 	}
 
-	fn add_all(&mut self, parameters: SearchParameters) {
+	fn add_all(&mut self, parameters: SearchParameters<R>) {
 		for (key, value) in parameters.into_queries() {
 			self.add_raw(key, value);
 		}
@@ -285,7 +283,7 @@ impl SearchParameters {
 	}
 }
 
-impl<Q> FromIterator<Q> for SearchParameters
+impl<Q, R> FromIterator<Q> for SearchParameters<R>
 where
 	Q: IntoQuery,
 {
