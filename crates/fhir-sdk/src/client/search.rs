@@ -1,5 +1,6 @@
 //! Search handling.
 
+use std::hash::{Hash, Hasher};
 use std::marker::PhantomData;
 
 use async_trait::async_trait;
@@ -196,13 +197,27 @@ impl<V: 'static> Client<V> {
 }
 
 /// A collection of AND-joined search parameters.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone)]
 pub struct SearchParameters<R> {
 	/// List of search queries.
 	queries: Vec<(String, String)>,
 
 	resource_type: PhantomData<R>,
 }
+
+impl<R> Hash for SearchParameters<R> {
+	fn hash<H: Hasher>(&self, state: &mut H) {
+		self.queries.hash(state);
+	}
+}
+
+impl<R> PartialEq for SearchParameters<R> {
+	fn eq(&self, other: &Self) -> bool {
+		self.queries.eq(&other.queries)
+	}
+}
+
+impl<R> Eq for SearchParameters<R> {}
 
 impl<R> Default for SearchParameters<R> {
 	fn default() -> Self {
