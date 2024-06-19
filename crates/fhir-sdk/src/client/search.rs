@@ -197,12 +197,18 @@ impl<V: 'static> Client<V> {
 }
 
 /// A collection of AND-joined search parameters.
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct SearchParameters<R> {
 	/// List of search queries.
 	queries: Vec<(String, String)>,
 
 	resource_type: PhantomData<R>,
+}
+
+impl<R> Clone for SearchParameters<R> {
+	fn clone(&self) -> Self {
+		Self { queries: self.queries.clone(), resource_type: PhantomData::default() }
+	}
 }
 
 impl<R> Hash for SearchParameters<R> {
