@@ -277,14 +277,16 @@ impl<R> SearchParameters<R> {
 		self.queries
 	}
 
-	fn add<P>(&mut self, key: &str, parameter: P)
+	/// Add other types of parameters to the query string without consuming `self`
+	pub fn add<P>(&mut self, key: &str, parameter: P)
 	where
 		P: SearchParameter,
 	{
 		self.add_query((key, parameter))
 	}
 
-	fn add_query<Q>(&mut self, query: Q)
+	/// Add a query parameter without consuming `self`
+	pub fn add_query<Q>(&mut self, query: Q)
 	where
 		Q: IntoQuery,
 	{
