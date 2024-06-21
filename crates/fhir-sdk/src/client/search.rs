@@ -368,7 +368,8 @@ pub struct SearchParameterOrList<P> {
 }
 
 impl<P: SearchParameter> SearchParameterOrList<P> {
-	fn empty() -> Self {
+	/// Create an empty [SearchParameterOrList]
+	pub fn empty() -> Self {
 		Self { modifier: None, params: Vec::new() }
 	}
 
