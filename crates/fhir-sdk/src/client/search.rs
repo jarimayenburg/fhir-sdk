@@ -358,7 +358,7 @@ pub trait SearchParameter: Sized {
 }
 
 /// A set of OR-ed FHIR search parameters
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct SearchParameterOrList<P> {
 	// Used to validate that every added parameter has the same modifier
 	modifier: Option<String>,
