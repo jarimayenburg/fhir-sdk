@@ -13,7 +13,7 @@ use crate::error::DateFormatError;
 pub struct Instant(#[serde(with = "time::serde::rfc3339")] pub OffsetDateTime);
 
 /// FHIR date type: <https://hl7.org/fhir/datatypes.html#date>
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Eq, Hash)]
 pub enum Date {
 	/// Date in the format of YYYY
 	Year(i32),
@@ -45,7 +45,7 @@ impl TryFrom<Date> for time::Date {
 }
 
 /// FHIR dateTime type: <https://hl7.org/fhir/datatypes.html#dateTime>
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
+#[derive(Debug, Clone, Eq, Hash, Serialize)]
 #[serde(untagged)]
 pub enum DateTime {
 	/// Date that does not contain time or timezone
@@ -215,16 +215,21 @@ impl FromStr for Instant {
 
 impl PartialOrd for Date {
 	fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+		Some(self.cmp(other))
+	}
+}
+
+impl Ord for Date {
+	fn cmp(&self, other: &Self) -> Ordering {
 		match (self, other) {
-			(Date::Date(ld), r) => ld.partial_cmp(r),
-			(l, Date::Date(rd)) => l.partial_cmp(rd),
-			(Date::Year(ly), Date::Year(ry)) => ly.partial_cmp(ry),
-			(Date::Year(ly), Date::YearMonth(ry, _rm)) => ly.partial_cmp(ry),
-			(Date::YearMonth(ly, _lm), Date::Year(ry)) => ly.partial_cmp(ry),
-			(Date::YearMonth(ly, lm), Date::YearMonth(ry, rm)) => match ly.partial_cmp(ry)? {
-				Ordering::Less => Some(Ordering::Less),
-				Ordering::Greater => Some(Ordering::Greater),
-				Ordering::Equal => (*lm as u8).partial_cmp(&(*rm as u8)),
+			(Date::Date(ld), r) => ld.partial_cmp(r).unwrap(),
+			(l, Date::Date(rd)) => l.partial_cmp(rd).unwrap(),
+			(Date::Year(ly), Date::Year(ry)) => ly.cmp(ry),
+			(Date::Year(ly), Date::YearMonth(ry, _rm)) => ly.cmp(ry),
+			(Date::YearMonth(ly, _lm), Date::Year(ry)) => ly.cmp(ry),
+			(Date::YearMonth(ly, lm), Date::YearMonth(ry, rm)) => match ly.cmp(ry) {
+				Ordering::Equal => (*lm as u8).cmp(&(*rm as u8)),
+				other => other,
 			},
 		}
 	}
@@ -232,11 +237,45 @@ impl PartialOrd for Date {
 
 impl PartialOrd for DateTime {
 	fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+		Some(self.cmp(other))
+	}
+}
+
+impl Ord for DateTime {
+	fn cmp(&self, other: &Self) -> Ordering {
 		match (self, other) {
-			(DateTime::Date(ld), DateTime::Date(rd)) => ld.partial_cmp(rd),
-			(DateTime::Date(ld), DateTime::DateTime(Instant(rdtm))) => ld.partial_cmp(&rdtm.date()),
-			(DateTime::DateTime(Instant(ldtm)), DateTime::Date(rd)) => ldtm.date().partial_cmp(rd),
-			(DateTime::DateTime(ldtm), DateTime::DateTime(rdtm)) => ldtm.partial_cmp(rdtm),
+			(DateTime::Date(ld), DateTime::Date(rd)) => ld.cmp(&rd),
+			(DateTime::Date(ld), DateTime::DateTime(Instant(rdtm))) => {
+				ld.partial_cmp(&rdtm.date()).unwrap()
+			}
+			(DateTime::DateTime(Instant(ldtm)), DateTime::Date(rd)) => {
+				ldtm.date().partial_cmp(rd).unwrap()
+			}
+			(DateTime::DateTime(ldtm), DateTime::DateTime(rdtm)) => ldtm.cmp(&rdtm),
+		}
+	}
+}
+
+impl PartialEq for DateTime {
+	fn eq(&self, other: &Self) -> bool {
+		match (self, other) {
+			(DateTime::Date(ld), DateTime::Date(rd)) => ld.eq(rd),
+			(DateTime::Date(ld), DateTime::DateTime(Instant(rdtm))) => ld.eq(rdtm),
+			(DateTime::DateTime(Instant(ldtm)), DateTime::Date(rd)) => ldtm.eq(rd),
+			(DateTime::DateTime(Instant(ldtm)), DateTime::DateTime(Instant(rdtm))) => ldtm.eq(rdtm),
+		}
+	}
+}
+
+impl PartialEq for Date {
+	fn eq(&self, other: &Self) -> bool {
+		match (self, other) {
+			(Date::Date(ld), r) => ld.eq(r),
+			(l, Date::Date(rd)) => l.eq(rd),
+			(Date::Year(ly), Date::Year(ry)) => ly.eq(ry),
+			(Date::Year(ly), Date::YearMonth(ry, _rm)) => ly.eq(ry),
+			(Date::YearMonth(ly, _lm), Date::Year(ry)) => ly.eq(ry),
+			(Date::YearMonth(ly, lm), Date::YearMonth(ry, rm)) => ly.eq(ry) && lm.eq(rm),
 		}
 	}
 }
@@ -264,13 +303,13 @@ impl PartialEq<Date> for time::Date {
 impl PartialOrd<time::Date> for Date {
 	fn partial_cmp(&self, other: &time::Date) -> Option<Ordering> {
 		match self {
-			Date::Year(year) => year.partial_cmp(&other.year()),
-			Date::YearMonth(year, month) => match year.partial_cmp(&other.year())? {
+			Date::Year(year) => Some(year.cmp(&other.year())),
+			Date::YearMonth(year, month) => match year.cmp(&other.year()) {
 				Ordering::Less => Some(Ordering::Less),
 				Ordering::Greater => Some(Ordering::Greater),
-				Ordering::Equal => (*month as u8).partial_cmp(&(other.month() as u8)),
+				Ordering::Equal => Some((*month as u8).cmp(&(other.month() as u8))),
 			},
-			Date::Date(date) => date.partial_cmp(other),
+			Date::Date(date) => Some(date.cmp(other)),
 		}
 	}
 }
@@ -278,13 +317,13 @@ impl PartialOrd<time::Date> for Date {
 impl PartialOrd<Date> for time::Date {
 	fn partial_cmp(&self, other: &Date) -> Option<Ordering> {
 		match other {
-			Date::Year(year) => self.year().partial_cmp(year),
-			Date::YearMonth(year, month) => match self.year().partial_cmp(year)? {
+			Date::Year(year) => Some(self.year().cmp(year)),
+			Date::YearMonth(year, month) => match self.year().cmp(year) {
 				Ordering::Less => Some(Ordering::Less),
 				Ordering::Greater => Some(Ordering::Greater),
-				Ordering::Equal => (self.month() as u8).partial_cmp(&(*month as u8)),
+				Ordering::Equal => Some((self.month() as u8).cmp(&(*month as u8))),
 			},
-			Date::Date(date) => self.partial_cmp(date),
+			Date::Date(date) => Some(self.cmp(date)),
 		}
 	}
 }
@@ -307,11 +346,35 @@ impl PartialEq<DateTime> for OffsetDateTime {
 	}
 }
 
+impl PartialEq<OffsetDateTime> for Date {
+	fn eq(&self, other: &OffsetDateTime) -> bool {
+		match self {
+			Self::Year(year) => *year == other.date().year(),
+			Self::YearMonth(year, month) => {
+				*year == other.date().year() && *month == other.date().month()
+			}
+			Self::Date(date) => *date == other.date(),
+		}
+	}
+}
+
+impl PartialEq<Date> for OffsetDateTime {
+	fn eq(&self, other: &Date) -> bool {
+		match other {
+			Date::Year(year) => *year == self.date().year(),
+			Date::YearMonth(year, month) => {
+				*year == self.date().year() && *month == self.date().month()
+			}
+			Date::Date(date) => *date == self.date(),
+		}
+	}
+}
+
 impl PartialOrd<OffsetDateTime> for DateTime {
 	fn partial_cmp(&self, other: &OffsetDateTime) -> Option<Ordering> {
 		match self {
 			DateTime::Date(date) => date.partial_cmp(&other.date()),
-			DateTime::DateTime(Instant(datetime)) => datetime.partial_cmp(other),
+			DateTime::DateTime(Instant(datetime)) => Some(datetime.cmp(other)),
 		}
 	}
 }
@@ -320,7 +383,128 @@ impl PartialOrd<DateTime> for OffsetDateTime {
 	fn partial_cmp(&self, other: &DateTime) -> Option<Ordering> {
 		match other {
 			DateTime::Date(date) => self.date().partial_cmp(date),
-			DateTime::DateTime(Instant(datetime)) => self.partial_cmp(datetime),
+			DateTime::DateTime(Instant(datetime)) => Some(self.cmp(datetime)),
 		}
+	}
+}
+
+#[cfg(test)]
+mod tests {
+	use time::macros::{date, datetime};
+
+	use super::*;
+
+	#[test]
+	fn date_ordering() {
+		assert!(Date::Year(2024) < Date::Year(2025));
+		assert!(Date::Year(2024) == Date::Year(2024));
+		assert!(Date::Year(2024) > Date::Year(2023));
+
+		assert!(Date::Year(2024) < Date::YearMonth(2025, time::Month::February));
+		assert!(Date::Year(2024) == Date::YearMonth(2024, time::Month::February));
+		assert!(Date::Year(2024) > Date::YearMonth(2023, time::Month::February));
+
+		assert!(Date::Year(2024) < Date::Date(date!(2025 - 02 - 11)));
+		assert!(Date::Year(2024) == Date::Date(date!(2024 - 02 - 11)));
+		assert!(Date::Year(2024) > Date::Date(date!(2023 - 02 - 11)));
+
+		assert!(Date::YearMonth(2024, time::Month::February) < Date::Date(date!(2024 - 03 - 11)));
+		assert!(Date::YearMonth(2024, time::Month::February) == Date::Date(date!(2024 - 02 - 11)));
+		assert!(Date::YearMonth(2024, time::Month::February) > Date::Date(date!(2024 - 01 - 11)));
+	}
+
+	#[test]
+	fn datetime_ordering() {
+		assert!(DateTime::Date(Date::Year(2024)) < DateTime::Date(Date::Year(2025)));
+		assert!(DateTime::Date(Date::Year(2024)) == DateTime::Date(Date::Year(2024)));
+		assert!(DateTime::Date(Date::Year(2024)) > DateTime::Date(Date::Year(2023)));
+
+		assert!(
+			DateTime::Date(Date::Year(2024))
+				< DateTime::Date(Date::YearMonth(2025, time::Month::February))
+		);
+		assert!(
+			DateTime::Date(Date::Year(2024))
+				== DateTime::Date(Date::YearMonth(2024, time::Month::February))
+		);
+		assert!(
+			DateTime::Date(Date::Year(2024))
+				> DateTime::Date(Date::YearMonth(2023, time::Month::February))
+		);
+
+		assert!(
+			DateTime::Date(Date::Year(2024)) < DateTime::Date(Date::Date(date!(2025 - 02 - 11)))
+		);
+		assert!(
+			DateTime::Date(Date::Year(2024)) == DateTime::Date(Date::Date(date!(2024 - 02 - 11)))
+		);
+		assert!(
+			DateTime::Date(Date::Year(2024)) > DateTime::Date(Date::Date(date!(2023 - 02 - 11)))
+		);
+
+		assert!(
+			DateTime::Date(Date::YearMonth(2024, time::Month::February))
+				< DateTime::Date(Date::Date(date!(2024 - 03 - 11)))
+		);
+		assert!(
+			DateTime::Date(Date::YearMonth(2024, time::Month::February))
+				== DateTime::Date(Date::Date(date!(2024 - 02 - 11)))
+		);
+		assert!(
+			DateTime::Date(Date::YearMonth(2024, time::Month::February))
+				> DateTime::Date(Date::Date(date!(2024 - 01 - 11)))
+		);
+
+		assert!(
+			DateTime::DateTime(Instant(datetime!(2024-11-01 13:00:00 UTC)))
+				> DateTime::DateTime(Instant(datetime!(2024-11-01 12:00:00 UTC)))
+		);
+		assert!(
+			DateTime::DateTime(Instant(datetime!(2024-11-01 13:00:00 UTC)))
+				== DateTime::DateTime(Instant(datetime!(2024-11-01 13:00:00 UTC)))
+		);
+		assert!(
+			DateTime::DateTime(Instant(datetime!(2024-11-01 13:00:00 UTC)))
+				< DateTime::DateTime(Instant(datetime!(2024-11-01 14:00:00 UTC)))
+		);
+
+		assert!(
+			DateTime::DateTime(Instant(datetime!(2024-02-11 13:00:00 UTC)))
+				> DateTime::Date(Date::Year(2023))
+		);
+		assert!(
+			DateTime::DateTime(Instant(datetime!(2024-02-11 13:00:00 UTC)))
+				== DateTime::Date(Date::Year(2024))
+		);
+		assert!(
+			DateTime::DateTime(Instant(datetime!(2024-02-11 13:00:00 UTC)))
+				< DateTime::Date(Date::Year(2025))
+		);
+
+		assert!(
+			DateTime::DateTime(Instant(datetime!(2024-02-11 13:00:00 UTC)))
+				> DateTime::Date(Date::YearMonth(2024, time::Month::January))
+		);
+		assert!(
+			DateTime::DateTime(Instant(datetime!(2024-02-11 13:00:00 UTC)))
+				== DateTime::Date(Date::YearMonth(2024, time::Month::February))
+		);
+		assert!(
+			DateTime::DateTime(Instant(datetime!(2024-02-11 13:00:00 UTC)))
+				< DateTime::Date(Date::YearMonth(2024, time::Month::March))
+		);
+
+		assert!(
+			DateTime::DateTime(Instant(datetime!(2024-02-11 13:00:00 UTC)))
+				> DateTime::Date(Date::Date(date!(2024 - 02 - 10)))
+		);
+		assert!(
+			DateTime::DateTime(Instant(datetime!(2024-02-11 13:00:00 UTC)))
+				== DateTime::Date(Date::Date(date!(2024 - 02 - 11)))
+		);
+		assert!(
+			DateTime::DateTime(Instant(datetime!(2024-02-11 13:00:00 UTC)))
+				< DateTime::Date(Date::Date(date!(2024 - 02 - 12)))
+		);
 	}
 }
