@@ -489,6 +489,12 @@ impl<'a> IncludeParam<'a> {
 		self.iterate = true;
 		self
 	}
+
+	/// Set a target type
+	pub fn with_target_type(mut self, target_type: ResourceType) -> Self {
+		self.target_type = Some(target_type);
+		self
+	}
 }
 
 impl<'a> IntoQuery for IncludeParam<'a> {
