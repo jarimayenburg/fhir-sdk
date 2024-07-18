@@ -5,18 +5,14 @@ resolver = "2"
 [profile.dev]
 incremental = true
 lto = "off"
-[profile.dev.build-override]
 opt-level = 0
 
 [profile.test]
 incremental = true
 lto = "off"
-[profile.test.build-override]
 opt-level = 0
 
 [profile.release]
-incremental = true
-[profile.release.build-override]
 opt-level = 2
 
 [workspace.lints.rust]
