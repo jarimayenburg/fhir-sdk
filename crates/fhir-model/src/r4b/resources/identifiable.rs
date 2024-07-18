@@ -47,12 +47,12 @@ pub trait IdentifiableResource {
 	}
 
 	/// Return the first identifier value for a given system.
-	fn identifier_with_system(&self, system: &str) -> Option<&String> {
+	fn identifier_with_system(&self, system: &str) -> Option<&str> {
 		self.identifier()
 			.iter()
 			.flatten()
 			.filter(|ident| ident.system.as_ref().map_or(false, |sys| sys == system))
-			.find_map(|ident| ident.value.as_ref())
+			.find_map(|ident| ident.value.as_deref())
 	}
 
 	/// Return a list of identifiers for a given system.
@@ -65,7 +65,7 @@ pub trait IdentifiableResource {
 	}
 
 	/// Return the first identifier value for a given type.
-	fn identifier_with_type(&self, type_system: &str, type_code: &str) -> Option<&String> {
+	fn identifier_with_type(&self, type_system: &str, type_code: &str) -> Option<&str> {
 		self.identifier()
 			.iter()
 			.flatten()
@@ -77,7 +77,7 @@ pub trait IdentifiableResource {
 					})
 				})
 			})
-			.find_map(|ident| ident.value.as_ref())
+			.find_map(|ident| ident.value.as_deref())
 	}
 
 	/// Return a list of identifiers for a given type.
