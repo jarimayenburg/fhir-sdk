@@ -84,6 +84,10 @@ impl RequestSettings {
 		self
 	}
 
+	pub fn headers_mut(&mut self) -> &mut HeaderMap {
+		&mut self.headers
+	}
+
 	/// Make a HTTP request using the settings. Returns the response.
 	pub(crate) async fn make_request(
 		&self,
