@@ -22,7 +22,6 @@ use fhir_sdk::{
 			BaseResource, Bundle, Encounter, Observation, ObservationSubjectReferenceTarget,
 			OperationOutcome, ParametersParameter, ParametersParameterValue, Patient,
 			PatientGeneralPractitionerReferenceTarget, Practitioner, Resource, ResourceType,
-			
 		},
 		types::{CodeableConcept, HumanName, Identifier, Reference},
 	},

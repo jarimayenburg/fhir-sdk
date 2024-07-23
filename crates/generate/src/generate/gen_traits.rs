@@ -3,6 +3,7 @@
 use std::collections::HashMap;
 
 use anyhow::{anyhow, Result};
+use inflector::Inflector;
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote};
 
@@ -12,6 +13,7 @@ use super::{
 	map_field_ident, map_type,
 };
 use crate::model::{
+	params::SearchParam,
 	structures::{Field, Type},
 	StructureDefinitionKind,
 };
@@ -179,6 +181,29 @@ pub fn generate_named_resource(resources: &[Type]) -> Result<TokenStream> {
 		#trait_definition
 		#trait_implementations
 	})
+}
+
+/// Generate implementations of the ResourceWithSearchParameters trait
+pub fn generate_resource_with_search_parameters_impls(
+	resource_params: &[(Type, Vec<&SearchParam>)],
+) -> Vec<TokenStream> {
+	resource_params
+		.iter()
+		.map(|(res, _)| {
+			let name = format_ident!("{}", res.name.to_pascal_case());
+			let search_param_name = format_ident!("{name}SearchParameter");
+
+			let doc_comment =
+				format!(" Parameters that can be used when searching {name} resources");
+
+			quote! {
+				impl ResourceWithSearchParameters for resources::#name {
+					#[doc = #doc_comment]
+					type Params = #search_param_name;
+				}
+			}
+		})
+		.collect()
 }
 
 /// Get field names and types from the elements.

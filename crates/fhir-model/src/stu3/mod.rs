@@ -1,6 +1,7 @@
 //! Revision STU3 types of FHIR.
 
 pub mod codes;
+pub mod params;
 pub mod resources;
 pub mod types;
 

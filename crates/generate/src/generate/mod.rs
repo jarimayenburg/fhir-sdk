@@ -2,6 +2,7 @@
 
 mod comments;
 mod gen_codes;
+mod gen_params;
 mod gen_traits;
 mod gen_types;
 
@@ -12,6 +13,8 @@ use inflector::Inflector;
 use proc_macro2::{Ident, TokenStream};
 use quote::{format_ident, quote};
 
+use crate::model::params::SearchParam;
+use crate::model::SearchParamType;
 use crate::model::{codes::Code, structures::Type, CodeSystemContentMode, StructureDefinitionKind};
 
 /// Generate the Rust code for the FHIR codes.
@@ -51,6 +54,54 @@ pub fn generate_codes(mut codes: Vec<Code>) -> Result<(TokenStream, HashMap<Stri
 		#(#codes)*
 	};
 	Ok((gen_enum, generated_codes))
+}
+
+/// Generate the Rust code for all resource search parameter enums
+pub fn generate_search_params(
+	search_params: Vec<SearchParam>,
+	resources: Vec<Type>,
+) -> Result<TokenStream> {
+	// Set generation variables.
+	let module_doc = " Generated code! Take a look at the generator-crate for changing this file!";
+
+	// Search params of type "special" and params without a FHIRPath expression are
+	// currently impossible to generate code for.
+	let search_params: Vec<SearchParam> =
+		search_params.into_iter().filter(|sp| sp.r#type != SearchParamType::Special).collect();
+
+	let resource_params: Vec<_> = resources
+		.into_iter()
+		.filter(|r| !r.r#abstract)
+		.filter_map(|r| {
+			// For now we don't generate variants for the search parameters shared by all
+			// resources (i.e. _lastUpdated, _language, etc)
+			let res_params: Vec<_> =
+				search_params.iter().filter(|sp| sp.base.contains(&r.name)).collect();
+
+			if res_params.is_empty() {
+				return None;
+			}
+
+			Some((r, res_params))
+		})
+		.collect();
+
+	let enums = gen_params::generate_search_param_enums(&resource_params);
+
+	let searchable_resource_impls =
+		gen_traits::generate_resource_with_search_parameters_impls(&resource_params);
+
+	Ok(quote! {
+		#![doc = #module_doc]
+		#![allow(clippy::too_many_lines)]
+
+		use crate::ResourceWithSearchParameters;
+		use super::super::resources;
+
+		#(#enums)*
+
+		#(#searchable_resource_impls)*
+	})
 }
 
 /// Generate the Rust code for the FHIR types.

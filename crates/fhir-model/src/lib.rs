@@ -336,3 +336,9 @@ wrapper_impls!(Base64Binary, Vec<u8>);
 wrapper_impls!(Time, time::Time);
 wrapper_impls!(Instant, time::OffsetDateTime);
 wrapper_impls!(Decimal, BigDecimal);
+
+/// A resource type that can be searched on
+pub trait ResourceWithSearchParameters {
+	/// Enum of parameters that can be used in the search
+	type Params;
+}
