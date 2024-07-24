@@ -84,6 +84,7 @@ impl RequestSettings {
 		self
 	}
 
+	/// Provides the HeaderMap such that it can be changed directly
 	pub fn headers_mut(&mut self) -> &mut HeaderMap {
 		&mut self.headers
 	}
