@@ -9,7 +9,7 @@ use fhir_model::stu3::{
 use futures::{future::BoxFuture, ready, Future, FutureExt, Stream, StreamExt};
 use reqwest::Url;
 
-use crate::client::{stu3::references::populate_reference_targets_internal, search::Paged};
+use crate::client::{search::Paged, stu3::references::populate_reference_targets_internal};
 
 use super::{find_next_page_url, Client, Error, FhirStu3};
 
