@@ -285,6 +285,8 @@ pub struct ChoiceField {
 	pub is_modifier: bool,
 	/// Whether this field is part of the summary.
 	pub is_summary: bool,
+	/// Possible target resource types
+	pub reference_target_resource_types: Vec<String>,
 }
 
 /// Definition of a reference field.

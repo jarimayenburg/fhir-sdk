@@ -11,42 +11,34 @@ use crate::model::structures::{
 impl From<stu3::resources::StructureDefinition> for Type {
 	fn from(structure_definition: stu3::resources::StructureDefinition) -> Self {
 		let structure_definition = structure_definition.0;
-		let name = structure_definition.name;
 		let version = structure_definition.version.expect("StructureDefinition.version");
 		assert_eq!(
 			structure_definition.fhir_version.expect("StructureDefinition.fhirVersion").to_string(),
 			version
 		);
-		let url = structure_definition.url;
-		let description =
-			structure_definition.description.expect("StructureDefinition.description");
-		let kind = structure_definition.kind.into();
-		let r#abstract = structure_definition.r#abstract;
 		let base = structure_definition.base_definition.map(|base| {
 			base.split_once("http://hl7.org/fhir/StructureDefinition/")
 				.expect("parsing StructureDefinition.baseDefinition")
 				.1
 				.to_owned()
 		});
-		let status = structure_definition.status.into();
-		let experimental =
-			structure_definition.experimental.expect("StructureDefinition.experimental");
-		let r#type = structure_definition.r#type;
-		let elements =
-			ObjectField::from(structure_definition.snapshot.expect("StructureDefinition.snapshot"));
 
 		Self {
-			name,
+			name: structure_definition.name,
 			version,
-			url,
-			description,
-			kind,
-			r#abstract,
+			url: structure_definition.url,
+			description: structure_definition.description.expect("StructureDefinition.description"),
+			kind: structure_definition.kind.into(),
+			r#abstract: structure_definition.r#abstract,
 			base,
-			status,
-			experimental,
-			r#type,
-			elements,
+			status: structure_definition.status.into(),
+			experimental: structure_definition
+				.experimental
+				.expect("StructureDefinition.experimental"),
+			r#type: structure_definition.r#type,
+			elements: ObjectField::from(
+				structure_definition.snapshot.expect("StructureDefinition.snapshot"),
+			),
 		}
 	}
 }
@@ -54,42 +46,34 @@ impl From<stu3::resources::StructureDefinition> for Type {
 impl From<r4b::resources::StructureDefinition> for Type {
 	fn from(structure_definition: r4b::resources::StructureDefinition) -> Self {
 		let structure_definition = structure_definition.0;
-		let name = structure_definition.name;
 		let version = structure_definition.version.expect("StructureDefinition.version");
 		assert_eq!(
 			structure_definition.fhir_version.expect("StructureDefinition.fhirVersion").to_string(),
 			version
 		);
-		let url = structure_definition.url;
-		let description =
-			structure_definition.description.expect("StructureDefinition.description");
-		let kind = structure_definition.kind.into();
-		let r#abstract = structure_definition.r#abstract;
 		let base = structure_definition.base_definition.map(|base| {
 			base.split_once("http://hl7.org/fhir/StructureDefinition/")
 				.expect("parsing StructureDefinition.baseDefinition")
 				.1
 				.to_owned()
 		});
-		let status = structure_definition.status.into();
-		let experimental =
-			structure_definition.experimental.expect("StructureDefinition.experimental");
-		let r#type = structure_definition.r#type;
-		let elements =
-			ObjectField::from(structure_definition.snapshot.expect("StructureDefinition.snapshot"));
 
 		Self {
-			name,
+			name: structure_definition.name,
 			version,
-			url,
-			description,
-			kind,
-			r#abstract,
+			url: structure_definition.url,
+			description: structure_definition.description.expect("StructureDefinition.description"),
+			kind: structure_definition.kind.into(),
+			r#abstract: structure_definition.r#abstract,
 			base,
-			status,
-			experimental,
-			r#type,
-			elements,
+			status: structure_definition.status.into(),
+			experimental: structure_definition
+				.experimental
+				.expect("StructureDefinition.experimental"),
+			r#type: structure_definition.r#type,
+			elements: ObjectField::from(
+				structure_definition.snapshot.expect("StructureDefinition.snapshot"),
+			),
 		}
 	}
 }
@@ -97,42 +81,34 @@ impl From<r4b::resources::StructureDefinition> for Type {
 impl From<r5::resources::StructureDefinition> for Type {
 	fn from(structure_definition: r5::resources::StructureDefinition) -> Self {
 		let structure_definition = structure_definition.0;
-		let name = structure_definition.name;
 		let version = structure_definition.version.expect("StructureDefinition.version");
 		assert_eq!(
 			structure_definition.fhir_version.expect("StructureDefinition.fhirVersion").to_string(),
 			version
 		);
-		let url = structure_definition.url;
-		let description =
-			structure_definition.description.expect("StructureDefinition.description");
-		let kind = structure_definition.kind.into();
-		let r#abstract = structure_definition.r#abstract;
 		let base = structure_definition.base_definition.map(|base| {
 			base.split_once("http://hl7.org/fhir/StructureDefinition/")
 				.expect("parsing StructureDefinition.baseDefinition")
 				.1
 				.to_owned()
 		});
-		let status = structure_definition.status.into();
-		let experimental =
-			structure_definition.experimental.expect("StructureDefinition.experimental");
-		let r#type = structure_definition.r#type;
-		let elements =
-			ObjectField::from(structure_definition.snapshot.expect("StructureDefinition.snapshot"));
 
 		Self {
-			name,
+			name: structure_definition.name,
 			version,
-			url,
-			description,
-			kind,
-			r#abstract,
+			url: structure_definition.url,
+			description: structure_definition.description.expect("StructureDefinition.description"),
+			kind: structure_definition.kind.into(),
+			r#abstract: structure_definition.r#abstract,
 			base,
-			status,
-			experimental,
-			r#type,
-			elements,
+			status: structure_definition.status.into(),
+			experimental: structure_definition
+				.experimental
+				.expect("StructureDefinition.experimental"),
+			r#type: structure_definition.r#type,
+			elements: ObjectField::from(
+				structure_definition.snapshot.expect("StructureDefinition.snapshot"),
+			),
 		}
 	}
 }
@@ -209,35 +185,25 @@ impl From<stu3::resources::StructureDefinitionSnapshot> for ObjectField {
 		let first = elements.next().expect("Found no ElementDefinition").0;
 		let name = first.path;
 		assert!(!name.contains('.'));
-		let short = first.short.expect("ElementDefinition.short");
-		let definition = first.definition.expect("ElementDefinition.definition");
-		let comment = first.comment;
 		let min = first.min.expect("ElementDefinition.min");
-		let optional = min == 0;
 		let max = first.max.expect("ElementDefinition.max");
-		let is_array = &max != "1";
-		let r#type = first.r#type.into_iter().flatten().next().map(stu3_type_to_string);
-		let is_modifier = first.is_modifier.expect("ElementDefinition.isModifier");
-		let is_summary = first.is_summary.unwrap_or(false);
-
-		let fields = Vec::new();
-		let field_map = BTreeMap::new();
+		let r#type = first.r#type.iter().flatten().next().map(stu3_type_to_string);
 
 		let mut object = Self {
 			name,
-			short,
-			definition,
-			comment,
-			optional,
-			is_array,
+			short: first.short.expect("ElementDefinition.short"),
+			definition: first.definition.expect("ElementDefinition.definition"),
+			comment: first.comment,
+			optional: min == 0,
+			is_array: &max != "1",
 			is_base_field: false,
 			r#type,
 			type_name: None,
 			content_reference: None,
-			is_modifier,
-			is_summary,
-			fields,
-			field_map,
+			is_modifier: first.is_modifier.expect("ElementDefinition.isModifier"),
+			is_summary: first.is_summary.unwrap_or(false),
+			fields: Vec::new(),
+			field_map: BTreeMap::new(),
 		};
 
 		for element in elements {
@@ -261,35 +227,26 @@ impl From<r4b::resources::StructureDefinitionSnapshot> for ObjectField {
 		let first = elements.next().expect("Found no ElementDefinition").0;
 		let name = first.path;
 		assert!(!name.contains('.'));
-		let short = first.short.expect("ElementDefinition.short");
-		let definition = first.definition.expect("ElementDefinition.definition");
-		let comment = first.comment;
-		let min = first.min.expect("ElementDefinition.min");
-		let optional = min == 0;
-		let max = first.max.expect("ElementDefinition.max");
-		let is_array = &max != "1";
-		let r#type = first.r#type.into_iter().flatten().next().map(r4b_type_to_string);
-		let is_modifier = first.is_modifier.expect("ElementDefinition.isModifier");
-		let is_summary = first.is_summary.unwrap_or(false);
 
-		let fields = Vec::new();
-		let field_map = BTreeMap::new();
+		let min = first.min.expect("ElementDefinition.min");
+		let max = first.max.expect("ElementDefinition.max");
+		let r#type = first.r#type.iter().flatten().next().map(r4b_type_to_string);
 
 		let mut object = Self {
 			name,
-			short,
-			definition,
-			comment,
-			optional,
-			is_array,
+			short: first.short.expect("ElementDefinition.short"),
+			definition: first.definition.expect("ElementDefinition.definition"),
+			comment: first.comment,
+			optional: min == 0,
+			is_array: &max != "1",
 			is_base_field: false,
 			r#type,
 			type_name: None,
 			content_reference: None,
-			is_modifier,
-			is_summary,
-			fields,
-			field_map,
+			is_modifier: first.is_modifier.expect("ElementDefinition.isModifier"),
+			is_summary: first.is_summary.unwrap_or(false),
+			fields: Vec::new(),
+			field_map: BTreeMap::new(),
 		};
 
 		for element in elements {
@@ -313,35 +270,25 @@ impl From<r5::resources::StructureDefinitionSnapshot> for ObjectField {
 		let first = elements.next().expect("Found no ElementDefinition").0;
 		let name = first.path;
 		assert!(!name.contains('.'));
-		let short = first.short.expect("ElementDefinition.short");
-		let definition = first.definition.expect("ElementDefinition.definition");
-		let comment = first.comment;
 		let min = first.min.expect("ElementDefinition.min");
-		let optional = min == 0;
 		let max = first.max.expect("ElementDefinition.max");
-		let is_array = &max != "1";
-		let r#type = first.r#type.into_iter().flatten().next().map(r5_type_to_string);
-		let is_modifier = first.is_modifier.expect("ElementDefinition.isModifier");
-		let is_summary = first.is_summary.unwrap_or(false);
-
-		let fields = Vec::new();
-		let field_map = BTreeMap::new();
+		let r#type = first.r#type.iter().flatten().next().map(r5_type_to_string);
 
 		let mut object = Self {
 			name,
-			short,
-			definition,
-			comment,
-			optional,
-			is_array,
+			short: first.short.expect("ElementDefinition.short"),
+			definition: first.definition.expect("ElementDefinition.definition"),
+			comment: first.comment,
+			optional: min == 0,
+			is_array: &max != "1",
 			is_base_field: false,
 			r#type,
 			type_name: None,
 			content_reference: None,
-			is_modifier,
-			is_summary,
-			fields,
-			field_map,
+			is_modifier: first.is_modifier.expect("ElementDefinition.isModifier"),
+			is_summary: first.is_summary.unwrap_or(false),
+			fields: Vec::new(),
+			field_map: BTreeMap::new(),
 		};
 
 		for element in elements {
@@ -362,17 +309,10 @@ impl From<r5::resources::StructureDefinitionSnapshot> for ObjectField {
 impl From<stu3::types::ElementDefinition> for ObjectField {
 	fn from(element: stu3::types::ElementDefinition) -> Self {
 		let element = element.0;
-		let name =
-			element.path.rsplit_once('.').map_or(element.path.clone(), |(_, n)| n.to_owned());
-		let short = element.short.expect("ElementDefinition.short");
-		let definition = element.definition.expect("ElementDefinition.definition");
-		let comment = element.comment;
 		let min = element.min.expect("ElementDefinition.min");
-		let optional = min == 0;
 		let max = element.max.expect("ElementDefinition.max");
-		let is_array = &max != "1";
 		let is_base_field = element.base.map_or(false, |base| base.path != element.path);
-		let r#type = element.r#type.into_iter().flatten().next().map(stu3_type_to_string);
+		let r#type = element.r#type.iter().flatten().next().map(stu3_type_to_string);
 		let type_name = element
 			.extension
 			.into_iter()
@@ -382,30 +322,24 @@ impl From<stu3::types::ElementDefinition> for ObjectField {
 			.and_then(|extension| extension.0.value)
 			.map(|value| match value {
 				stu3::types::ExtensionValue::String(s) => s,
-				_ => panic!("Wrong value type in ElemenentDefinition.extension"),
+				_ => panic!("Wrong value type in ElementDefinition.extension"),
 			});
-		let content_reference = element.content_reference;
-		let is_modifier = element.is_modifier.expect("ElementDefinition.isModifier");
-		let is_summary = element.is_summary.unwrap_or(false);
-
-		let fields = Vec::new();
-		let field_map = BTreeMap::new();
 
 		Self {
-			name,
-			short,
-			definition,
-			comment,
-			optional,
-			is_array,
+			name: element.path.rsplit_once('.').map_or(element.path.clone(), |(_, n)| n.to_owned()),
+			short: element.short.expect("ElementDefinition.short"),
+			definition: element.definition.expect("ElementDefinition.definition"),
+			comment: element.comment,
+			optional: min == 0,
+			is_array: &max != "1",
 			is_base_field,
 			r#type,
 			type_name,
-			content_reference,
-			is_modifier,
-			is_summary,
-			fields,
-			field_map,
+			content_reference: element.content_reference,
+			is_modifier: element.is_modifier.expect("ElementDefinition.isModifier"),
+			is_summary: element.is_summary.unwrap_or(false),
+			fields: Vec::new(),
+			field_map: BTreeMap::new(),
 		}
 	}
 }
@@ -413,17 +347,8 @@ impl From<stu3::types::ElementDefinition> for ObjectField {
 impl From<r4b::types::ElementDefinition> for ObjectField {
 	fn from(element: r4b::types::ElementDefinition) -> Self {
 		let element = element.0;
-		let name =
-			element.path.rsplit_once('.').map_or(element.path.clone(), |(_, n)| n.to_owned());
-		let short = element.short.expect("ElementDefinition.short");
-		let definition = element.definition.expect("ElementDefinition.definition");
-		let comment = element.comment;
 		let min = element.min.expect("ElementDefinition.min");
-		let optional = min == 0;
 		let max = element.max.expect("ElementDefinition.max");
-		let is_array = &max != "1";
-		let is_base_field = element.base.map_or(false, |base| base.path != element.path);
-		let r#type = element.r#type.into_iter().flatten().next().map(r4b_type_to_string);
 		let type_name = element
 			.extension
 			.into_iter()
@@ -433,30 +358,24 @@ impl From<r4b::types::ElementDefinition> for ObjectField {
 			.and_then(|extension| extension.0.value)
 			.map(|value| match value {
 				r4b::types::ExtensionValue::String(s) => s,
-				_ => panic!("Wrong value type in ElemenentDefinition.extension"),
+				_ => panic!("Wrong value type in ElementDefinition.extension"),
 			});
-		let content_reference = element.content_reference;
-		let is_modifier = element.is_modifier.expect("ElementDefinition.isModifier");
-		let is_summary = element.is_summary.unwrap_or(false);
-
-		let fields = Vec::new();
-		let field_map = BTreeMap::new();
 
 		Self {
-			name,
-			short,
-			definition,
-			comment,
-			optional,
-			is_array,
-			is_base_field,
-			r#type,
+			name: element.path.rsplit_once('.').map_or(element.path.clone(), |(_, n)| n.to_owned()),
+			short: element.short.expect("ElementDefinition.short"),
+			definition: element.definition.expect("ElementDefinition.definition"),
+			comment: element.comment,
+			optional: min == 0,
+			is_array: &max != "1",
+			is_base_field: element.base.map_or(false, |base| base.path != element.path),
+			r#type: element.r#type.iter().flatten().next().map(r4b_type_to_string),
 			type_name,
-			content_reference,
-			is_modifier,
-			is_summary,
-			fields,
-			field_map,
+			content_reference: element.content_reference,
+			is_modifier: element.is_modifier.expect("ElementDefinition.isModifier"),
+			is_summary: element.is_summary.unwrap_or(false),
+			fields: Vec::new(),
+			field_map: BTreeMap::new(),
 		}
 	}
 }
@@ -464,17 +383,8 @@ impl From<r4b::types::ElementDefinition> for ObjectField {
 impl From<r5::types::ElementDefinition> for ObjectField {
 	fn from(element: r5::types::ElementDefinition) -> Self {
 		let element = element.0;
-		let name =
-			element.path.rsplit_once('.').map_or(element.path.clone(), |(_, n)| n.to_owned());
-		let short = element.short.expect("ElementDefinition.short");
-		let definition = element.definition.expect("ElementDefinition.definition");
-		let comment = element.comment;
 		let min = element.min.expect("ElementDefinition.min");
-		let optional = min == 0;
 		let max = element.max.expect("ElementDefinition.max");
-		let is_array = &max != "1";
-		let is_base_field = element.base.map_or(false, |base| base.path != element.path);
-		let r#type = element.r#type.into_iter().flatten().next().map(r5_type_to_string);
 		let type_name = element
 			.extension
 			.into_iter()
@@ -484,30 +394,24 @@ impl From<r5::types::ElementDefinition> for ObjectField {
 			.and_then(|extension| extension.0.value)
 			.map(|value| match value {
 				r5::types::ExtensionValue::String(s) => s,
-				_ => panic!("Wrong value type in ElemenentDefinition.extension"),
+				_ => panic!("Wrong value type in ElementDefinition.extension"),
 			});
-		let content_reference = element.content_reference;
-		let is_modifier = element.is_modifier.expect("ElementDefinition.isModifier");
-		let is_summary = element.is_summary.unwrap_or(false);
-
-		let fields = Vec::new();
-		let field_map = BTreeMap::new();
 
 		Self {
-			name,
-			short,
-			definition,
-			comment,
-			optional,
-			is_array,
-			is_base_field,
-			r#type,
+			name: element.path.rsplit_once('.').map_or(element.path.clone(), |(_, n)| n.to_owned()),
+			short: element.short.expect("ElementDefinition.short"),
+			definition: element.definition.expect("ElementDefinition.definition"),
+			comment: element.comment,
+			optional: min == 0,
+			is_array: &max != "1",
+			is_base_field: element.base.map_or(false, |base| base.path != element.path),
+			r#type: element.r#type.iter().flatten().next().map(r5_type_to_string),
 			type_name,
-			content_reference,
-			is_modifier,
-			is_summary,
-			fields,
-			field_map,
+			content_reference: element.content_reference,
+			is_modifier: element.is_modifier.expect("ElementDefinition.isModifier"),
+			is_summary: element.is_summary.unwrap_or(false),
+			fields: Vec::new(),
+			field_map: BTreeMap::new(),
 		}
 	}
 }
@@ -519,15 +423,8 @@ impl From<stu3::types::ElementDefinition> for StandardField {
 			panic!("Element without type: {element:#?}");
 		}
 
-		let name =
-			element.path.rsplit_once('.').map_or(element.path.clone(), |(_, n)| n.to_owned());
-		let short = element.short.expect("ElementDefinition.short");
-		let definition = element.definition.expect("ElementDefinition.definition");
-		let comment = element.comment;
 		let min = element.min.expect("ElementDefinition.min");
-		let optional = min == 0;
 		let max = element.max.expect("ElementDefinition.max");
-		let is_array = &max != "1";
 		let is_base_field = element.base.map_or(false, |base| base.path != element.path)
 			|| element
 				.r#type
@@ -536,25 +433,23 @@ impl From<stu3::types::ElementDefinition> for StandardField {
 				.map_or(false, |ty| &ty.code == "http://hl7.org/fhirpath/System.String");
 		let r#type = element
 			.r#type
-			.into_iter()
+			.iter()
 			.flatten()
 			.next()
 			.map(stu3_type_to_string)
 			.expect("ElementDefinition.type");
-		let is_modifier = element.is_modifier.expect("ElementDefinition.isModifier");
-		let is_summary = element.is_summary.unwrap_or(false);
 
 		Self {
-			name,
-			short,
-			definition,
-			comment,
-			optional,
-			is_array,
+			name: element.path.rsplit_once('.').map_or(element.path.clone(), |(_, n)| n.to_owned()),
+			short: element.short.expect("ElementDefinition.short"),
+			definition: element.definition.expect("ElementDefinition.definition"),
+			comment: element.comment,
+			optional: min == 0,
+			is_array: &max != "1",
 			is_base_field,
 			r#type,
-			is_modifier,
-			is_summary,
+			is_modifier: element.is_modifier.expect("ElementDefinition.isModifier"),
+			is_summary: element.is_summary.unwrap_or(false),
 		}
 	}
 }
@@ -566,15 +461,8 @@ impl From<r4b::types::ElementDefinition> for StandardField {
 			panic!("Element without type: {element:#?}");
 		}
 
-		let name =
-			element.path.rsplit_once('.').map_or(element.path.clone(), |(_, n)| n.to_owned());
-		let short = element.short.expect("ElementDefinition.short");
-		let definition = element.definition.expect("ElementDefinition.definition");
-		let comment = element.comment;
 		let min = element.min.expect("ElementDefinition.min");
-		let optional = min == 0;
 		let max = element.max.expect("ElementDefinition.max");
-		let is_array = &max != "1";
 		let is_base_field = element.base.map_or(false, |base| base.path != element.path)
 			|| element
 				.r#type
@@ -583,25 +471,23 @@ impl From<r4b::types::ElementDefinition> for StandardField {
 				.map_or(false, |ty| &ty.code == "http://hl7.org/fhirpath/System.String");
 		let r#type = element
 			.r#type
-			.into_iter()
+			.iter()
 			.flatten()
 			.next()
 			.map(r4b_type_to_string)
 			.expect("ElementDefinition.type");
-		let is_modifier = element.is_modifier.expect("ElementDefinition.isModifier");
-		let is_summary = element.is_summary.unwrap_or(false);
 
 		Self {
-			name,
-			short,
-			definition,
-			comment,
-			optional,
-			is_array,
+			name: element.path.rsplit_once('.').map_or(element.path.clone(), |(_, n)| n.to_owned()),
+			short: element.short.expect("ElementDefinition.short"),
+			definition: element.definition.expect("ElementDefinition.definition"),
+			comment: element.comment,
+			optional: min == 0,
+			is_array: &max != "1",
 			is_base_field,
 			r#type,
-			is_modifier,
-			is_summary,
+			is_modifier: element.is_modifier.expect("ElementDefinition.isModifier"),
+			is_summary: element.is_summary.unwrap_or(false),
 		}
 	}
 }
@@ -613,15 +499,8 @@ impl From<r5::types::ElementDefinition> for StandardField {
 			panic!("Element without type: {element:#?}");
 		}
 
-		let name =
-			element.path.rsplit_once('.').map_or(element.path.clone(), |(_, n)| n.to_owned());
-		let short = element.short.expect("ElementDefinition.short");
-		let definition = element.definition.expect("ElementDefinition.definition");
-		let comment = element.comment;
 		let min = element.min.expect("ElementDefinition.min");
-		let optional = min == 0;
 		let max = element.max.expect("ElementDefinition.max");
-		let is_array = &max != "1";
 		let is_base_field = element.base.map_or(false, |base| base.path != element.path)
 			|| element
 				.r#type
@@ -630,25 +509,22 @@ impl From<r5::types::ElementDefinition> for StandardField {
 				.map_or(false, |ty| &ty.code == "http://hl7.org/fhirpath/System.String");
 		let r#type = element
 			.r#type
-			.into_iter()
+			.iter()
 			.flatten()
 			.next()
 			.map(r5_type_to_string)
 			.expect("ElementDefinition.type");
-		let is_modifier = element.is_modifier.expect("ElementDefinition.isModifier");
-		let is_summary = element.is_summary.unwrap_or(false);
-
 		Self {
-			name,
-			short,
-			definition,
-			comment,
-			optional,
-			is_array,
+			name: element.path.rsplit_once('.').map_or(element.path.clone(), |(_, n)| n.to_owned()),
+			short: element.short.expect("ElementDefinition.short"),
+			definition: element.definition.expect("ElementDefinition.definition"),
+			comment: element.comment,
+			optional: min == 0,
+			is_array: &max != "1",
 			is_base_field,
 			r#type,
-			is_modifier,
-			is_summary,
+			is_modifier: element.is_modifier.expect("ElementDefinition.isModifier"),
+			is_summary: element.is_summary.unwrap_or(false),
 		}
 	}
 }
@@ -656,19 +532,13 @@ impl From<r5::types::ElementDefinition> for StandardField {
 impl From<stu3::types::ElementDefinition> for CodeField {
 	fn from(element: stu3::types::ElementDefinition) -> Self {
 		let element = element.0;
-		let name =
-			element.path.rsplit_once('.').map_or(element.path.clone(), |(_, n)| n.to_owned());
-		let short = element.short.expect("ElementDefinition.short");
-		let definition = element.definition.expect("ElementDefinition.definition");
-		let comment = element.comment;
 		let min = element.min.expect("ElementDefinition.min");
-		let optional = min == 0;
 		let max = element.max.expect("ElementDefinition.max");
 		let is_array = &max != "1";
 		let is_base_field = element.base.map_or(false, |base| base.path != element.path);
 		let r#type = element
 			.r#type
-			.into_iter()
+			.iter()
 			.flatten()
 			.next()
 			.map(stu3_type_to_string)
@@ -698,22 +568,19 @@ impl From<stu3::types::ElementDefinition> for CodeField {
 			.map(|code_url| {
 				code_url.split_once('|').map_or(code_url.as_str(), |(start, _end)| start).to_owned()
 			});
-		let is_modifier = element.is_modifier.expect("ElementDefinition.isModifier");
-		let is_summary = element.is_summary.unwrap_or(false);
-
 		Self {
-			name,
-			short,
-			definition,
-			comment,
-			optional,
+			name: element.path.rsplit_once('.').map_or(element.path.clone(), |(_, n)| n.to_owned()),
+			short: element.short.expect("ElementDefinition.short"),
+			definition: element.definition.expect("ElementDefinition.definition"),
+			comment: element.comment,
+			optional: min == 0,
 			is_array,
 			is_base_field,
 			r#type,
 			code_name,
 			code_url,
-			is_modifier,
-			is_summary,
+			is_modifier: element.is_modifier.expect("ElementDefinition.isModifier"),
+			is_summary: element.is_summary.unwrap_or(false),
 		}
 	}
 }
@@ -721,19 +588,11 @@ impl From<stu3::types::ElementDefinition> for CodeField {
 impl From<r4b::types::ElementDefinition> for CodeField {
 	fn from(element: r4b::types::ElementDefinition) -> Self {
 		let element = element.0;
-		let name =
-			element.path.rsplit_once('.').map_or(element.path.clone(), |(_, n)| n.to_owned());
-		let short = element.short.expect("ElementDefinition.short");
-		let definition = element.definition.expect("ElementDefinition.definition");
-		let comment = element.comment;
 		let min = element.min.expect("ElementDefinition.min");
-		let optional = min == 0;
 		let max = element.max.expect("ElementDefinition.max");
-		let is_array = &max != "1";
-		let is_base_field = element.base.map_or(false, |base| base.path != element.path);
 		let r#type = element
 			.r#type
-			.into_iter()
+			.iter()
 			.flatten()
 			.next()
 			.map(r4b_type_to_string)
@@ -755,22 +614,19 @@ impl From<r4b::types::ElementDefinition> for CodeField {
 		let code_url = binding.value_set.map(|code_url| {
 			code_url.split_once('|').map_or(code_url.as_str(), |(start, _end)| start).to_owned()
 		});
-		let is_modifier = element.is_modifier.expect("ElementDefinition.isModifier");
-		let is_summary = element.is_summary.unwrap_or(false);
-
 		Self {
-			name,
-			short,
-			definition,
-			comment,
-			optional,
-			is_array,
-			is_base_field,
+			name: element.path.rsplit_once('.').map_or(element.path.clone(), |(_, n)| n.to_owned()),
+			short: element.short.expect("ElementDefinition.short"),
+			definition: element.definition.expect("ElementDefinition.definition"),
+			comment: element.comment,
+			optional: min == 0,
+			is_array: &max != "1",
+			is_base_field: element.base.map_or(false, |base| base.path != element.path),
 			r#type,
 			code_name,
 			code_url,
-			is_modifier,
-			is_summary,
+			is_modifier: element.is_modifier.expect("ElementDefinition.isModifier"),
+			is_summary: element.is_summary.unwrap_or(false),
 		}
 	}
 }
@@ -778,19 +634,11 @@ impl From<r4b::types::ElementDefinition> for CodeField {
 impl From<r5::types::ElementDefinition> for CodeField {
 	fn from(element: r5::types::ElementDefinition) -> Self {
 		let element = element.0;
-		let name =
-			element.path.rsplit_once('.').map_or(element.path.clone(), |(_, n)| n.to_owned());
-		let short = element.short.expect("ElementDefinition.short");
-		let definition = element.definition.expect("ElementDefinition.definition");
-		let comment = element.comment;
 		let min = element.min.expect("ElementDefinition.min");
-		let optional = min == 0;
 		let max = element.max.expect("ElementDefinition.max");
-		let is_array = &max != "1";
-		let is_base_field = element.base.map_or(false, |base| base.path != element.path);
 		let r#type = element
 			.r#type
-			.into_iter()
+			.iter()
 			.flatten()
 			.next()
 			.map(r5_type_to_string)
@@ -812,22 +660,20 @@ impl From<r5::types::ElementDefinition> for CodeField {
 		let code_url = binding.value_set.map(|code_url| {
 			code_url.split_once('|').map_or(code_url.as_str(), |(start, _end)| start).to_owned()
 		});
-		let is_modifier = element.is_modifier.expect("ElementDefinition.isModifier");
-		let is_summary = element.is_summary.unwrap_or(false);
 
 		Self {
-			name,
-			short,
-			definition,
-			comment,
-			optional,
-			is_array,
-			is_base_field,
+			name: element.path.rsplit_once('.').map_or(element.path.clone(), |(_, n)| n.to_owned()),
+			short: element.short.expect("ElementDefinition.short"),
+			definition: element.definition.expect("ElementDefinition.definition"),
+			comment: element.comment,
+			optional: min == 0,
+			is_array: &max != "1",
+			is_base_field: element.base.map_or(false, |base| base.path != element.path),
 			r#type,
 			code_name,
 			code_url,
-			is_modifier,
-			is_summary,
+			is_modifier: element.is_modifier.expect("ElementDefinition.isModifier"),
+			is_summary: element.is_summary.unwrap_or(false),
 		}
 	}
 }
@@ -835,35 +681,42 @@ impl From<r5::types::ElementDefinition> for CodeField {
 impl From<stu3::types::ElementDefinition> for ChoiceField {
 	fn from(element: stu3::types::ElementDefinition) -> Self {
 		let element = element.0;
-		let name =
-			element.path.rsplit_once('.').map_or(element.path.clone(), |(_, n)| n.to_owned());
-		let short = element.short.expect("ElementDefinition.short");
-		let definition = element.definition.expect("ElementDefinition.definition");
-		let comment = element.comment;
 		let min = element.min.expect("ElementDefinition.min");
-		let optional = min == 0;
 		let max = element.max.expect("ElementDefinition.max");
-		let is_array = &max != "1";
-		let is_base_field = element.base.map_or(false, |base| base.path != element.path);
-
-		let mut types: Vec<String> =
-			element.r#type.into_iter().flatten().map(stu3_type_to_string).collect();
+		let mut types: Vec<_> = element.r#type.iter().flatten().map(stu3_type_to_string).collect();
 		types.dedup();
 
-		let is_modifier = element.is_modifier.expect("ElementDefinition.isModifier");
-		let is_summary = element.is_summary.unwrap_or(false);
+		let mut reference_target_resource_types = vec![];
+
+		if element.r#type.iter().flatten().any(|t| t.code == "Reference") {
+			let target_resource_types_iter =
+				element.r#type.into_iter().flatten().flat_map(|t| t.target_profile).flat_map(|t| {
+					t.strip_prefix("http://hl7.org/fhir/StructureDefinition/")
+						.map(|t| t.to_string())
+				});
+
+			reference_target_resource_types.extend(target_resource_types_iter);
+
+			if reference_target_resource_types.is_empty() {
+				reference_target_resource_types.push("Resource".to_string());
+			}
+		}
+
+		reference_target_resource_types.sort();
+		reference_target_resource_types.dedup();
 
 		Self {
-			name,
-			short,
-			definition,
-			comment,
-			optional,
-			is_array,
-			is_base_field,
+			name: element.path.rsplit_once('.').map_or(element.path.clone(), |(_, n)| n.to_owned()),
+			short: element.short.expect("ElementDefinition.short"),
+			definition: element.definition.expect("ElementDefinition.definition"),
+			comment: element.comment,
+			optional: min == 0,
+			is_array: &max != "1",
+			is_base_field: element.base.map_or(false, |base| base.path != element.path),
 			types,
-			is_modifier,
-			is_summary,
+			is_modifier: element.is_modifier.expect("ElementDefinition.isModifier"),
+			is_summary: element.is_summary.unwrap_or(false),
+			reference_target_resource_types,
 		}
 	}
 }
@@ -871,31 +724,44 @@ impl From<stu3::types::ElementDefinition> for ChoiceField {
 impl From<r4b::types::ElementDefinition> for ChoiceField {
 	fn from(element: r4b::types::ElementDefinition) -> Self {
 		let element = element.0;
-		let name =
-			element.path.rsplit_once('.').map_or(element.path.clone(), |(_, n)| n.to_owned());
-		let short = element.short.expect("ElementDefinition.short");
-		let definition = element.definition.expect("ElementDefinition.definition");
-		let comment = element.comment;
 		let min = element.min.expect("ElementDefinition.min");
-		let optional = min == 0;
 		let max = element.max.expect("ElementDefinition.max");
-		let is_array = &max != "1";
-		let is_base_field = element.base.map_or(false, |base| base.path != element.path);
-		let types = element.r#type.into_iter().flatten().map(r4b_type_to_string).collect();
-		let is_modifier = element.is_modifier.expect("ElementDefinition.isModifier");
-		let is_summary = element.is_summary.unwrap_or(false);
+		let types = element.r#type.iter().flatten().map(r4b_type_to_string).collect();
+		let reference_target_resource_types =
+			match element.r#type.iter().flatten().find(|t| t.code == "Reference") {
+				Some(r#type) => {
+					let mut reference_target_resource_types: Vec<_> = r#type
+						.target_profile
+						.iter()
+						.flatten()
+						.flat_map(|t| t.strip_prefix("http://hl7.org/fhir/StructureDefinition/"))
+						.map(|t| t.to_string())
+						.collect();
+
+					if reference_target_resource_types.is_empty() {
+						reference_target_resource_types.push("Resource".to_string());
+					}
+
+					reference_target_resource_types.sort();
+					reference_target_resource_types.dedup();
+
+					reference_target_resource_types
+				}
+				None => vec![],
+			};
 
 		Self {
-			name,
-			short,
-			definition,
-			comment,
-			optional,
-			is_array,
-			is_base_field,
+			name: element.path.rsplit_once('.').map_or(element.path.clone(), |(_, n)| n.to_owned()),
+			short: element.short.expect("ElementDefinition.short"),
+			definition: element.definition.expect("ElementDefinition.definition"),
+			comment: element.comment,
+			optional: min == 0,
+			is_array: &max != "1",
+			is_base_field: element.base.map_or(false, |base| base.path != element.path),
 			types,
-			is_modifier,
-			is_summary,
+			is_modifier: element.is_modifier.expect("ElementDefinition.isModifier"),
+			is_summary: element.is_summary.unwrap_or(false),
+			reference_target_resource_types,
 		}
 	}
 }
@@ -903,31 +769,44 @@ impl From<r4b::types::ElementDefinition> for ChoiceField {
 impl From<r5::types::ElementDefinition> for ChoiceField {
 	fn from(element: r5::types::ElementDefinition) -> Self {
 		let element = element.0;
-		let name =
-			element.path.rsplit_once('.').map_or(element.path.clone(), |(_, n)| n.to_owned());
-		let short = element.short.expect("ElementDefinition.short");
-		let definition = element.definition.expect("ElementDefinition.definition");
-		let comment = element.comment;
 		let min = element.min.expect("ElementDefinition.min");
-		let optional = min == 0;
 		let max = element.max.expect("ElementDefinition.max");
-		let is_array = &max != "1";
-		let is_base_field = element.base.map_or(false, |base| base.path != element.path);
-		let types = element.r#type.into_iter().flatten().map(r5_type_to_string).collect();
-		let is_modifier = element.is_modifier.expect("ElementDefinition.isModifier");
-		let is_summary = element.is_summary.unwrap_or(false);
+		let types = element.r#type.iter().flatten().map(r5_type_to_string).collect();
+		let reference_target_resource_types =
+			match element.r#type.iter().flatten().find(|t| t.code == "Reference") {
+				Some(r#type) => {
+					let mut target_types: Vec<_> = r#type
+						.target_profile
+						.iter()
+						.flatten()
+						.flat_map(|t| t.strip_prefix("http://hl7.org/fhir/StructureDefinition/"))
+						.map(|t| t.to_string())
+						.collect();
+
+					if target_types.is_empty() {
+						target_types.push("Resource".to_string());
+					}
+
+					target_types.sort();
+					target_types.dedup();
+
+					target_types
+				}
+				None => vec![],
+			};
 
 		Self {
-			name,
-			short,
-			definition,
-			comment,
-			optional,
-			is_array,
-			is_base_field,
+			name: element.path.rsplit_once('.').map_or(element.path.clone(), |(_, n)| n.to_owned()),
+			short: element.short.expect("ElementDefinition.short"),
+			definition: element.definition.expect("ElementDefinition.definition"),
+			comment: element.comment,
+			optional: min == 0,
+			is_array: &max != "1",
+			is_base_field: element.base.map_or(false, |base| base.path != element.path),
 			types,
-			is_modifier,
-			is_summary,
+			is_modifier: element.is_modifier.expect("ElementDefinition.isModifier"),
+			is_summary: element.is_summary.unwrap_or(false),
+			reference_target_resource_types,
 		}
 	}
 }
@@ -939,16 +818,8 @@ impl From<stu3::types::ElementDefinition> for ReferenceField {
 			panic!("Element not a Reference: {element:#?}");
 		}
 
-		let name =
-			element.path.rsplit_once('.').map_or(element.path.clone(), |(_, n)| n.to_owned());
-		let short = element.short.expect("ElementDefinition.short");
-		let definition = element.definition.expect("ElementDefinition.definition");
-		let comment = element.comment;
 		let min = element.min.expect("ElementDefinition.min");
-		let optional = min == 0;
 		let max = element.max.expect("ElementDefinition.max");
-		let is_array = &max != "1";
-
 		let mut target_resource_types: Vec<_> = element
 			.r#type
 			.into_iter()
@@ -966,20 +837,17 @@ impl From<stu3::types::ElementDefinition> for ReferenceField {
 		target_resource_types.sort();
 		target_resource_types.dedup();
 
-		let is_modifier = element.is_modifier.expect("ElementDefinition.isModifier");
-		let is_summary = element.is_summary.unwrap_or(false);
-
 		Self {
-			name,
-			short,
-			definition,
-			comment,
-			optional,
-			is_array,
+			name: element.path.rsplit_once('.').map_or(element.path.clone(), |(_, n)| n.to_owned()),
+			short: element.short.expect("ElementDefinition.short"),
+			definition: element.definition.expect("ElementDefinition.definition"),
+			comment: element.comment,
+			optional: min == 0,
+			is_array: &max != "1",
 			is_base_field: false,
 			target_resource_types,
-			is_modifier,
-			is_summary,
+			is_modifier: element.is_modifier.expect("ElementDefinition.isModifier"),
+			is_summary: element.is_summary.unwrap_or(false),
 		}
 	}
 }
@@ -991,16 +859,8 @@ impl From<r4b::types::ElementDefinition> for ReferenceField {
 			panic!("Element not a Reference: {element:#?}");
 		}
 
-		let name =
-			element.path.rsplit_once('.').map_or(element.path.clone(), |(_, n)| n.to_owned());
-		let short = element.short.expect("ElementDefinition.short");
-		let definition = element.definition.expect("ElementDefinition.definition");
-		let comment = element.comment;
 		let min = element.min.expect("ElementDefinition.min");
-		let optional = min == 0;
 		let max = element.max.expect("ElementDefinition.max");
-		let is_array = &max != "1";
-
 		let r#type = element.r#type.iter().flatten().find(|t| t.code == "Reference").unwrap();
 
 		let mut target_resource_types: Vec<_> = r#type
@@ -1018,20 +878,17 @@ impl From<r4b::types::ElementDefinition> for ReferenceField {
 		target_resource_types.sort();
 		target_resource_types.dedup();
 
-		let is_modifier = element.is_modifier.expect("ElementDefinition.isModifier");
-		let is_summary = element.is_summary.unwrap_or(false);
-
 		Self {
-			name,
-			short,
-			definition,
-			comment,
-			optional,
-			is_array,
+			name: element.path.rsplit_once('.').map_or(element.path.clone(), |(_, n)| n.to_owned()),
+			short: element.short.expect("ElementDefinition.short"),
+			definition: element.definition.expect("ElementDefinition.definition"),
+			comment: element.comment,
+			optional: min == 0,
+			is_array: &max != "1",
 			is_base_field: false,
 			target_resource_types,
-			is_modifier,
-			is_summary,
+			is_modifier: element.is_modifier.expect("ElementDefinition.isModifier"),
+			is_summary: element.is_summary.unwrap_or(false),
 		}
 	}
 }
@@ -1043,16 +900,8 @@ impl From<r5::types::ElementDefinition> for ReferenceField {
 			panic!("Element not a Reference: {element:#?}");
 		}
 
-		let name =
-			element.path.rsplit_once('.').map_or(element.path.clone(), |(_, n)| n.to_owned());
-		let short = element.short.expect("ElementDefinition.short");
-		let definition = element.definition.expect("ElementDefinition.definition");
-		let comment = element.comment;
 		let min = element.min.expect("ElementDefinition.min");
-		let optional = min == 0;
 		let max = element.max.expect("ElementDefinition.max");
-		let is_array = &max != "1";
-
 		let r#type = element.r#type.iter().flatten().find(|t| t.code == "Reference").unwrap();
 
 		let mut target_resource_types: Vec<_> = r#type
@@ -1070,35 +919,33 @@ impl From<r5::types::ElementDefinition> for ReferenceField {
 		target_resource_types.sort();
 		target_resource_types.dedup();
 
-		let is_modifier = element.is_modifier.expect("ElementDefinition.isModifier");
-		let is_summary = element.is_summary.unwrap_or(false);
-
 		Self {
-			name,
-			short,
-			definition,
-			comment,
-			optional,
-			is_array,
+			name: element.path.rsplit_once('.').map_or(element.path.clone(), |(_, n)| n.to_owned()),
+			short: element.short.expect("ElementDefinition.short"),
+			definition: element.definition.expect("ElementDefinition.definition"),
+			comment: element.comment,
+			optional: min == 0,
+			is_array: &max != "1",
 			is_base_field: false,
 			target_resource_types,
-			is_modifier,
-			is_summary,
+			is_modifier: element.is_modifier.expect("ElementDefinition.isModifier"),
+			is_summary: element.is_summary.unwrap_or(false),
 		}
 	}
 }
 
-fn stu3_type_to_string(r#type: stu3::types::ElementDefinitionType) -> String {
+fn stu3_type_to_string(r#type: &stu3::types::ElementDefinitionType) -> String {
 	if !r#type.extension.is_empty() {
-		for extension in r#type.extension {
+		for extension in r#type.extension.iter() {
 			if &extension.url
 				== "http://hl7.org/fhir/StructureDefinition/structuredefinition-fhir-type"
 			{
 				return extension
 					.0
 					.value
+					.as_ref()
 					.map(|v| match v {
-						stu3::types::ExtensionValue::Uri(uri) => uri,
+						stu3::types::ExtensionValue::Uri(uri) => uri.to_string(),
 						_ => panic!("ElementDefinition.type.extension.value is not URI"),
 					})
 					.expect("ElementDefinition.type.extension.value");
@@ -1106,21 +953,22 @@ fn stu3_type_to_string(r#type: stu3::types::ElementDefinitionType) -> String {
 		}
 	}
 
-	r#type.code
+	r#type.code.to_string()
 }
 
 /// Convert a type value to a proper string of the type name.
-fn r4b_type_to_string(r#type: r4b::types::ElementDefinitionType) -> String {
+fn r4b_type_to_string(r#type: &r4b::types::ElementDefinitionType) -> String {
 	if !r#type.extension.is_empty() {
-		for extension in r#type.extension {
+		for extension in r#type.extension.iter() {
 			if &extension.url
 				== "http://hl7.org/fhir/StructureDefinition/structuredefinition-fhir-type"
 			{
 				return extension
 					.0
 					.value
+					.as_ref()
 					.map(|v| match v {
-						r4b::types::ExtensionValue::Url(url) => url,
+						r4b::types::ExtensionValue::Url(url) => url.to_string(),
 						_ => panic!("ElementDefinition.type.extension.value is not URL"),
 					})
 					.expect("ElementDefinition.type.extension.value");
@@ -1128,21 +976,22 @@ fn r4b_type_to_string(r#type: r4b::types::ElementDefinitionType) -> String {
 		}
 	}
 
-	r#type.code
+	r#type.code.to_string()
 }
 
 /// Convert a type value to a proper string of the type name.
-fn r5_type_to_string(r#type: r5::types::ElementDefinitionType) -> String {
+fn r5_type_to_string(r#type: &r5::types::ElementDefinitionType) -> String {
 	if !r#type.extension.is_empty() {
-		for extension in r#type.extension {
+		for extension in r#type.extension.iter() {
 			if &extension.url
 				== "http://hl7.org/fhir/StructureDefinition/structuredefinition-fhir-type"
 			{
 				return extension
 					.0
 					.value
+					.as_ref()
 					.map(|v| match v {
-						r5::types::ExtensionValue::Url(url) => url,
+						r5::types::ExtensionValue::Url(url) => url.to_string(),
 						_ => panic!("ElementDefinition.type.extension.value is not URL"),
 					})
 					.expect("ElementDefinition.type.extension.value");
@@ -1150,7 +999,7 @@ fn r5_type_to_string(r#type: r5::types::ElementDefinitionType) -> String {
 		}
 	}
 
-	r#type.code
+	r#type.code.to_string()
 }
 
 /// Parse a Bundle into Types.
