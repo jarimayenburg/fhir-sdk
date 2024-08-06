@@ -483,13 +483,90 @@ impl Annotation {
         AnnotationBuilder::default()
     }
 }
+/// Reference wrapper type of the author[x] field in Annotation
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct AnnotationAuthorReference {
+    /// The resource that is being referred to. When doing searches, the client will fill this field if possible.
+    #[serde(skip)]
+    pub target: Option<Box<AnnotationAuthorReferenceTarget>>,
+    /// The FHIR Reference field
+    #[serde(flatten)]
+    pub reference: Reference,
+}
+impl From<Reference> for AnnotationAuthorReference {
+    fn from(reference: Reference) -> Self {
+        Self { target: None, reference }
+    }
+}
+impl ReferenceField for AnnotationAuthorReference {
+    fn set_target(&mut self, target: Resource) -> Result<(), WrongResourceType> {
+        self.target = Some(Box::new(target.try_into()?));
+        Ok(())
+    }
+    fn reference(&self) -> &Reference {
+        &self.reference
+    }
+    fn reference_mut(&mut self) -> &mut Reference {
+        &mut self.reference
+    }
+}
+/// Target resources for the author[x] reference field in Annotation
+#[derive(Debug, Clone, PartialEq)]
+pub enum AnnotationAuthorReferenceTarget {
+    /// Variant for Organization target resources
+    Organization(Organization),
+    /// Variant for Patient target resources
+    Patient(Patient),
+    /// Variant for Practitioner target resources
+    Practitioner(Practitioner),
+    /// Variant for RelatedPerson target resources
+    RelatedPerson(RelatedPerson),
+}
+impl TryFrom<Resource> for AnnotationAuthorReferenceTarget {
+    type Error = WrongResourceType;
+    fn try_from(resource: Resource) -> Result<Self, Self::Error> {
+        match resource {
+            Resource::Organization(r) => {
+                Ok(AnnotationAuthorReferenceTarget::Organization(r))
+            }
+            Resource::Patient(r) => Ok(AnnotationAuthorReferenceTarget::Patient(r)),
+            Resource::Practitioner(r) => {
+                Ok(AnnotationAuthorReferenceTarget::Practitioner(r))
+            }
+            Resource::RelatedPerson(r) => {
+                Ok(AnnotationAuthorReferenceTarget::RelatedPerson(r))
+            }
+            _ => Err(WrongResourceType),
+        }
+    }
+}
+impl From<Organization> for AnnotationAuthorReferenceTarget {
+    fn from(resource: Organization) -> AnnotationAuthorReferenceTarget {
+        AnnotationAuthorReferenceTarget::Organization(resource)
+    }
+}
+impl From<Patient> for AnnotationAuthorReferenceTarget {
+    fn from(resource: Patient) -> AnnotationAuthorReferenceTarget {
+        AnnotationAuthorReferenceTarget::Patient(resource)
+    }
+}
+impl From<Practitioner> for AnnotationAuthorReferenceTarget {
+    fn from(resource: Practitioner) -> AnnotationAuthorReferenceTarget {
+        AnnotationAuthorReferenceTarget::Practitioner(resource)
+    }
+}
+impl From<RelatedPerson> for AnnotationAuthorReferenceTarget {
+    fn from(resource: RelatedPerson) -> AnnotationAuthorReferenceTarget {
+        AnnotationAuthorReferenceTarget::RelatedPerson(resource)
+    }
+}
 /// Choice of types for the author[x] field in Annotation
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum AnnotationAuthor {
     /// Variant accepting the Reference type.
     #[serde(rename = "authorReference")]
-    Reference(Reference),
+    Reference(AnnotationAuthorReference),
     /// Variant accepting the String type.
     #[serde(rename = "authorString")]
     String(String),
@@ -1810,6 +1887,33 @@ impl DataRequirement {
         DataRequirementBuilder::default()
     }
 }
+/// Reference wrapper type of the subject[x] field in DataRequirement
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct DataRequirementSubjectReference {
+    /// The resource that is being referred to. When doing searches, the client will fill this field if possible.
+    #[serde(skip)]
+    pub target: Option<Box<Group>>,
+    /// The FHIR Reference field
+    #[serde(flatten)]
+    pub reference: Reference,
+}
+impl From<Reference> for DataRequirementSubjectReference {
+    fn from(reference: Reference) -> Self {
+        Self { target: None, reference }
+    }
+}
+impl ReferenceField for DataRequirementSubjectReference {
+    fn set_target(&mut self, target: Resource) -> Result<(), WrongResourceType> {
+        self.target = Some(Box::new(target.try_into()?));
+        Ok(())
+    }
+    fn reference(&self) -> &Reference {
+        &self.reference
+    }
+    fn reference_mut(&mut self) -> &mut Reference {
+        &mut self.reference
+    }
+}
 /// Choice of types for the subject[x] field in DataRequirement
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -1819,7 +1923,7 @@ pub enum DataRequirementSubject {
     CodeableConcept(CodeableConcept),
     /// Variant accepting the Reference type.
     #[serde(rename = "subjectReference")]
-    Reference(Reference),
+    Reference(DataRequirementSubjectReference),
 }
 /// Extension value for DataRequirementSubject.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -3758,6 +3862,33 @@ impl LookupReferences for ElementDefinitionType {
         Vec::new()
     }
 }
+/// Reference wrapper type of the defaultValue[x] field in ElementDefinition
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct ElementDefinitionDefaultValueReference {
+    /// The resource that is being referred to. When doing searches, the client will fill this field if possible.
+    #[serde(skip)]
+    pub target: Option<Box<Resource>>,
+    /// The FHIR Reference field
+    #[serde(flatten)]
+    pub reference: Reference,
+}
+impl From<Reference> for ElementDefinitionDefaultValueReference {
+    fn from(reference: Reference) -> Self {
+        Self { target: None, reference }
+    }
+}
+impl ReferenceField for ElementDefinitionDefaultValueReference {
+    fn set_target(&mut self, target: Resource) -> Result<(), WrongResourceType> {
+        self.target = Some(Box::new(target.try_into()?));
+        Ok(())
+    }
+    fn reference(&self) -> &Reference {
+        &self.reference
+    }
+    fn reference_mut(&mut self) -> &mut Reference {
+        &mut self.reference
+    }
+}
 /// Choice of types for the defaultValue[x] field in ElementDefinition
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -3878,7 +4009,7 @@ pub enum ElementDefinitionDefaultValue {
     RatioRange(RatioRange),
     /// Variant accepting the Reference type.
     #[serde(rename = "defaultValueReference")]
-    Reference(Reference),
+    Reference(ElementDefinitionDefaultValueReference),
     /// Variant accepting the SampledData type.
     #[serde(rename = "defaultValueSampledData")]
     SampledData(SampledData),
@@ -4074,6 +4205,33 @@ pub enum ElementDefinitionDefaultValueExtension {
     #[serde(rename = "_defaultValueDosage")]
     Dosage(FieldExtension),
 }
+/// Reference wrapper type of the fixed[x] field in ElementDefinition
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct ElementDefinitionFixedReference {
+    /// The resource that is being referred to. When doing searches, the client will fill this field if possible.
+    #[serde(skip)]
+    pub target: Option<Box<Resource>>,
+    /// The FHIR Reference field
+    #[serde(flatten)]
+    pub reference: Reference,
+}
+impl From<Reference> for ElementDefinitionFixedReference {
+    fn from(reference: Reference) -> Self {
+        Self { target: None, reference }
+    }
+}
+impl ReferenceField for ElementDefinitionFixedReference {
+    fn set_target(&mut self, target: Resource) -> Result<(), WrongResourceType> {
+        self.target = Some(Box::new(target.try_into()?));
+        Ok(())
+    }
+    fn reference(&self) -> &Reference {
+        &self.reference
+    }
+    fn reference_mut(&mut self) -> &mut Reference {
+        &mut self.reference
+    }
+}
 /// Choice of types for the fixed[x] field in ElementDefinition
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -4194,7 +4352,7 @@ pub enum ElementDefinitionFixed {
     RatioRange(RatioRange),
     /// Variant accepting the Reference type.
     #[serde(rename = "fixedReference")]
-    Reference(Reference),
+    Reference(ElementDefinitionFixedReference),
     /// Variant accepting the SampledData type.
     #[serde(rename = "fixedSampledData")]
     SampledData(SampledData),
@@ -4390,6 +4548,33 @@ pub enum ElementDefinitionFixedExtension {
     #[serde(rename = "_fixedDosage")]
     Dosage(FieldExtension),
 }
+/// Reference wrapper type of the pattern[x] field in ElementDefinition
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct ElementDefinitionPatternReference {
+    /// The resource that is being referred to. When doing searches, the client will fill this field if possible.
+    #[serde(skip)]
+    pub target: Option<Box<Resource>>,
+    /// The FHIR Reference field
+    #[serde(flatten)]
+    pub reference: Reference,
+}
+impl From<Reference> for ElementDefinitionPatternReference {
+    fn from(reference: Reference) -> Self {
+        Self { target: None, reference }
+    }
+}
+impl ReferenceField for ElementDefinitionPatternReference {
+    fn set_target(&mut self, target: Resource) -> Result<(), WrongResourceType> {
+        self.target = Some(Box::new(target.try_into()?));
+        Ok(())
+    }
+    fn reference(&self) -> &Reference {
+        &self.reference
+    }
+    fn reference_mut(&mut self) -> &mut Reference {
+        &mut self.reference
+    }
+}
 /// Choice of types for the pattern[x] field in ElementDefinition
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -4510,7 +4695,7 @@ pub enum ElementDefinitionPattern {
     RatioRange(RatioRange),
     /// Variant accepting the Reference type.
     #[serde(rename = "patternReference")]
-    Reference(Reference),
+    Reference(ElementDefinitionPatternReference),
     /// Variant accepting the SampledData type.
     #[serde(rename = "patternSampledData")]
     SampledData(SampledData),
@@ -4772,7 +4957,38 @@ impl ElementDefinitionExample {
 }
 impl LookupReferences for ElementDefinitionExample {
     fn lookup_references(&mut self) -> Vec<Box<&mut dyn ReferenceField>> {
-        Vec::new()
+        let mut refs: Vec<Box<&mut dyn ReferenceField>> = Vec::new();
+        if let ElementDefinitionExampleValue::Reference(ref mut r) = &mut self.value {
+            refs.push(Box::new(r));
+        }
+        refs
+    }
+}
+/// Reference wrapper type of the value[x] field in ElementDefinitionExample
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct ElementDefinitionExampleValueReference {
+    /// The resource that is being referred to. When doing searches, the client will fill this field if possible.
+    #[serde(skip)]
+    pub target: Option<Box<Resource>>,
+    /// The FHIR Reference field
+    #[serde(flatten)]
+    pub reference: Reference,
+}
+impl From<Reference> for ElementDefinitionExampleValueReference {
+    fn from(reference: Reference) -> Self {
+        Self { target: None, reference }
+    }
+}
+impl ReferenceField for ElementDefinitionExampleValueReference {
+    fn set_target(&mut self, target: Resource) -> Result<(), WrongResourceType> {
+        self.target = Some(Box::new(target.try_into()?));
+        Ok(())
+    }
+    fn reference(&self) -> &Reference {
+        &self.reference
+    }
+    fn reference_mut(&mut self) -> &mut Reference {
+        &mut self.reference
     }
 }
 /// Choice of types for the value[x] field in ElementDefinitionExample
@@ -4895,7 +5111,7 @@ pub enum ElementDefinitionExampleValue {
     RatioRange(RatioRange),
     /// Variant accepting the Reference type.
     #[serde(rename = "valueReference")]
-    Reference(Reference),
+    Reference(ElementDefinitionExampleValueReference),
     /// Variant accepting the SampledData type.
     #[serde(rename = "valueSampledData")]
     SampledData(SampledData),
@@ -5793,6 +6009,33 @@ impl Extension {
         ExtensionBuilder::default()
     }
 }
+/// Reference wrapper type of the value[x] field in Extension
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct ExtensionValueReference {
+    /// The resource that is being referred to. When doing searches, the client will fill this field if possible.
+    #[serde(skip)]
+    pub target: Option<Box<Resource>>,
+    /// The FHIR Reference field
+    #[serde(flatten)]
+    pub reference: Reference,
+}
+impl From<Reference> for ExtensionValueReference {
+    fn from(reference: Reference) -> Self {
+        Self { target: None, reference }
+    }
+}
+impl ReferenceField for ExtensionValueReference {
+    fn set_target(&mut self, target: Resource) -> Result<(), WrongResourceType> {
+        self.target = Some(Box::new(target.try_into()?));
+        Ok(())
+    }
+    fn reference(&self) -> &Reference {
+        &self.reference
+    }
+    fn reference_mut(&mut self) -> &mut Reference {
+        &mut self.reference
+    }
+}
 /// Choice of types for the value[x] field in Extension
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -5913,7 +6156,7 @@ pub enum ExtensionValue {
     RatioRange(RatioRange),
     /// Variant accepting the Reference type.
     #[serde(rename = "valueReference")]
-    Reference(Reference),
+    Reference(ExtensionValueReference),
     /// Variant accepting the SampledData type.
     #[serde(rename = "valueSampledData")]
     SampledData(SampledData),
@@ -9823,6 +10066,33 @@ impl TriggerDefinition {
         TriggerDefinitionBuilder::default()
     }
 }
+/// Reference wrapper type of the timing[x] field in TriggerDefinition
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct TriggerDefinitionTimingReference {
+    /// The resource that is being referred to. When doing searches, the client will fill this field if possible.
+    #[serde(skip)]
+    pub target: Option<Box<Schedule>>,
+    /// The FHIR Reference field
+    #[serde(flatten)]
+    pub reference: Reference,
+}
+impl From<Reference> for TriggerDefinitionTimingReference {
+    fn from(reference: Reference) -> Self {
+        Self { target: None, reference }
+    }
+}
+impl ReferenceField for TriggerDefinitionTimingReference {
+    fn set_target(&mut self, target: Resource) -> Result<(), WrongResourceType> {
+        self.target = Some(Box::new(target.try_into()?));
+        Ok(())
+    }
+    fn reference(&self) -> &Reference {
+        &self.reference
+    }
+    fn reference_mut(&mut self) -> &mut Reference {
+        &mut self.reference
+    }
+}
 /// Choice of types for the timing[x] field in TriggerDefinition
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -9832,7 +10102,7 @@ pub enum TriggerDefinitionTiming {
     Timing(Timing),
     /// Variant accepting the Reference type.
     #[serde(rename = "timingReference")]
-    Reference(Reference),
+    Reference(TriggerDefinitionTimingReference),
     /// Variant accepting the Date type.
     #[serde(rename = "timingDate")]
     Date(Date),
@@ -9964,6 +10234,111 @@ impl UsageContext {
         UsageContextBuilder::default()
     }
 }
+/// Reference wrapper type of the value[x] field in UsageContext
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct UsageContextValueReference {
+    /// The resource that is being referred to. When doing searches, the client will fill this field if possible.
+    #[serde(skip)]
+    pub target: Option<Box<UsageContextValueReferenceTarget>>,
+    /// The FHIR Reference field
+    #[serde(flatten)]
+    pub reference: Reference,
+}
+impl From<Reference> for UsageContextValueReference {
+    fn from(reference: Reference) -> Self {
+        Self { target: None, reference }
+    }
+}
+impl ReferenceField for UsageContextValueReference {
+    fn set_target(&mut self, target: Resource) -> Result<(), WrongResourceType> {
+        self.target = Some(Box::new(target.try_into()?));
+        Ok(())
+    }
+    fn reference(&self) -> &Reference {
+        &self.reference
+    }
+    fn reference_mut(&mut self) -> &mut Reference {
+        &mut self.reference
+    }
+}
+/// Target resources for the value[x] reference field in UsageContext
+#[derive(Debug, Clone, PartialEq)]
+pub enum UsageContextValueReferenceTarget {
+    /// Variant for Group target resources
+    Group(Group),
+    /// Variant for HealthcareService target resources
+    HealthcareService(HealthcareService),
+    /// Variant for InsurancePlan target resources
+    InsurancePlan(InsurancePlan),
+    /// Variant for Location target resources
+    Location(Location),
+    /// Variant for Organization target resources
+    Organization(Organization),
+    /// Variant for PlanDefinition target resources
+    PlanDefinition(PlanDefinition),
+    /// Variant for ResearchStudy target resources
+    ResearchStudy(ResearchStudy),
+}
+impl TryFrom<Resource> for UsageContextValueReferenceTarget {
+    type Error = WrongResourceType;
+    fn try_from(resource: Resource) -> Result<Self, Self::Error> {
+        match resource {
+            Resource::Group(r) => Ok(UsageContextValueReferenceTarget::Group(r)),
+            Resource::HealthcareService(r) => {
+                Ok(UsageContextValueReferenceTarget::HealthcareService(r))
+            }
+            Resource::InsurancePlan(r) => {
+                Ok(UsageContextValueReferenceTarget::InsurancePlan(r))
+            }
+            Resource::Location(r) => Ok(UsageContextValueReferenceTarget::Location(r)),
+            Resource::Organization(r) => {
+                Ok(UsageContextValueReferenceTarget::Organization(r))
+            }
+            Resource::PlanDefinition(r) => {
+                Ok(UsageContextValueReferenceTarget::PlanDefinition(r))
+            }
+            Resource::ResearchStudy(r) => {
+                Ok(UsageContextValueReferenceTarget::ResearchStudy(r))
+            }
+            _ => Err(WrongResourceType),
+        }
+    }
+}
+impl From<Group> for UsageContextValueReferenceTarget {
+    fn from(resource: Group) -> UsageContextValueReferenceTarget {
+        UsageContextValueReferenceTarget::Group(resource)
+    }
+}
+impl From<HealthcareService> for UsageContextValueReferenceTarget {
+    fn from(resource: HealthcareService) -> UsageContextValueReferenceTarget {
+        UsageContextValueReferenceTarget::HealthcareService(resource)
+    }
+}
+impl From<InsurancePlan> for UsageContextValueReferenceTarget {
+    fn from(resource: InsurancePlan) -> UsageContextValueReferenceTarget {
+        UsageContextValueReferenceTarget::InsurancePlan(resource)
+    }
+}
+impl From<Location> for UsageContextValueReferenceTarget {
+    fn from(resource: Location) -> UsageContextValueReferenceTarget {
+        UsageContextValueReferenceTarget::Location(resource)
+    }
+}
+impl From<Organization> for UsageContextValueReferenceTarget {
+    fn from(resource: Organization) -> UsageContextValueReferenceTarget {
+        UsageContextValueReferenceTarget::Organization(resource)
+    }
+}
+impl From<PlanDefinition> for UsageContextValueReferenceTarget {
+    fn from(resource: PlanDefinition) -> UsageContextValueReferenceTarget {
+        UsageContextValueReferenceTarget::PlanDefinition(resource)
+    }
+}
+impl From<ResearchStudy> for UsageContextValueReferenceTarget {
+    fn from(resource: ResearchStudy) -> UsageContextValueReferenceTarget {
+        UsageContextValueReferenceTarget::ResearchStudy(resource)
+    }
+}
 /// Choice of types for the value[x] field in UsageContext
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -9979,7 +10354,7 @@ pub enum UsageContextValue {
     Range(Range),
     /// Variant accepting the Reference type.
     #[serde(rename = "valueReference")]
-    Reference(Reference),
+    Reference(UsageContextValueReference),
 }
 /// Extension value for UsageContextValue.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
