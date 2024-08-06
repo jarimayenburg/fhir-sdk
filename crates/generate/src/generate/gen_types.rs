@@ -112,9 +112,14 @@ fn lookup_references_impl(ident: &Ident, field: &ObjectField, is_type: bool) -> 
 	let refs_pushes: Vec<_> = field
 		.fields
 		.iter()
-		.filter(|f| matches!(f, Field::Reference(_) | Field::Object(_)))
+		.filter(|f| match f {
+			Field::Standard(_) | Field::Code(_) => false,
+			Field::Choice(c) => !c.reference_target_resource_types.is_empty(),
+			Field::Object(_) | Field::Reference(_) => true,
+		})
 		.map(|f| {
 			let name = f.name().replace("[x]", "");
+			let ref_type = format_ident!("{}{}", ident, name.to_pascal_case().replace("[x]", ""));
 			let name = map_field_ident(&name);
 			let name = quote! { #name };
 			let path = if is_type {
@@ -125,6 +130,27 @@ fn lookup_references_impl(ident: &Ident, field: &ObjectField, is_type: bool) -> 
 
 			let is_wrapped = f.optional() || f.is_array();
 			let mut push = match f {
+				Field::Choice(c) if !c.reference_target_resource_types.is_empty() => {
+					if f.optional() {
+						quote! {
+							match #path.as_mut() {
+								Some(#ref_type::Reference(ref mut r)) => {
+									refs.push(Box::new(r));
+								},
+								_ => {}
+							}
+						}
+					} else {
+						quote! {
+							match &mut #path {
+								#ref_type::Reference(ref mut r) => {
+									refs.push(Box::new(r));
+								},
+								_ => {}
+							}
+						}
+					}
+				}
 				Field::Reference(_) if is_wrapped => quote! {
 					refs.push(Box::new(#name));
 				},
@@ -140,22 +166,25 @@ fn lookup_references_impl(ident: &Ident, field: &ObjectField, is_type: bool) -> 
 				_ => panic!("Wrong field type"),
 			};
 
-			// Wrap in Option check
-			if f.optional() || (f.is_array() && !f.is_base_field()) {
-				let var = if f.is_array() { &name } else { &path };
+			// TODO Choices should be fully handled by now, but think of a better way
+			if !matches!(f, Field::Choice(_)) {
+				// Wrap in Option check
+				if f.optional() || (f.is_array() && !f.is_base_field()) {
+					let var = if f.is_array() { &name } else { &path };
 
-				push = quote! {
-					if let Some(#name) = #var.as_mut() {
-						#push
-					}
-				};
-			}
+					push = quote! {
+						if let Some(#name) = #var.as_mut() {
+							#push
+						}
+					};
+				}
 
-			// Unwind Vec types
-			if f.is_array() {
-				push = quote! {
-					for #name in #path.iter_mut() {
-						#push
+				// Unwind Vec types
+				if f.is_array() {
+					push = quote! {
+						for #name in #path.iter_mut() {
+							#push
+						}
 					}
 				}
 			}
@@ -229,7 +258,10 @@ fn generate_field(
 	let (doc_comment, (field_type, extension_type), structs) = match field {
 		Field::Standard(f) => generate_standard_field(f),
 		Field::Code(f) => generate_code_field(f, implemented_codes),
-		Field::Choice(f) => generate_choice_field(f, type_ident),
+		Field::Choice(f) if f.reference_target_resource_types.is_empty() => {
+			generate_choice_field(f, type_ident)
+		}
+		Field::Choice(f) => generate_choice_reference_field(f, type_ident),
 		Field::Object(f) => generate_object_field(f, type_ident, base_type, implemented_codes),
 		Field::Reference(f) => generate_reference_field(f, type_ident),
 	};
@@ -248,19 +280,25 @@ fn generate_field(
 	let builder_attr = field.optional().then_some(
 		quote!(#[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]),
 	);
-	let serde_rename_or_flatten = if matches!(field, Field::Choice(_)) {
-		quote!(#[serde(flatten)])
-	} else {
-		quote!(#[serde(rename = #name)])
+	let serde_rename_or_flatten = match field {
+		Field::Choice(_) => {
+			quote!(#[serde(flatten)])
+		}
+		Field::Object(_) | Field::Standard(_) | Field::Code(_) | Field::Reference(_) => {
+			quote!(#[serde(rename = #name)])
+		}
 	};
 
 	let extension_field = (!field.is_base_field()).then(|| {
 		let ident_ext = format_ident!("{ident}_ext");
-		let serde_ext = if matches!(field, Field::Choice(_)) {
-			quote!(#[serde(flatten)])
-		} else {
-			let rename_ext = format!("_{name}");
-			quote!(#[serde(rename = #rename_ext)])
+		let serde_ext = match field {
+			Field::Choice(_) => {
+				quote!(#[serde(flatten)])
+			}
+			Field::Object(_) | Field::Standard(_) | Field::Code(_) | Field::Reference(_) => {
+				let rename_ext = format!("_{name}");
+				quote!(#[serde(rename = #rename_ext)])
+			}
 		};
 
 		if field.is_array() {
@@ -291,6 +329,181 @@ fn generate_field(
 		#extension_field
 	};
 	(fields, structs)
+}
+
+fn generate_choice_reference_field(
+	field: &ChoiceField,
+	type_ident: &Ident,
+) -> (String, (TokenStream, Ident), TokenStream) {
+	let mut doc_comment =
+		format!(" **{}** \n\n {} \n\n ", sanitize(&field.short), sanitize(&field.definition));
+	if let Some(comment) = &field.comment {
+		doc_comment.push_str(&sanitize(comment));
+		doc_comment.push(' ');
+	}
+
+	// If there are more than one possible target resource types, we define an enum
+	// Otherwise, we refer directly to the resource
+	let (target_type, target_defs) = if field.reference_target_resource_types.len() > 1 {
+		let target_type =
+			format_ident!("{type_ident}{}ReferenceTarget", field.name.to_pascal_case());
+
+		let enum_doc =
+			format!(" Target resources for the {} reference field in {type_ident}", field.name);
+
+		let variants = field.reference_target_resource_types.iter().map(|ty| {
+			let variant_type = format_ident!("{}", ty.to_pascal_case());
+			let variant_doc = format!(" Variant for {ty} target resources");
+
+			quote! {
+				#[doc = #variant_doc]
+				#variant_type(#variant_type),
+			}
+		});
+
+		let match_arms = field.reference_target_resource_types.iter().map(|resource_type| {
+			let rt = format_ident!("{}", resource_type.to_pascal_case());
+
+			quote! {
+				Resource::#rt(r) => Ok(#target_type::#rt(r)),
+			}
+		});
+
+		let from_impls = field.reference_target_resource_types.iter().map(|resource_type| {
+			let rt = format_ident!("{}", resource_type.to_pascal_case());
+
+			quote! {
+				impl From<#rt> for #target_type {
+					fn from(resource: #rt) -> #target_type {
+						#target_type::#rt(resource)
+					}
+				}
+			}
+		});
+
+		let target_defs = quote! {
+			#[doc = #enum_doc]
+			#[derive(Debug, Clone, PartialEq)]
+			pub enum #target_type {
+				#(#variants)*
+			}
+
+			impl TryFrom<Resource> for #target_type {
+				type Error = WrongResourceType;
+
+				fn try_from(resource: Resource) -> Result<Self, Self::Error> {
+					match resource {
+						#(#match_arms)*
+						_ => Err(WrongResourceType),
+					}
+				}
+			}
+
+			#(#from_impls)*
+		};
+
+		(target_type, Some(target_defs))
+	} else {
+		let resource_type = field.reference_target_resource_types.get(0).unwrap();
+		let target_type = format_ident!("{}", resource_type.to_pascal_case());
+
+		(target_type, None)
+	};
+
+	let struct_type =
+		format_ident!("{type_ident}{}Reference", field.name.replace("[x]", "").to_pascal_case());
+
+	let struct_doc = format!(" Reference wrapper type of the {} field in {type_ident}", field.name);
+
+	let reference_struct = quote! {
+		#[doc = #struct_doc]
+		#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+		pub struct #struct_type {
+			#[doc = r" The resource that is being referred to. When doing searches, the client will fill this field if possible."]
+			#[serde(skip)]
+			pub target: Option<Box<#target_type>>,
+
+			#[doc = r" The FHIR Reference field"]
+			#[serde(flatten)]
+			pub reference: Reference,
+		}
+
+		impl From<Reference> for #struct_type {
+			fn from(reference: Reference) -> Self {
+				Self {
+					target: None,
+					reference,
+				}
+			}
+		}
+
+		impl ReferenceField for #struct_type {
+			fn set_target(&mut self, target: Resource) -> Result<(), WrongResourceType> {
+				self.target = Some(Box::new(target.try_into()?));
+
+				Ok(())
+			}
+
+			fn reference(&self) -> &Reference {
+				&self.reference
+			}
+
+			fn reference_mut(&mut self) -> &mut Reference {
+				&mut self.reference
+			}
+		}
+
+		#target_defs
+	};
+
+	let enum_type = format_ident!("{type_ident}{}", field.name.replace("[x]", "").to_pascal_case());
+	let enum_doc = format!(" Choice of types for the {} field in {type_ident}", field.name);
+
+	let variants = field.types.iter().map(|ty| {
+		let variant_ident = format_ident!("{}", ty.to_pascal_case());
+		let variant_type = if ty == "Reference" { struct_type.clone() } else { map_type(ty) };
+		let variant_doc = format!(" Variant accepting the {variant_ident} type.");
+		let rename = field.name.replace("[x]", &variant_ident.to_string());
+
+		quote! {
+			#[doc = #variant_doc]
+			#[serde(rename = #rename)]
+			#variant_ident(#variant_type),
+		}
+	});
+
+	let extension_type = format_ident!("{enum_type}Extension");
+	let extension_doc = format!(" Extension value for {enum_type}.");
+	let extension_variants = field.types.iter().map(|ty| {
+		let variant_ident = format_ident!("{}", ty.to_pascal_case());
+		let variant_doc = format!(" Variant accepting the {variant_ident} extension.");
+		let rename = format!("_{}", field.name.replace("[x]", &variant_ident.to_string()));
+
+		quote! {
+			#[doc = #variant_doc]
+			#[serde(rename = #rename)]
+			#variant_ident(FieldExtension),
+		}
+	});
+
+	let choice_enum = quote! {
+	#reference_struct
+
+		#[doc = #enum_doc]
+		#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+		#[serde(rename_all = "camelCase")]
+		pub enum #enum_type {
+			#(#variants)*
+		}
+
+		#[doc = #extension_doc]
+		#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+		#[serde(rename_all = "camelCase")]
+		pub enum #extension_type {
+			#(#extension_variants)*
+		}
+	};
+	(doc_comment, (quote!(#enum_type), extension_type), choice_enum)
 }
 
 /// Generate field information and sub-structs for a standard field.
