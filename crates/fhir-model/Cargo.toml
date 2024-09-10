@@ -18,6 +18,7 @@ workspace = true
 
 [features]
 default = ["r5", "builders"]
+search-params = []
 builders = ["dep:derive_builder"]
 stu3 = []
 r4b = []

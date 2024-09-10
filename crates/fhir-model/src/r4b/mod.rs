@@ -1,6 +1,7 @@
 //! Revision 4B types of FHIR.
 
 pub mod codes;
+#[cfg(feature = "search-params")]
 pub mod params;
 pub mod resources;
 pub mod types;

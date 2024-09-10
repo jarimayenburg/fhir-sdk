@@ -180,7 +180,8 @@ impl<'a> ParsedReference<'a> {
 	/// references and turns relative references into absolute ones.
 	///
 	/// Panics for local references
-	#[must_use] pub fn with_base_url(self, mut base_url: &'a str) -> Self {
+	#[must_use]
+	pub fn with_base_url(self, mut base_url: &'a str) -> Self {
 		if base_url.ends_with('/') {
 			base_url = base_url.strip_suffix('/').unwrap();
 		}
@@ -338,6 +339,7 @@ wrapper_impls!(Instant, time::OffsetDateTime);
 wrapper_impls!(Decimal, BigDecimal);
 
 /// A resource type that can be searched on
+#[cfg(feature = "search-params")]
 pub trait ResourceWithSearchParameters {
 	/// Enum of parameters that can be used in the search
 	type Params;
