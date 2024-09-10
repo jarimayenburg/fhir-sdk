@@ -7,6 +7,8 @@
 
 mod date_time;
 mod error;
+#[cfg(feature = "search-params")]
+mod params;
 #[cfg(feature = "r4b")]
 pub mod r4b;
 #[cfg(feature = "r5")]
@@ -25,6 +27,8 @@ use serde_json::value::RawValue;
 use crate::error::UnknownResourceType;
 
 pub use self::date_time::*;
+#[cfg(feature = "search-params")]
+pub use self::params::*;
 pub use bigdecimal;
 pub use time;
 
@@ -337,10 +341,3 @@ wrapper_impls!(Base64Binary, Vec<u8>);
 wrapper_impls!(Time, time::Time);
 wrapper_impls!(Instant, time::OffsetDateTime);
 wrapper_impls!(Decimal, BigDecimal);
-
-/// A resource type that can be searched on
-#[cfg(feature = "search-params")]
-pub trait ResourceWithSearchParameters {
-	/// Enum of parameters that can be used in the search
-	type Params;
-}
