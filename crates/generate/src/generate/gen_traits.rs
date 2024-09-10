@@ -183,8 +183,8 @@ pub fn generate_named_resource(resources: &[Type]) -> Result<TokenStream> {
 	})
 }
 
-/// Generate implementations of the ResourceWithSearchParameters trait
-pub fn generate_resource_with_search_parameters_impls(
+/// Generate implementations of the SearchableResource trait
+pub fn generate_searchable_resource_impls(
 	resource_params: &[(Type, Vec<&SearchParam>)],
 ) -> Vec<TokenStream> {
 	resource_params
@@ -197,7 +197,7 @@ pub fn generate_resource_with_search_parameters_impls(
 				format!(" Parameters that can be used when searching {name} resources");
 
 			quote! {
-				impl ResourceWithSearchParameters for resources::#name {
+				impl SearchableResource for resources::#name {
 					#[doc = #doc_comment]
 					type Params = #search_param_name;
 				}

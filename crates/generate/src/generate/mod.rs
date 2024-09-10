@@ -89,13 +89,13 @@ pub fn generate_search_params(
 	let enums = gen_params::generate_search_param_enums(&resource_params);
 
 	let searchable_resource_impls =
-		gen_traits::generate_resource_with_search_parameters_impls(&resource_params);
+		gen_traits::generate_searchable_resource_impls(&resource_params);
 
 	Ok(quote! {
 		#![doc = #module_doc]
 		#![allow(clippy::too_many_lines)]
 
-		use crate::ResourceWithSearchParameters;
+		use crate::params::*;
 		use super::super::resources;
 
 		#(#enums)*

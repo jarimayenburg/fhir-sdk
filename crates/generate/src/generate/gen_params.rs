@@ -11,9 +11,10 @@ pub fn generate_search_param_enums(
 	resource_params
 		.iter()
 		.map(|(res, params)| {
-			let name = format_ident!("{}SearchParameter", res.name.to_pascal_case());
+			let res_name = &res.name;
+			let params_ident = format_ident!("{}SearchParameter", res_name.to_pascal_case());
 
-			let arms = params
+			let variants = params
 				.iter()
 				.map(|sp| {
 					// Descriptions for search parameters with multiple bases are enormous,
@@ -42,13 +43,37 @@ pub fn generate_search_param_enums(
 				})
 				.collect::<Vec<_>>();
 
-			let doc_comment = format!(" Search parameters for the {} resource", res.name.as_str());
+			let code_arms: Vec<_> = params
+				.iter()
+				.map(|sp| {
+					let code = &sp.code;
+					let variant = format_ident!("{}", code.to_pascal_case());
+
+					quote! {
+						Self::#variant => #code
+					}
+				})
+				.collect();
+
+			let doc_comment = format!(" Search parameters for the {} resource", res_name);
 
 			quote! {
 				#[doc = #doc_comment]
 				#[derive(Clone, Debug)]
-				pub enum #name {
-					#(#arms,)*
+				pub enum #params_ident {
+					#(#variants,)*
+				}
+
+				impl ResourceSearchParameterDefinition for #params_ident {
+					fn resource_type(&self) -> &'static str {
+						#res_name
+					}
+
+					fn code(&self) -> &'static str {
+						match self {
+							#(#code_arms,)*
+						}
+					}
 				}
 			}
 		})
