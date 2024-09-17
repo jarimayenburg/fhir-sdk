@@ -3,7 +3,7 @@
 use crate::params::*;
 use super::super::resources;
 /// Search parameters for the Account resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum AccountSearchParameter {
     /// How much is in account?
     Balance,
@@ -43,7 +43,7 @@ impl ResourceSearchParameterDefinition for AccountSearchParameter {
     }
 }
 /// Search parameters for the ActivityDefinition resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum ActivityDefinitionSearchParameter {
     /// What resource is being referenced
     ComposedOf,
@@ -107,7 +107,7 @@ impl ResourceSearchParameterDefinition for ActivityDefinitionSearchParameter {
     }
 }
 /// Search parameters for the AdverseEvent resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum AdverseEventSearchParameter {
     /** AE | PAE
 An adverse event is an event that caused harm to a patient,  an adverse reaction is a something that is a subject-specific event that is a result of an exposure to a medication, food, device or environmental substance, a potential adverse event is something that occurred and that could have caused harm to a patient but did not*/
@@ -151,7 +151,7 @@ impl ResourceSearchParameterDefinition for AdverseEventSearchParameter {
     }
 }
 /// Search parameters for the AllergyIntolerance resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum AllergyIntoleranceSearchParameter {
     /// Source of the information about the allergy
     Asserter,
@@ -212,7 +212,7 @@ impl ResourceSearchParameterDefinition for AllergyIntoleranceSearchParameter {
     }
 }
 /// Search parameters for the Appointment resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum AppointmentSearchParameter {
     /// Any one of the individuals participating in the appointment
     Actor,
@@ -258,7 +258,7 @@ impl ResourceSearchParameterDefinition for AppointmentSearchParameter {
     }
 }
 /// Search parameters for the AppointmentResponse resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum AppointmentResponseSearchParameter {
     /// The Person, Location/HealthcareService or Device that this appointment response replies for
     Actor,
@@ -292,7 +292,7 @@ impl ResourceSearchParameterDefinition for AppointmentResponseSearchParameter {
     }
 }
 /// Search parameters for the AuditEvent resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum AuditEventSearchParameter {
     /// Type of action performed during the event
     Action,
@@ -365,7 +365,7 @@ impl ResourceSearchParameterDefinition for AuditEventSearchParameter {
     }
 }
 /// Search parameters for the Basic resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum BasicSearchParameter {
     /// Who created
     Author,
@@ -396,7 +396,7 @@ impl ResourceSearchParameterDefinition for BasicSearchParameter {
     }
 }
 /// Search parameters for the Binary resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum BinarySearchParameter {
     /// MimeType of the binary content
     Contenttype,
@@ -412,7 +412,7 @@ impl ResourceSearchParameterDefinition for BinarySearchParameter {
     }
 }
 /// Search parameters for the BodySite resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum BodySiteSearchParameter {
     /// Named anatomical location
     Code,
@@ -434,7 +434,7 @@ impl ResourceSearchParameterDefinition for BodySiteSearchParameter {
     }
 }
 /// Search parameters for the Bundle resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum BundleSearchParameter {
     /// The first resource in the bundle, if the bundle type is "document" - this is a composition, and this parameter provides access to searches its contents
     Composition,
@@ -459,7 +459,7 @@ impl ResourceSearchParameterDefinition for BundleSearchParameter {
     }
 }
 /// Search parameters for the CapabilityStatement resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum CapabilityStatementSearchParameter {
     /// The capability statement publication date
     Date,
@@ -529,7 +529,7 @@ impl ResourceSearchParameterDefinition for CapabilityStatementSearchParameter {
     }
 }
 /// Search parameters for the CarePlan resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum CarePlanSearchParameter {
     /// Time period plan covers
     Date,
@@ -602,7 +602,7 @@ impl ResourceSearchParameterDefinition for CarePlanSearchParameter {
     }
 }
 /// Search parameters for the CareTeam resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum CareTeamSearchParameter {
     /// Time period team covers
     Date,
@@ -642,7 +642,7 @@ impl ResourceSearchParameterDefinition for CareTeamSearchParameter {
     }
 }
 /// Search parameters for the ChargeItem resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum ChargeItemSearchParameter {
     /// Account to place this charge
     Account,
@@ -706,7 +706,7 @@ impl ResourceSearchParameterDefinition for ChargeItemSearchParameter {
     }
 }
 /// Search parameters for the Claim resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum ClaimSearchParameter {
     /// Member of the CareTeam
     CareTeam,
@@ -758,7 +758,7 @@ impl ResourceSearchParameterDefinition for ClaimSearchParameter {
     }
 }
 /// Search parameters for the ClaimResponse resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum ClaimResponseSearchParameter {
     /// The creation date
     Created,
@@ -798,7 +798,7 @@ impl ResourceSearchParameterDefinition for ClaimResponseSearchParameter {
     }
 }
 /// Search parameters for the ClinicalImpression resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum ClinicalImpressionSearchParameter {
     /// When the assessment was documented
     Date,
@@ -850,7 +850,7 @@ impl ResourceSearchParameterDefinition for ClinicalImpressionSearchParameter {
     }
 }
 /// Search parameters for the CodeSystem resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum CodeSystemSearchParameter {
     /// A code defined in the code system
     Code,
@@ -905,7 +905,7 @@ impl ResourceSearchParameterDefinition for CodeSystemSearchParameter {
     }
 }
 /// Search parameters for the Communication resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum CommunicationSearchParameter {
     /// Request fulfilled by this communication
     BasedOn,
@@ -963,7 +963,7 @@ impl ResourceSearchParameterDefinition for CommunicationSearchParameter {
     }
 }
 /// Search parameters for the CommunicationRequest resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum CommunicationRequestSearchParameter {
     /// When request transitioned to being actionable
     Authored,
@@ -1027,7 +1027,7 @@ impl ResourceSearchParameterDefinition for CommunicationRequestSearchParameter {
     }
 }
 /// Search parameters for the CompartmentDefinition resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum CompartmentDefinitionSearchParameter {
     /// Patient | Encounter | RelatedPerson | Practitioner | Device
     Code,
@@ -1070,7 +1070,7 @@ impl ResourceSearchParameterDefinition for CompartmentDefinitionSearchParameter 
     }
 }
 /// Search parameters for the Composition resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum CompositionSearchParameter {
     /// Composition editing time
     Date,
@@ -1137,7 +1137,7 @@ impl ResourceSearchParameterDefinition for CompositionSearchParameter {
     }
 }
 /// Search parameters for the ConceptMap resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum ConceptMapSearchParameter {
     /// The concept map publication date
     Date,
@@ -1213,7 +1213,7 @@ impl ResourceSearchParameterDefinition for ConceptMapSearchParameter {
     }
 }
 /// Search parameters for the Condition resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum ConditionSearchParameter {
     /// Code for the condition
     Code,
@@ -1295,7 +1295,7 @@ impl ResourceSearchParameterDefinition for ConditionSearchParameter {
     }
 }
 /// Search parameters for the Consent resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum ConsentSearchParameter {
     /// When this Consent was created or indexed
     Date,
@@ -1350,7 +1350,7 @@ impl ResourceSearchParameterDefinition for ConsentSearchParameter {
     }
 }
 /// Search parameters for the Contract resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum ContractSearchParameter {
     /// Agent to the Contact
     Agent,
@@ -1390,7 +1390,7 @@ impl ResourceSearchParameterDefinition for ContractSearchParameter {
     }
 }
 /// Search parameters for the Coverage resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum CoverageSearchParameter {
     /// Covered party
     Beneficiary,
@@ -1445,7 +1445,7 @@ impl ResourceSearchParameterDefinition for CoverageSearchParameter {
     }
 }
 /// Search parameters for the DataElement resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum DataElementSearchParameter {
     /// A code for the data element (server may choose to do subsumption)
     Code,
@@ -1494,7 +1494,7 @@ impl ResourceSearchParameterDefinition for DataElementSearchParameter {
     }
 }
 /// Search parameters for the DetectedIssue resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum DetectedIssueSearchParameter {
     /// When identified
     Date,
@@ -1525,7 +1525,7 @@ impl ResourceSearchParameterDefinition for DetectedIssueSearchParameter {
     }
 }
 /// Search parameters for the Device resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum DeviceSearchParameter {
     /// A server defined search that may match any of the string fields in the Device.udi.name  or Device.type.coding.display or  Device.type.text
     DeviceName,
@@ -1574,7 +1574,7 @@ impl ResourceSearchParameterDefinition for DeviceSearchParameter {
     }
 }
 /// Search parameters for the DeviceComponent resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum DeviceComponentSearchParameter {
     /// The identifier of the component
     Identifier,
@@ -1599,7 +1599,7 @@ impl ResourceSearchParameterDefinition for DeviceComponentSearchParameter {
     }
 }
 /// Search parameters for the DeviceMetric resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum DeviceMetricSearchParameter {
     /// The category of the metric
     Category,
@@ -1627,7 +1627,7 @@ impl ResourceSearchParameterDefinition for DeviceMetricSearchParameter {
     }
 }
 /// Search parameters for the DeviceRequest resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum DeviceRequestSearchParameter {
     /// Code for what is being requested/ordered
     Code,
@@ -1688,7 +1688,7 @@ impl ResourceSearchParameterDefinition for DeviceRequestSearchParameter {
     }
 }
 /// Search parameters for the DeviceUseStatement resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum DeviceUseStatementSearchParameter {
     /// Search by subject - a patient
     Patient,
@@ -1713,7 +1713,7 @@ impl ResourceSearchParameterDefinition for DeviceUseStatementSearchParameter {
     }
 }
 /// Search parameters for the DiagnosticReport resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum DiagnosticReportSearchParameter {
     /// The code for the report as a whole, as opposed to codes for the atomic results, which are the names on the observation resource referred to from the result
     Code,
@@ -1774,7 +1774,7 @@ impl ResourceSearchParameterDefinition for DiagnosticReportSearchParameter {
     }
 }
 /// Search parameters for the DocumentManifest resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum DocumentManifestSearchParameter {
     /// Unique Identifier for the set of documents
     Identifier,
@@ -1826,7 +1826,7 @@ impl ResourceSearchParameterDefinition for DocumentManifestSearchParameter {
     }
 }
 /// Search parameters for the DocumentReference resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum DocumentReferenceSearchParameter {
     /// Master Version Specific Identifier
     Identifier,
@@ -1917,7 +1917,7 @@ impl ResourceSearchParameterDefinition for DocumentReferenceSearchParameter {
     }
 }
 /// Search parameters for the EligibilityRequest resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum EligibilityRequestSearchParameter {
     /// The creation date for the EOB
     Created,
@@ -1951,7 +1951,7 @@ impl ResourceSearchParameterDefinition for EligibilityRequestSearchParameter {
     }
 }
 /// Search parameters for the EligibilityResponse resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum EligibilityResponseSearchParameter {
     /// The creation date
     Created,
@@ -1988,7 +1988,7 @@ impl ResourceSearchParameterDefinition for EligibilityResponseSearchParameter {
     }
 }
 /// Search parameters for the Encounter resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum EncounterSearchParameter {
     /// A date within the period the Encounter lasted
     Date,
@@ -2064,7 +2064,7 @@ impl ResourceSearchParameterDefinition for EncounterSearchParameter {
     }
 }
 /// Search parameters for the Endpoint resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum EndpointSearchParameter {
     /// Protocol/Profile/Standard to be used with this endpoint connection
     ConnectionType,
@@ -2095,7 +2095,7 @@ impl ResourceSearchParameterDefinition for EndpointSearchParameter {
     }
 }
 /// Search parameters for the EnrollmentRequest resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum EnrollmentRequestSearchParameter {
     /// The business identifier of the Enrollment
     Identifier,
@@ -2120,7 +2120,7 @@ impl ResourceSearchParameterDefinition for EnrollmentRequestSearchParameter {
     }
 }
 /// Search parameters for the EnrollmentResponse resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum EnrollmentResponseSearchParameter {
     /// The business identifier of the EnrollmentResponse
     Identifier,
@@ -2142,7 +2142,7 @@ impl ResourceSearchParameterDefinition for EnrollmentResponseSearchParameter {
     }
 }
 /// Search parameters for the EpisodeOfCare resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum EpisodeOfCareSearchParameter {
     /// The provided date search value falls within the episode of care's period
     Date,
@@ -2182,7 +2182,7 @@ impl ResourceSearchParameterDefinition for EpisodeOfCareSearchParameter {
     }
 }
 /// Search parameters for the ExpansionProfile resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum ExpansionProfileSearchParameter {
     /// The expansion profile publication date
     Date,
@@ -2222,7 +2222,7 @@ impl ResourceSearchParameterDefinition for ExpansionProfileSearchParameter {
     }
 }
 /// Search parameters for the ExplanationOfBenefit resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum ExplanationOfBenefitSearchParameter {
     /// Member of the CareTeam
     CareTeam,
@@ -2274,7 +2274,7 @@ impl ResourceSearchParameterDefinition for ExplanationOfBenefitSearchParameter {
     }
 }
 /// Search parameters for the FamilyMemberHistory resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum FamilyMemberHistorySearchParameter {
     /// A search by a condition code
     Code,
@@ -2311,7 +2311,7 @@ impl ResourceSearchParameterDefinition for FamilyMemberHistorySearchParameter {
     }
 }
 /// Search parameters for the Flag resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum FlagSearchParameter {
     /// Time period when flag is active
     Date,
@@ -2342,7 +2342,7 @@ impl ResourceSearchParameterDefinition for FlagSearchParameter {
     }
 }
 /// Search parameters for the Goal resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum GoalSearchParameter {
     /// External Ids for this goal
     Identifier,
@@ -2376,7 +2376,7 @@ impl ResourceSearchParameterDefinition for GoalSearchParameter {
     }
 }
 /// Search parameters for the GraphDefinition resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum GraphDefinitionSearchParameter {
     /// The graph definition publication date
     Date,
@@ -2416,7 +2416,7 @@ impl ResourceSearchParameterDefinition for GraphDefinitionSearchParameter {
     }
 }
 /// Search parameters for the Group resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum GroupSearchParameter {
     /// Descriptive or actual
     Actual,
@@ -2456,7 +2456,7 @@ impl ResourceSearchParameterDefinition for GroupSearchParameter {
     }
 }
 /// Search parameters for the GuidanceResponse resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum GuidanceResponseSearchParameter {
     /// The identifier of the guidance response
     Identifier,
@@ -2481,7 +2481,7 @@ impl ResourceSearchParameterDefinition for GuidanceResponseSearchParameter {
     }
 }
 /// Search parameters for the HealthcareService resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum HealthcareServiceSearchParameter {
     /// The Healthcare Service is currently marked as active
     Active,
@@ -2524,7 +2524,7 @@ impl ResourceSearchParameterDefinition for HealthcareServiceSearchParameter {
     }
 }
 /// Search parameters for the ImagingManifest resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum ImagingManifestSearchParameter {
     /// Subject of the ImagingManifest (or a DICOM Key Object Selection which it represents)
     Patient,
@@ -2558,7 +2558,7 @@ impl ResourceSearchParameterDefinition for ImagingManifestSearchParameter {
     }
 }
 /// Search parameters for the ImagingStudy resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum ImagingStudySearchParameter {
     /// Other identifiers for the Study
     Identifier,
@@ -2616,7 +2616,7 @@ impl ResourceSearchParameterDefinition for ImagingStudySearchParameter {
     }
 }
 /// Search parameters for the Immunization resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum ImmunizationSearchParameter {
     /// Vaccination  (non)-Administration Date
     Date,
@@ -2674,7 +2674,7 @@ impl ResourceSearchParameterDefinition for ImmunizationSearchParameter {
     }
 }
 /// Search parameters for the ImmunizationRecommendation resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum ImmunizationRecommendationSearchParameter {
     /// Date recommendation created
     Date,
@@ -2717,7 +2717,7 @@ impl ResourceSearchParameterDefinition for ImmunizationRecommendationSearchParam
     }
 }
 /// Search parameters for the ImplementationGuide resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum ImplementationGuideSearchParameter {
     /// The implementation guide publication date
     Date,
@@ -2763,7 +2763,7 @@ impl ResourceSearchParameterDefinition for ImplementationGuideSearchParameter {
     }
 }
 /// Search parameters for the Library resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum LibrarySearchParameter {
     /// What resource is being referenced
     ComposedOf,
@@ -2827,7 +2827,7 @@ impl ResourceSearchParameterDefinition for LibrarySearchParameter {
     }
 }
 /// Search parameters for the Linkage resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum LinkageSearchParameter {
     /// Author of the Linkage
     Author,
@@ -2849,7 +2849,7 @@ impl ResourceSearchParameterDefinition for LinkageSearchParameter {
     }
 }
 /// Search parameters for the List resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum ListSearchParameter {
     /// What the purpose of this list is
     Code,
@@ -2898,7 +2898,7 @@ impl ResourceSearchParameterDefinition for ListSearchParameter {
     }
 }
 /// Search parameters for the Location resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum LocationSearchParameter {
     /// A (part of the) address of the location
     Address,
@@ -2963,7 +2963,7 @@ impl ResourceSearchParameterDefinition for LocationSearchParameter {
     }
 }
 /// Search parameters for the Measure resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum MeasureSearchParameter {
     /// What resource is being referenced
     ComposedOf,
@@ -3027,7 +3027,7 @@ impl ResourceSearchParameterDefinition for MeasureSearchParameter {
     }
 }
 /// Search parameters for the MeasureReport resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum MeasureReportSearchParameter {
     /// External identifier of the measure report to be returned
     Identifier,
@@ -3049,7 +3049,7 @@ impl ResourceSearchParameterDefinition for MeasureReportSearchParameter {
     }
 }
 /// Search parameters for the Media resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum MediaSearchParameter {
     /// Procedure that caused this media to be created
     BasedOn,
@@ -3101,7 +3101,7 @@ impl ResourceSearchParameterDefinition for MediaSearchParameter {
     }
 }
 /// Search parameters for the Medication resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum MedicationSearchParameter {
     /// Codes that identify this medication
     Code,
@@ -3144,7 +3144,7 @@ impl ResourceSearchParameterDefinition for MedicationSearchParameter {
     }
 }
 /// Search parameters for the MedicationAdministration resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum MedicationAdministrationSearchParameter {
     /// Return administrations of this medication code
     Code,
@@ -3199,7 +3199,7 @@ impl ResourceSearchParameterDefinition for MedicationAdministrationSearchParamet
     }
 }
 /// Search parameters for the MedicationDispense resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum MedicationDispenseSearchParameter {
     /// Return dispenses of this medicine code
     Code,
@@ -3257,7 +3257,7 @@ impl ResourceSearchParameterDefinition for MedicationDispenseSearchParameter {
     }
 }
 /// Search parameters for the MedicationRequest resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum MedicationRequestSearchParameter {
     /// Return prescriptions of this medication code
     Code,
@@ -3312,7 +3312,7 @@ impl ResourceSearchParameterDefinition for MedicationRequestSearchParameter {
     }
 }
 /// Search parameters for the MedicationStatement resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum MedicationStatementSearchParameter {
     /// Return statements of this medication code
     Code,
@@ -3358,7 +3358,7 @@ impl ResourceSearchParameterDefinition for MedicationStatementSearchParameter {
     }
 }
 /// Search parameters for the MessageDefinition resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum MessageDefinitionSearchParameter {
     /// The behavior associated with the message
     Category,
@@ -3410,7 +3410,7 @@ impl ResourceSearchParameterDefinition for MessageDefinitionSearchParameter {
     }
 }
 /// Search parameters for the MessageHeader resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum MessageHeaderSearchParameter {
     /// The source of the decision
     Author,
@@ -3468,7 +3468,7 @@ impl ResourceSearchParameterDefinition for MessageHeaderSearchParameter {
     }
 }
 /// Search parameters for the NamingSystem resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum NamingSystemSearchParameter {
     /// Name of an individual to contact
     Contact,
@@ -3526,7 +3526,7 @@ impl ResourceSearchParameterDefinition for NamingSystemSearchParameter {
     }
 }
 /// Search parameters for the NutritionOrder resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum NutritionOrderSearchParameter {
     /// Return nutrition orders with this external identifier
     Identifier,
@@ -3569,7 +3569,7 @@ impl ResourceSearchParameterDefinition for NutritionOrderSearchParameter {
     }
 }
 /// Search parameters for the Observation resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum ObservationSearchParameter {
     /// The code of the observation type
     Code,
@@ -3696,7 +3696,7 @@ impl ResourceSearchParameterDefinition for ObservationSearchParameter {
     }
 }
 /// Search parameters for the OperationDefinition resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum OperationDefinitionSearchParameter {
     /// Marks this as a profile of the base
     Base,
@@ -3754,7 +3754,7 @@ impl ResourceSearchParameterDefinition for OperationDefinitionSearchParameter {
     }
 }
 /// Search parameters for the Organization resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum OrganizationSearchParameter {
     /// A server defined search that may match any of the string fields in the Address, including line, city, state, country, postalCode, and/or text
     Active,
@@ -3806,7 +3806,7 @@ impl ResourceSearchParameterDefinition for OrganizationSearchParameter {
     }
 }
 /// Search parameters for the Patient resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum PatientSearchParameter {
     /// Whether the patient record is active
     Active,
@@ -3894,7 +3894,7 @@ impl ResourceSearchParameterDefinition for PatientSearchParameter {
     }
 }
 /// Search parameters for the PaymentNotice resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum PaymentNoticeSearchParameter {
     /// Creation date fro the notice
     Created,
@@ -3931,7 +3931,7 @@ impl ResourceSearchParameterDefinition for PaymentNoticeSearchParameter {
     }
 }
 /// Search parameters for the PaymentReconciliation resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum PaymentReconciliationSearchParameter {
     /// The creation date
     Created,
@@ -3968,7 +3968,7 @@ impl ResourceSearchParameterDefinition for PaymentReconciliationSearchParameter 
     }
 }
 /// Search parameters for the Person resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum PersonSearchParameter {
     /// A server defined search that may match any of the string fields in the Address, including line, city, state, country, postalCode, and/or text
     Address,
@@ -4038,7 +4038,7 @@ impl ResourceSearchParameterDefinition for PersonSearchParameter {
     }
 }
 /// Search parameters for the PlanDefinition resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum PlanDefinitionSearchParameter {
     /// What resource is being referenced
     ComposedOf,
@@ -4102,7 +4102,7 @@ impl ResourceSearchParameterDefinition for PlanDefinitionSearchParameter {
     }
 }
 /// Search parameters for the Practitioner resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum PractitionerSearchParameter {
     /// A server defined search that may match any of the string fields in the Address, including line, city, state, country, postalCode, and/or text
     Address,
@@ -4166,7 +4166,7 @@ impl ResourceSearchParameterDefinition for PractitionerSearchParameter {
     }
 }
 /// Search parameters for the PractitionerRole resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum PractitionerRoleSearchParameter {
     /// A value in an email contact
     Email,
@@ -4218,7 +4218,7 @@ impl ResourceSearchParameterDefinition for PractitionerRoleSearchParameter {
     }
 }
 /// Search parameters for the Procedure resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum ProcedureSearchParameter {
     /// A code to identify a  procedure
     Code,
@@ -4273,7 +4273,7 @@ impl ResourceSearchParameterDefinition for ProcedureSearchParameter {
     }
 }
 /// Search parameters for the ProcedureRequest resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum ProcedureRequestSearchParameter {
     /// What is being requested/ordered
     Code,
@@ -4346,7 +4346,7 @@ impl ResourceSearchParameterDefinition for ProcedureRequestSearchParameter {
     }
 }
 /// Search parameters for the ProcessRequest resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum ProcessRequestSearchParameter {
     /// The action requested by this resource
     Action,
@@ -4371,7 +4371,7 @@ impl ResourceSearchParameterDefinition for ProcessRequestSearchParameter {
     }
 }
 /// Search parameters for the ProcessResponse resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum ProcessResponseSearchParameter {
     /// The business identifier of the Explanation of Benefit
     Identifier,
@@ -4399,7 +4399,7 @@ impl ResourceSearchParameterDefinition for ProcessResponseSearchParameter {
     }
 }
 /// Search parameters for the Provenance resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum ProvenanceSearchParameter {
     /// Who participated
     Agent,
@@ -4445,7 +4445,7 @@ impl ResourceSearchParameterDefinition for ProvenanceSearchParameter {
     }
 }
 /// Search parameters for the Questionnaire resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum QuestionnaireSearchParameter {
     /// A code that corresponds to one of its items in the questionnaire
     Code,
@@ -4494,7 +4494,7 @@ impl ResourceSearchParameterDefinition for QuestionnaireSearchParameter {
     }
 }
 /// Search parameters for the QuestionnaireResponse resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum QuestionnaireResponseSearchParameter {
     /// The author of the questionnaire response
     Author,
@@ -4540,7 +4540,7 @@ impl ResourceSearchParameterDefinition for QuestionnaireResponseSearchParameter 
     }
 }
 /// Search parameters for the ReferralRequest resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum ReferralRequestSearchParameter {
     /// Who the referral is about
     Patient,
@@ -4610,7 +4610,7 @@ impl ResourceSearchParameterDefinition for ReferralRequestSearchParameter {
     }
 }
 /// Search parameters for the RelatedPerson resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum RelatedPersonSearchParameter {
     /// A server defined search that may match any of the string fields in the Address, including line, city, state, country, postalCode, and/or text
     Address,
@@ -4671,7 +4671,7 @@ impl ResourceSearchParameterDefinition for RelatedPersonSearchParameter {
     }
 }
 /// Search parameters for the RequestGroup resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum RequestGroupSearchParameter {
     /// The author of the request group
     Author,
@@ -4723,7 +4723,7 @@ impl ResourceSearchParameterDefinition for RequestGroupSearchParameter {
     }
 }
 /// Search parameters for the ResearchStudy resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum ResearchStudySearchParameter {
     /// Classifications for the study
     Category,
@@ -4775,7 +4775,7 @@ impl ResourceSearchParameterDefinition for ResearchStudySearchParameter {
     }
 }
 /// Search parameters for the ResearchSubject resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum ResearchSubjectSearchParameter {
     /// Start and end of participation
     Date,
@@ -4803,7 +4803,7 @@ impl ResourceSearchParameterDefinition for ResearchSubjectSearchParameter {
     }
 }
 /// Search parameters for the RiskAssessment resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum RiskAssessmentSearchParameter {
     /// When was assessment made?
     Date,
@@ -4846,7 +4846,7 @@ impl ResourceSearchParameterDefinition for RiskAssessmentSearchParameter {
     }
 }
 /// Search parameters for the Schedule resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum ScheduleSearchParameter {
     /// Is the schedule in active use
     Active,
@@ -4874,7 +4874,7 @@ impl ResourceSearchParameterDefinition for ScheduleSearchParameter {
     }
 }
 /// Search parameters for the SearchParameter resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum SearchParameterSearchParameter {
     /// The resource type(s) this search parameter applies to
     Base,
@@ -4929,7 +4929,7 @@ impl ResourceSearchParameterDefinition for SearchParameterSearchParameter {
     }
 }
 /// Search parameters for the Sequence resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum SequenceSearchParameter {
     /// Chromosome number of the reference sequence
     Chromosome,
@@ -4963,7 +4963,7 @@ impl ResourceSearchParameterDefinition for SequenceSearchParameter {
     }
 }
 /// Search parameters for the ServiceDefinition resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum ServiceDefinitionSearchParameter {
     /// What resource is being referenced
     ComposedOf,
@@ -5027,7 +5027,7 @@ impl ResourceSearchParameterDefinition for ServiceDefinitionSearchParameter {
     }
 }
 /// Search parameters for the Slot resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum SlotSearchParameter {
     /// A Slot Identifier
     Identifier,
@@ -5055,7 +5055,7 @@ impl ResourceSearchParameterDefinition for SlotSearchParameter {
     }
 }
 /// Search parameters for the Specimen resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum SpecimenSearchParameter {
     /// The accession number associated with the specimen
     Accession,
@@ -5104,7 +5104,7 @@ impl ResourceSearchParameterDefinition for SpecimenSearchParameter {
     }
 }
 /// Search parameters for the StructureDefinition resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum StructureDefinitionSearchParameter {
     /// Whether the structure is abstract
     Abstract,
@@ -5183,7 +5183,7 @@ impl ResourceSearchParameterDefinition for StructureDefinitionSearchParameter {
     }
 }
 /// Search parameters for the StructureMap resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum StructureMapSearchParameter {
     /// The structure map publication date
     Date,
@@ -5226,7 +5226,7 @@ impl ResourceSearchParameterDefinition for StructureMapSearchParameter {
     }
 }
 /// Search parameters for the Subscription resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum SubscriptionSearchParameter {
     /// A tag to be added to the resource matching the criteria
     AddTag,
@@ -5260,7 +5260,7 @@ impl ResourceSearchParameterDefinition for SubscriptionSearchParameter {
     }
 }
 /// Search parameters for the Substance resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum SubstanceSearchParameter {
     /// The category of the substance
     Category,
@@ -5297,7 +5297,7 @@ impl ResourceSearchParameterDefinition for SubstanceSearchParameter {
     }
 }
 /// Search parameters for the SupplyDelivery resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum SupplyDeliverySearchParameter {
     /// External identifier
     Identifier,
@@ -5325,7 +5325,7 @@ impl ResourceSearchParameterDefinition for SupplyDeliverySearchParameter {
     }
 }
 /// Search parameters for the SupplyRequest resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum SupplyRequestSearchParameter {
     /// When the request was made
     Date,
@@ -5356,7 +5356,7 @@ impl ResourceSearchParameterDefinition for SupplyRequestSearchParameter {
     }
 }
 /// Search parameters for the Task resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum TaskSearchParameter {
     /// Search by creation date
     AuthoredOn,
@@ -5429,7 +5429,7 @@ impl ResourceSearchParameterDefinition for TaskSearchParameter {
     }
 }
 /// Search parameters for the TestReport resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum TestReportSearchParameter {
     /// An external identifier for the test report
     Identifier,
@@ -5460,7 +5460,7 @@ impl ResourceSearchParameterDefinition for TestReportSearchParameter {
     }
 }
 /// Search parameters for the TestScript resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum TestScriptSearchParameter {
     /// The test script publication date
     Date,
@@ -5506,7 +5506,7 @@ impl ResourceSearchParameterDefinition for TestScriptSearchParameter {
     }
 }
 /// Search parameters for the ValueSet resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum ValueSetSearchParameter {
     /// The value set publication date
     Date,
@@ -5555,7 +5555,7 @@ impl ResourceSearchParameterDefinition for ValueSetSearchParameter {
     }
 }
 /// Search parameters for the VisionPrescription resource
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum VisionPrescriptionSearchParameter {
     /// Return prescriptions with this external identifier
     Identifier,
