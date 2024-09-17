@@ -16,9 +16,11 @@ version = "0.9.0"
 workspace = true
 
 [features]
-default = ["r5", "builders", "client", "ordered", "docs"]
+default = ["r5", "builders", "client", "docs"]
 client = [
 	"builders",
+	"fhir-model/search-params",
+	"dep:ordered-stream",
 	"dep:async-trait",
 	"dep:futures",
 	"dep:reqwest",
@@ -29,7 +31,6 @@ client = [
 	"dep:tracing",
 	"dep:uuid",
 ]
-ordered = ["fhir-model/search-params", "dep:ordered-stream"]
 builders = ["fhir-model/builders"]
 stu3 = ["fhir-model/stu3"]
 r4b = ["fhir-model/r4b"]

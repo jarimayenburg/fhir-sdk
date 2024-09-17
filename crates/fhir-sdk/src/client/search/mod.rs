@@ -1,6 +1,5 @@
 //! Search handling.
 
-#[cfg(feature = "ordered")]
 mod ordered;
 mod params;
 
