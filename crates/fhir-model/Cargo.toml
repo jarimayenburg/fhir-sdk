@@ -17,7 +17,7 @@ version = "0.8.0"
 workspace = true
 
 [features]
-default = ["r5", "builders"]
+default = ["r5", "builders", "search-params"]
 search-params = []
 builders = ["dep:derive_builder"]
 stu3 = []
