@@ -1,5 +1,7 @@
 //! Search handling.
 
+#[cfg(feature = "ordered")]
+mod ordered;
 mod params;
 
 pub use params::*;

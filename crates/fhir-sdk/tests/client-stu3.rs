@@ -17,18 +17,22 @@ use fhir_sdk::{
 			AdministrativeGender, EncounterStatus, IssueSeverity, ObservationStatus,
 			SearchComparator,
 		},
-		local_reference_to, reference_to,
+		local_reference_to,
+		params::ObservationSearchParameter,
+		reference_to,
 		resources::{
-			BaseResource, Bundle, Encounter, Observation, ObservationSubjectReferenceTarget,
-			OperationOutcome, ParametersParameter, ParametersParameterValue, Patient,
-			PatientGeneralPractitionerReferenceTarget, Practitioner, Resource, ResourceType,
-			
+			BaseResource, Bundle, Encounter, Observation, ObservationEffective,
+			ObservationSubjectReferenceTarget, OperationOutcome, ParametersParameter,
+			ParametersParameterValue, Patient, PatientGeneralPractitionerReferenceTarget,
+			Practitioner, Resource, ResourceType,
 		},
 		types::{CodeableConcept, Coding, HumanName, Identifier, Reference},
 	},
-	Date,
+	time::Month,
+	Date, DateTime,
 };
 use futures::TryStreamExt;
+use ordered_stream::OrderedStreamExt;
 use uuid::Uuid;
 
 /// Set up a client for testing with the (local) FHIR server.
@@ -265,6 +269,52 @@ async fn search_inner() -> Result<()> {
 	assert_eq!(patients[0].birth_date, Some(date));
 
 	patient.delete(&client).await?;
+	Ok(())
+}
+
+#[test]
+fn unpaged_ordered() -> Result<()> {
+	common::RUNTIME.block_on(unpaged_ordered_inner())
+}
+
+async fn unpaged_ordered_inner() -> Result<()> {
+	let client = client().await?;
+
+	let obs2_effective =
+		ObservationEffective::DateTime(DateTime::Date(Date::YearMonth(2024, Month::September)));
+	let mut obs2 = Observation::builder()
+		.status(ObservationStatus::Final)
+		.code(CodeableConcept::builder().text("code".to_string()).build().unwrap())
+		.effective(obs2_effective.clone())
+		.build()
+		.unwrap();
+	obs2.create(&client).await?;
+
+	let obs1_effective =
+		ObservationEffective::DateTime(DateTime::Date(Date::YearMonth(2024, Month::July)));
+	let mut obs1 = Observation::builder()
+		.status(ObservationStatus::Final)
+		.code(CodeableConcept::builder().text("code".to_string()).build().unwrap())
+		.effective(obs1_effective.clone())
+		.build()
+		.unwrap();
+	obs1.create(&client).await?;
+
+	let observations: Vec<Observation> = client
+		.search()
+		.order_by(ObservationSearchParameter::Date)
+		.send()
+		.await?
+		.into_stream()
+		.try_collect()
+		.await?;
+
+	obs1.delete(&client).await?;
+	obs2.delete(&client).await?;
+
+	assert_eq!(observations.get(0).and_then(|o| o.effective.as_ref()), Some(&obs1_effective));
+	assert_eq!(observations.get(1).and_then(|o| o.effective.as_ref()), Some(&obs2_effective));
+
 	Ok(())
 }
 
