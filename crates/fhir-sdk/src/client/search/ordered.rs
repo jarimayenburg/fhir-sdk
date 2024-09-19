@@ -2,8 +2,9 @@ use std::cmp::Ordering;
 
 use super::*;
 
+use async_trait::async_trait;
 use fhir_model::{Resolve, ResourceSearchParameterDefinition, SearchableResource};
-use ordered_stream::{FromStream, OrderedStream};
+use ordered_stream::FromStream;
 
 #[derive(Debug)]
 pub struct OrderedSearch<S, O> {
@@ -14,21 +15,45 @@ pub struct OrderedSearch<S, O> {
 	order_by: O,
 }
 
-impl<E, R> OrderedSearch<UnpagedSearch<E, R>, R::Params>
+#[async_trait]
+impl<E, R> Search for OrderedSearch<UnpagedSearch<E, R>, R::Params>
 where
-	R: SearchableResource + Resolve + Clone + Eq + 'static,
-	R::Params: Clone + Eq,
-	E: UnpagedSearchExecutor<R>,
+	R: SearchableResource + Resolve + Clone + Send + Eq + 'static,
+	R::Params: Clone + Eq + Send,
+	E: UnpagedSearchExecutor<R> + Send,
+	E::Stream: 'static,
 {
-	pub async fn send(
-		self,
-	) -> Result<impl OrderedStream<Data = <E::Stream as Stream>::Item>, Error> {
+	type Value = FromStream<
+		E::Stream,
+		Box<
+			dyn FnMut(
+				<E::Stream as Stream>::Item,
+			) -> (OrderedSearchResult<R>, <E::Stream as Stream>::Item),
+		>,
+		OrderedSearchResult<R>,
+	>;
+
+	async fn send(self) -> Result<Self::Value, Error> {
 		let stream = self.search.send().await?;
 
-		Ok(FromStream::with_ordering(stream, move |res| match res {
+		let get_ordering = move |res: &Result<R, Error>| match res {
 			Ok(r) => OrderedSearchResult::Orderable(r.clone(), self.order_by.clone()),
 			Err(_) => OrderedSearchResult::Err,
-		}))
+		};
+
+		let split_item: Box<
+			dyn FnMut(
+				<E::Stream as Stream>::Item,
+			) -> (OrderedSearchResult<R>, <E::Stream as Stream>::Item),
+		> = Box::new(move |data| {
+			let ordering = get_ordering(&data);
+
+			(ordering, data)
+		});
+
+		let ordered = FromStream::new(stream, split_item);
+
+		Ok(ordered)
 	}
 }
 

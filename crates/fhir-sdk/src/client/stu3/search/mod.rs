@@ -93,7 +93,7 @@ pub(self) fn find_next_page_url(bundle: &Bundle) -> Option<Result<Url, Error>> {
 mod tests {
 	use fhir_model::stu3::resources::Observation;
 
-	use crate::client::{Client, FhirStu3};
+	use crate::client::{Client, FhirStu3, Search};
 
 	/// The search code is prone to run into rustc bugs [rust-lang/rust#100013](https://github.com/rust-lang/rust/issues/100013) and
 	/// [rust-lang/rust#102211](https://github.com/rust-lang/rust/issues/102211). We implemented a workaround for it.

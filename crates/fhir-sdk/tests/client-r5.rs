@@ -10,7 +10,7 @@ use eyre::Result;
 use fhir_sdk::{
 	client::{
 		r5::search::{DateParam, TokenParam},
-		Client, FhirR5, ResourceWrite,
+		Client, FhirR5, ResourceWrite, Search,
 	},
 	r5::{
 		codes::{
