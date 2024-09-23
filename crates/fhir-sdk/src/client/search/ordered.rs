@@ -4,7 +4,7 @@ use super::*;
 
 use async_trait::async_trait;
 use fhir_model::{Resolve, ResourceSearchParameterDefinition, SearchableResource};
-use ordered_stream::FromStream;
+use ordered_stream::{FromStream, OrderedStreamExt};
 
 #[derive(Debug)]
 pub struct OrderedSearch<S, O> {
@@ -16,12 +16,12 @@ pub struct OrderedSearch<S, O> {
 }
 
 #[async_trait]
-impl<E, R> Search for OrderedSearch<UnpagedSearch<E, R>, R::Params>
+impl<E, R> Search<R> for OrderedSearch<UnpagedSearch<E, R>, R::Params>
 where
 	R: SearchableResource + Resolve + Clone + Send + Eq + 'static,
 	R::Params: Clone + Eq + Send,
 	E: UnpagedSearchExecutor<R> + Send,
-	E::Stream: 'static,
+	E::Stream: IntoStream<R> + 'static,
 {
 	type Value = FromStream<
 		E::Stream,
@@ -54,6 +54,18 @@ where
 		let ordered = FromStream::new(stream, split_item);
 
 		Ok(ordered)
+	}
+}
+
+impl<R, S, F> IntoStream<R> for FromStream<S, F, OrderedSearchResult<R>>
+where
+	S: Stream<Item = Result<R, Error>>,
+	R: SearchableResource + Resolve + Clone + Eq,
+	R::Params: Clone + Eq,
+	F: FnMut(Result<R, Error>) -> (OrderedSearchResult<R>, Result<R, Error>),
+{
+	fn into_stream(self) -> impl Stream<Item = Result<R, Error>> {
+		OrderedStreamExt::into_stream(self)
 	}
 }
 

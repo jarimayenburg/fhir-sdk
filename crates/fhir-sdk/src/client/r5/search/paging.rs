@@ -4,12 +4,15 @@ use std::{collections::VecDeque, pin::Pin, task::Poll};
 
 use fhir_model::r5::{
 	codes::{BundleType, SearchEntryMode},
-	resources::{Bundle, BundleEntry, DomainResource, NamedResource, Resource, },
+	resources::{Bundle, BundleEntry, DomainResource, NamedResource, Resource},
 };
 use futures::{future::BoxFuture, ready, Future, FutureExt, Stream, StreamExt};
 use reqwest::Url;
 
-use crate::client::{r5::references::populate_reference_targets_internal, search::Paged};
+use crate::client::{
+	r5::references::populate_reference_targets_internal,
+	search::{IntoStream, Paged},
+};
 
 use super::{find_next_page_url, Client, Error, FhirR5};
 
@@ -107,6 +110,15 @@ where
 		} else {
 			(page_min, page_max)
 		}
+	}
+}
+
+impl<R> IntoStream<R> for Unpaged<R>
+where
+	R: NamedResource + DomainResource + TryFrom<Resource> + 'static,
+{
+	fn into_stream(self) -> impl Stream<Item = Result<R, Error>> {
+		self
 	}
 }
 

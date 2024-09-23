@@ -92,10 +92,11 @@ where
 }
 
 #[async_trait]
-impl<E, R> Search for UnpagedSearch<E, R>
+impl<E, R> Search<R> for UnpagedSearch<E, R>
 where
 	E: UnpagedSearchExecutor<R> + Send,
 	R: Send,
+	E::Stream: IntoStream<R>,
 {
 	type Value = E::Stream;
 
@@ -128,19 +129,24 @@ pub struct PagedSearch<E, R> {
 	page_size: Option<u32>,
 }
 
-#[async_trait]
-impl<E, R> Search for PagedSearch<E, R>
+impl<E, R> PagedSearch<E, R>
 where
-	E: PagedSearchExecutor<R> + Send,
-	R: Send,
+	E: PagedSearchExecutor<R>,
 {
-	type Value = (E::Stream, Option<NextPageCursor<E, R>>);
-
-	async fn send(self) -> Result<Self::Value, Error> {
+	pub async fn send(self) -> Result<(E::Stream, Option<NextPageCursor<E, R>>), Error> {
 		self.executor
 			.expect("no search executor set")
 			.search_paged(self.params, self.page_size)
 			.await
+	}
+}
+
+impl<E, R> IntoStream<R> for (E::Stream, Option<NextPageCursor<E, R>>)
+where
+	E: PagedSearchExecutor<R>,
+{
+	fn into_stream(self) -> impl Stream<Item = Result<R, Error>> {
+		self.0
 	}
 }
 
@@ -174,12 +180,16 @@ where
 /// Trait implemented by the different search types, allowing them to
 /// define their own return value.
 #[async_trait]
-pub trait Search {
+pub trait Search<R> {
 	/// The type to return
-	type Value;
+	type Value: IntoStream<R>;
 
 	/// Send out the search request
 	async fn send(self) -> Result<Self::Value, Error>;
+}
+
+pub trait IntoStream<R> {
+	fn into_stream(self) -> impl Stream<Item = Result<R, Error>>;
 }
 
 /// Executor of unpaged FHIR searches (e.g. [Client])
