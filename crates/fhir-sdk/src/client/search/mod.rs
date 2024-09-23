@@ -16,7 +16,7 @@ use super::{Client, Error};
 
 /// A FHIR search that automatically resolves next pages
 #[derive(Debug, Clone)]
-pub struct UnpagedSearch<E, R> {
+pub struct Search<E, R> {
 	/// The executor of the search (e.g. the [Client])
 	executor: Option<E>,
 
@@ -24,14 +24,14 @@ pub struct UnpagedSearch<E, R> {
 	params: SearchParameters<R>,
 }
 
-impl<E, R> UnpagedSearch<E, R>
+impl<E, R> Search<E, R>
 where
-	E: UnpagedSearchExecutor<R>,
+	E: SearchExecutor<R>,
 {
-	/// Creates a new [UnpagedSearch] without an executor. An executor needs to be set with [UnpagedSearch::with_executor] before calling [UnpagedSearch::send].
-	/// If [UnpagedSearch::send] is called without an executor being set, it will panic.
+	/// Creates a new [Search] without an executor. An executor needs to be set with [Search::with_executor] before calling [Search::send].
+	/// If [Search::send] is called without an executor being set, it will panic.
 	///
-	/// An [UnpagedSearch] is useful if you're looking for a way to represent a search that can be executed on an arbitrary or currently unknown [Client].
+	/// An [Search] is useful if you're looking for a way to represent a search that can be executed on an arbitrary or currently unknown [Client].
 	/// If you just want to have your [Client] do a search, you are probably looking for [Client::search] instead.
 	pub fn new() -> Self {
 		Self { executor: None, params: SearchParameters::empty() }
@@ -86,9 +86,9 @@ where
 }
 
 #[async_trait]
-impl<E, R> Search<E, R> for UnpagedSearch<E, R>
+impl<E, R> ExecutableSearch<E, R> for Search<E, R>
 where
-	E: UnpagedSearchExecutor<R> + Send,
+	E: SearchExecutor<R> + Send,
 	R: Send,
 {
 	type Value = E::Stream;
@@ -99,11 +99,11 @@ where
 	}
 
 	async fn send(self) -> Result<Self::Value, Error> {
-		self.executor.expect("no search executor set").search_unpaged(self.params).await
+		self.executor.expect("no search executor set").search(self.params).await
 	}
 }
 
-impl<E, R> Hash for UnpagedSearch<E, R>
+impl<E, R> Hash for Search<E, R>
 where
 	R: Hash,
 {
@@ -112,17 +112,17 @@ where
 	}
 }
 
-impl<E, R> PartialEq for UnpagedSearch<E, R> {
+impl<E, R> PartialEq for Search<E, R> {
 	fn eq(&self, other: &Self) -> bool {
 		self.params.eq(&other.params)
 	}
 }
 
-impl<E, R> Eq for UnpagedSearch<E, R> {}
+impl<E, R> Eq for Search<E, R> {}
 
-impl<E, R> UnpagedSearch<E, R>
+impl<E, R> Search<E, R>
 where
-	E: UnpagedSearchExecutor<R> + PagedSearchExecutor<R>,
+	E: SearchExecutor<R> + PagedSearchExecutor<R>,
 {
 	/// Transform this search into a paged search
 	pub fn paged(self, page_size: Option<u32>) -> PagedSearch<E, R> {
@@ -204,7 +204,7 @@ where
 /// Trait implemented by the different search types, allowing them to
 /// define their own return value.
 #[async_trait]
-pub trait Search<E, R> {
+pub trait ExecutableSearch<E, R> {
 	/// The type to return
 	type Value: Stream<Item = Result<R, Error>>;
 
@@ -217,12 +217,12 @@ pub trait Search<E, R> {
 
 /// Executor of unpaged FHIR searches (e.g. [Client])
 #[async_trait]
-pub trait UnpagedSearchExecutor<R>: Sized {
+pub trait SearchExecutor<R>: Sized {
 	/// The stream of FHIR resources that will be returned
 	type Stream: Stream<Item = Result<R, Error>>;
 
 	/// Execute an unpaged search
-	async fn search_unpaged(self, params: SearchParameters<R>) -> Result<Self::Stream, Error>;
+	async fn search(self, params: SearchParameters<R>) -> Result<Self::Stream, Error>;
 }
 
 /// Executor of paged FHIR searches (e.g. [Client])
@@ -247,11 +247,11 @@ impl<V: 'static + Send> Client<V> {
 	/// Start constructing a search for FHIR resources of a given type.
 	/// Only returns matches. Populates reference target fields with any
 	/// matching included resources.
-	pub fn search<R>(&self) -> UnpagedSearch<Self, R>
+	pub fn search<R>(&self) -> Search<Self, R>
 	where
-		Self: UnpagedSearchExecutor<R>,
+		Self: SearchExecutor<R>,
 		R: Send,
 	{
-		UnpagedSearch::new().with_executor(self.clone())
+		Search::new().with_executor(self.clone())
 	}
 }

@@ -2,8 +2,7 @@
 
 use crate::client::search::NextPageCursor;
 use crate::client::{
-	search::PagedSearchExecutor, search::UnpagedSearchExecutor, Client, Error, FhirStu3,
-	SearchParameters,
+	search::PagedSearchExecutor, search::SearchExecutor, Client, Error, FhirStu3, SearchParameters,
 };
 use async_trait::async_trait;
 use fhir_model::stu3::resources::{Bundle, DomainResource, NamedResource, Resource};
@@ -64,14 +63,14 @@ where
 }
 
 #[async_trait]
-impl<R> UnpagedSearchExecutor<R> for Client<FhirStu3>
+impl<R> SearchExecutor<R> for Client<FhirStu3>
 where
 	R: NamedResource + DomainResource + TryFrom<Resource> + Send + 'static,
 {
 	type Stream = Unpaged<R>;
 
 	#[allow(refining_impl_trait)]
-	async fn search_unpaged(self, params: SearchParameters<R>) -> Result<Unpaged<R>, Error> {
+	async fn search(self, params: SearchParameters<R>) -> Result<Unpaged<R>, Error> {
 		let mut url = self.url(&[R::TYPE.as_str()]);
 		url.query_pairs_mut().extend_pairs(params.into_queries()).finish();
 
@@ -93,7 +92,7 @@ pub(self) fn find_next_page_url(bundle: &Bundle) -> Option<Result<Url, Error>> {
 mod tests {
 	use fhir_model::stu3::resources::Observation;
 
-	use crate::client::{Client, FhirStu3, Search};
+	use crate::client::{Client, ExecutableSearch, FhirStu3};
 
 	/// The search code is prone to run into rustc bugs [rust-lang/rust#100013](https://github.com/rust-lang/rust/issues/100013) and
 	/// [rust-lang/rust#102211](https://github.com/rust-lang/rust/issues/102211). We implemented a workaround for it.

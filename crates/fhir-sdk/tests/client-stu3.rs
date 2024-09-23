@@ -10,7 +10,7 @@ use eyre::Result;
 use fhir_sdk::{
 	client::{
 		stu3::search::{DateParam, TokenParam},
-		Client, FhirStu3, ResourceWrite, Search,
+		Client, ExecutableSearch, FhirStu3, ResourceWrite,
 	},
 	stu3::{
 		codes::{

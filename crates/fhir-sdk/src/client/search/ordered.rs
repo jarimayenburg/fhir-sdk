@@ -44,11 +44,11 @@ where
 }
 
 #[async_trait]
-impl<E, R> Search<E, R> for OrderedSearch<UnpagedSearch<E, R>, R::Params>
+impl<E, R> ExecutableSearch<E, R> for OrderedSearch<Search<E, R>, R::Params>
 where
 	R: SearchableResource + Resolve + Clone + Send + Eq + 'static,
 	R::Params: Clone + Eq + Send,
-	E: UnpagedSearchExecutor<R> + Send,
+	E: SearchExecutor<R> + Send,
 {
 	type Value = OrderedResourceStream<
 		FromStream<
@@ -141,7 +141,7 @@ where
 	}
 }
 
-impl<E, R> UnpagedSearch<E, R>
+impl<E, R> Search<E, R>
 where
 	R: SearchableResource,
 {
