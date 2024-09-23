@@ -15,6 +15,17 @@ pub struct OrderedSearch<S, O> {
 	order_by: O,
 }
 
+impl<S, O> Hash for OrderedSearch<S, O>
+where
+	S: Hash,
+	O: Hash,
+{
+	fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+		self.search.hash(state);
+		self.order_by.hash(state);
+	}
+}
+
 #[async_trait]
 impl<E, R> Search<E, R> for OrderedSearch<UnpagedSearch<E, R>, R::Params>
 where

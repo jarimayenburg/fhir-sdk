@@ -15,7 +15,7 @@ use reqwest::Url;
 use super::{Client, Error};
 
 /// A FHIR search that automatically resolves next pages
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct UnpagedSearch<E, R> {
 	/// The executor of the search (e.g. the [Client])
 	executor: Option<E>,
@@ -103,6 +103,15 @@ where
 	}
 }
 
+impl<E, R> Hash for UnpagedSearch<E, R>
+where
+	R: Hash,
+{
+	fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+		self.params.hash(state)
+	}
+}
+
 impl<E, R> UnpagedSearch<E, R>
 where
 	E: UnpagedSearchExecutor<R> + PagedSearchExecutor<R>,
@@ -136,6 +145,16 @@ where
 			.expect("no search executor set")
 			.search_paged(self.params, self.page_size)
 			.await
+	}
+}
+
+impl<E, R> Hash for PagedSearch<E, R>
+where
+	R: Hash,
+{
+	fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+		self.params.hash(state);
+		self.page_size.hash(state);
 	}
 }
 
