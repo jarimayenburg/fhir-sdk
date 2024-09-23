@@ -9,10 +9,7 @@ use fhir_model::stu3::{
 use futures::{future::BoxFuture, ready, Future, FutureExt, Stream, StreamExt};
 use reqwest::Url;
 
-use crate::client::{
-	search::{IntoStream, Paged},
-	stu3::references::populate_reference_targets_internal,
-};
+use crate::client::{search::Paged, stu3::references::populate_reference_targets_internal};
 
 use super::{find_next_page_url, Client, Error, FhirStu3};
 
@@ -110,15 +107,6 @@ where
 		} else {
 			(page_min, page_max)
 		}
-	}
-}
-
-impl<R> IntoStream<R> for Unpaged<R>
-where
-	R: NamedResource + DomainResource + TryFrom<Resource> + 'static,
-{
-	fn into_stream(self) -> impl Stream<Item = Result<R, Error>> {
-		self
 	}
 }
 

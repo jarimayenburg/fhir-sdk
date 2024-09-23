@@ -32,7 +32,6 @@ use fhir_sdk::{
 	Date, DateTime,
 };
 use futures::TryStreamExt;
-use ordered_stream::OrderedStreamExt;
 use uuid::Uuid;
 
 /// Set up a client for testing with the (local) FHIR server.
@@ -305,7 +304,6 @@ async fn unpaged_ordered_inner() -> Result<()> {
 		.order_by(ObservationSearchParameter::Date)
 		.send()
 		.await?
-		.into_stream()
 		.try_collect()
 		.await?;
 

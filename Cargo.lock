@@ -443,6 +443,7 @@ dependencies = [
  "futures",
  "once_cell",
  "ordered-stream",
+ "pin-project-lite",
  "reqwest",
  "serde",
  "serde_json",

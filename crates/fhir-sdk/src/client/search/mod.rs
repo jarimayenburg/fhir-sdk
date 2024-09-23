@@ -90,7 +90,6 @@ impl<E, R> Search<E, R> for UnpagedSearch<E, R>
 where
 	E: UnpagedSearchExecutor<R> + Send,
 	R: Send,
-	E::Stream: IntoStream<R>,
 {
 	type Value = E::Stream;
 
@@ -172,17 +171,13 @@ where
 #[async_trait]
 pub trait Search<E, R> {
 	/// The type to return
-	type Value: IntoStream<R>;
+	type Value: Stream<Item = Result<R, Error>>;
 
 	/// Set a search executor for this search
 	fn with_executor(self, executor: E) -> Self;
 
 	/// Send out the search request
 	async fn send(self) -> Result<Self::Value, Error>;
-}
-
-pub trait IntoStream<R> {
-	fn into_stream(self) -> impl Stream<Item = Result<R, Error>>;
 }
 
 /// Executor of unpaged FHIR searches (e.g. [Client])
@@ -220,7 +215,6 @@ impl<V: 'static + Send> Client<V> {
 	pub fn search<R>(&self) -> UnpagedSearch<Self, R>
 	where
 		Self: UnpagedSearchExecutor<R>,
-		<Self as UnpagedSearchExecutor<R>>::Stream: IntoStream<R>,
 		R: Send,
 	{
 		UnpagedSearch::new().with_executor(self.clone())

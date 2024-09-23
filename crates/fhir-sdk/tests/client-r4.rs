@@ -29,7 +29,6 @@ use fhir_sdk::{
 	Date, DateTime,
 };
 use futures::TryStreamExt;
-use ordered_stream::OrderedStreamExt;
 use reqwest::header::HeaderValue;
 use serde_json::json;
 use tokio::sync::OnceCell;
@@ -257,7 +256,6 @@ async fn unpaged_ordered_inner() -> Result<()> {
 		.order_by(ObservationSearchParameter::Date)
 		.send()
 		.await?
-		.into_stream()
 		.try_collect()
 		.await?;
 

@@ -4,7 +4,7 @@ use super::*;
 
 use async_trait::async_trait;
 use fhir_model::{Resolve, ResourceSearchParameterDefinition, SearchableResource};
-use ordered_stream::{FromStream, OrderedStreamExt};
+use ordered_stream::{FromStream, OrderedStream};
 
 #[derive(Debug)]
 pub struct OrderedSearch<S, O> {
@@ -21,16 +21,17 @@ where
 	R: SearchableResource + Resolve + Clone + Send + Eq + 'static,
 	R::Params: Clone + Eq + Send,
 	E: UnpagedSearchExecutor<R> + Send,
-	E::Stream: IntoStream<R> + 'static,
 {
-	type Value = FromStream<
-		E::Stream,
-		Box<
-			dyn FnMut(
-				<E::Stream as Stream>::Item,
-			) -> (OrderedSearchResult<R>, <E::Stream as Stream>::Item),
+	type Value = OrderedResourceStream<
+		FromStream<
+			E::Stream,
+			Box<
+				dyn FnMut(
+					<E::Stream as Stream>::Item,
+				) -> (OrderedSearchResult<R>, <E::Stream as Stream>::Item),
+			>,
+			OrderedSearchResult<R>,
 		>,
-		OrderedSearchResult<R>,
 	>;
 
 	fn with_executor(mut self, executor: E) -> Self {
@@ -58,19 +59,57 @@ where
 
 		let ordered = FromStream::new(stream, split_item);
 
-		Ok(ordered)
+		Ok(OrderedResourceStream { stream: ordered })
 	}
 }
 
-impl<R, S, F> IntoStream<R> for FromStream<S, F, OrderedSearchResult<R>>
+pin_project_lite::pin_project! {
+	pub struct OrderedResourceStream<S> {
+		#[pin]
+		stream: S,
+	}
+}
+
+impl<S> OrderedStream for OrderedResourceStream<S>
 where
-	S: Stream<Item = Result<R, Error>>,
-	R: SearchableResource + Resolve + Clone + Eq,
-	R::Params: Clone + Eq,
-	F: FnMut(Result<R, Error>) -> (OrderedSearchResult<R>, Result<R, Error>),
+	S: OrderedStream,
 {
-	fn into_stream(self) -> impl Stream<Item = Result<R, Error>> {
-		OrderedStreamExt::into_stream(self)
+	type Ordering = S::Ordering;
+
+	type Data = S::Data;
+
+	fn poll_next_before(
+		self: std::pin::Pin<&mut Self>,
+		cx: &mut std::task::Context<'_>,
+		before: Option<&Self::Ordering>,
+	) -> std::task::Poll<ordered_stream::PollResult<Self::Ordering, Self::Data>> {
+		self.project().stream.poll_next_before(cx, before)
+	}
+
+	fn size_hint(&self) -> (usize, Option<usize>) {
+		self.stream.size_hint()
+	}
+
+	fn position_hint(&self) -> Option<ordered_stream::MaybeBorrowed<'_, Self::Ordering>> {
+		self.stream.position_hint()
+	}
+}
+
+impl<S> Stream for OrderedResourceStream<S>
+where
+	S: OrderedStream,
+{
+	type Item = S::Data;
+
+	fn poll_next(
+		self: std::pin::Pin<&mut Self>,
+		cx: &mut std::task::Context<'_>,
+	) -> std::task::Poll<Option<Self::Item>> {
+		self.project().stream.poll_next_before(cx, None).map(|r| r.into_data())
+	}
+
+	fn size_hint(&self) -> (usize, Option<usize>) {
+		self.stream.size_hint()
 	}
 }
 
