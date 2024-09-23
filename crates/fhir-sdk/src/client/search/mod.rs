@@ -37,12 +37,6 @@ where
 		Self { executor: None, params: SearchParameters::empty() }
 	}
 
-	/// Sets a search executor (i.e. a [Client])
-	pub fn with_executor(mut self, executor: E) -> Self {
-		self.executor = Some(executor);
-		self
-	}
-
 	/// Add a search parameter
 	pub fn with<P>(mut self, field: &str, parameter: P) -> Self
 	where
@@ -92,13 +86,18 @@ where
 }
 
 #[async_trait]
-impl<E, R> Search<R> for UnpagedSearch<E, R>
+impl<E, R> Search<E, R> for UnpagedSearch<E, R>
 where
 	E: UnpagedSearchExecutor<R> + Send,
 	R: Send,
 	E::Stream: IntoStream<R>,
 {
 	type Value = E::Stream;
+
+	fn with_executor(mut self, executor: E) -> Self {
+		self.executor = Some(executor);
+		self
+	}
 
 	async fn send(self) -> Result<Self::Value, Error> {
 		self.executor.expect("no search executor set").search_unpaged(self.params).await
@@ -141,15 +140,6 @@ where
 	}
 }
 
-impl<E, R> IntoStream<R> for (E::Stream, Option<NextPageCursor<E, R>>)
-where
-	E: PagedSearchExecutor<R>,
-{
-	fn into_stream(self) -> impl Stream<Item = Result<R, Error>> {
-		self.0
-	}
-}
-
 /// Stream of resources returned by [Search::send].
 pub trait Paged<R>: Stream<Item = Result<R, Error>> + Send + Sized {
 	/// If the search is paged, returns the next page. Returns `None` if the [SearchResponse] is
@@ -180,9 +170,12 @@ where
 /// Trait implemented by the different search types, allowing them to
 /// define their own return value.
 #[async_trait]
-pub trait Search<R> {
+pub trait Search<E, R> {
 	/// The type to return
 	type Value: IntoStream<R>;
+
+	/// Set a search executor for this search
+	fn with_executor(self, executor: E) -> Self;
 
 	/// Send out the search request
 	async fn send(self) -> Result<Self::Value, Error>;
@@ -220,13 +213,14 @@ pub trait PagedSearchExecutor<R>: Sized {
 	) -> Result<(Self::Stream, Option<NextPageCursor<Self, R>>), Error>;
 }
 
-impl<V: 'static> Client<V> {
+impl<V: 'static + Send> Client<V> {
 	/// Start constructing a search for FHIR resources of a given type.
 	/// Only returns matches. Populates reference target fields with any
 	/// matching included resources.
 	pub fn search<R>(&self) -> UnpagedSearch<Self, R>
 	where
 		Self: UnpagedSearchExecutor<R>,
+		<Self as UnpagedSearchExecutor<R>>::Stream: IntoStream<R>,
 		R: Send,
 	{
 		UnpagedSearch::new().with_executor(self.clone())

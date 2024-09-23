@@ -16,7 +16,7 @@ pub struct OrderedSearch<S, O> {
 }
 
 #[async_trait]
-impl<E, R> Search<R> for OrderedSearch<UnpagedSearch<E, R>, R::Params>
+impl<E, R> Search<E, R> for OrderedSearch<UnpagedSearch<E, R>, R::Params>
 where
 	R: SearchableResource + Resolve + Clone + Send + Eq + 'static,
 	R::Params: Clone + Eq + Send,
@@ -32,6 +32,11 @@ where
 		>,
 		OrderedSearchResult<R>,
 	>;
+
+	fn with_executor(mut self, executor: E) -> Self {
+		self.search.executor = Some(executor);
+		self
+	}
 
 	async fn send(self) -> Result<Self::Value, Error> {
 		let stream = self.search.send().await?;
