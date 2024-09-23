@@ -60,6 +60,14 @@ where
 		self
 	}
 
+	/// Add other types of parameters to the query string without consuming `self`
+	pub fn add<P>(&mut self, key: &str, parameter: P)
+	where
+		P: SearchParameter,
+	{
+		self.params.add_query((key, parameter))
+	}
+
 	/// Add a search parameter. Alias of [Search::with].
 	pub fn and<P>(self, field: &str, parameter: P) -> Self
 	where
