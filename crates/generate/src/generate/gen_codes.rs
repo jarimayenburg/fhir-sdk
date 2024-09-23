@@ -58,7 +58,7 @@ pub fn generate_code_enum(mut code: Code) -> Result<TokenStream> {
 
 	Ok(quote! {
 		#[doc = #documentation]
-		#[derive(PartialEq, Eq, Clone)]
+		#[derive(PartialEq, Eq, Hash, Clone)]
 		#derive_copy
 		pub enum #ident {
 			#(#variants)*

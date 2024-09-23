@@ -1,6 +1,7 @@
 //! Generated code! Take a look at the generator-crate for changing this file!
 #![allow(clippy::too_many_lines)]
 use ::core::num::NonZeroU32;
+use std::hash::Hash;
 use serde::{Serialize, Deserialize};
 #[cfg(feature = "builders")]
 use derive_builder::Builder;
@@ -20,7 +21,7 @@ The ISO21090-codedString may be used to provide a coded representation of the co
 The ISO21090-codedString may be used to provide a coded representation of the contents of strings in an Address.
 
  Note: address is intended to describe postal addresses for administrative purposes, not to describe absolute geographical coordinates.  Postal addresses are often used as proxies for physical locations (also see the [Location](location.html#) resource). */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct Address(pub Box<AddressInner>);
 /** Address Type: An address expressed using postal conventions (as opposed to GPS or other location definition formats).  This data type may be used to convey addresses for use in delivering mail as well as for visiting locations which might not be valid for mail delivery.  There are a variety of postal address formats defined around the world.
@@ -34,7 +35,7 @@ The ISO21090-codedString may be used to provide a coded representation of the co
 The ISO21090-codedString may be used to provide a coded representation of the contents of strings in an Address.
 
  Note: address is intended to describe postal addresses for administrative purposes, not to describe absolute geographical coordinates.  Postal addresses are often used as proxies for physical locations (also see the [Location](location.html#) resource). */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(
@@ -245,7 +246,7 @@ impl Address {
  A duration of time during which an organism (or a process) has existed.
 
  The context of use may frequently define what kind of quantity this is and therefore what kind of units can be used. The context of use may also restrict the values for the comparator. */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct Age(pub Box<AgeInner>);
 /** Age Type: A duration of time during which an organism (or a process) has existed.
@@ -257,7 +258,7 @@ pub struct Age(pub Box<AgeInner>);
  A duration of time during which an organism (or a process) has existed.
 
  The context of use may frequently define what kind of quantity this is and therefore what kind of units can be used. The context of use may also restrict the values for the comparator. */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(
@@ -373,7 +374,7 @@ impl Age {
  A  text note which also  contains information about who made the statement and when.
 
  For systems that do not have structured annotations, they can simply communicate a single annotation with no author or time.  This element may need to be included in narrative because of the potential for modifying information.  *Annotations SHOULD NOT* be used to communicate "modifying" information that could be computable. (This is a SHOULD because enforcing user behavior is nearly impossible). */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct Annotation(pub Box<AnnotationInner>);
 /** Annotation Type: A  text note which also  contains information about who made the statement and when.
@@ -385,7 +386,7 @@ pub struct Annotation(pub Box<AnnotationInner>);
  A  text note which also  contains information about who made the statement and when.
 
  For systems that do not have structured annotations, they can simply communicate a single annotation with no author or time.  This element may need to be included in narrative because of the potential for modifying information.  *Annotations SHOULD NOT* be used to communicate "modifying" information that could be computable. (This is a SHOULD because enforcing user behavior is nearly impossible). */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(
@@ -488,7 +489,7 @@ impl Annotation {
     }
 }
 /// Choice of types for the author field in Annotation
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum AnnotationAuthor {
     /// Variant accepting the Reference type.
@@ -499,7 +500,7 @@ pub enum AnnotationAuthor {
     String(String),
 }
 /// Extension value for AnnotationAuthor.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum AnnotationAuthorExtension {
     /// Variant accepting the Reference extension.
@@ -525,6 +526,11 @@ impl PartialEq for AnnotationAuthorReference {
     }
 }
 impl Eq for AnnotationAuthorReference {}
+impl Hash for AnnotationAuthorReference {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.reference.hash(state);
+    }
+}
 impl From<Reference> for AnnotationAuthorReference {
     fn from(reference: Reference) -> Self {
         Self { target: None, reference }
@@ -543,7 +549,7 @@ impl ReferenceField for AnnotationAuthorReference {
     }
 }
 /// Target resources for the author reference field in Annotation
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum AnnotationAuthorReferenceTarget {
     /// Variant for Organization target resources
     Organization(Organization),
@@ -611,7 +617,7 @@ impl From<RelatedPerson> for AnnotationAuthorReferenceTarget {
  For referring to data content defined in other formats.
 
  When providing a summary view (for example with Observation.value[x]) Attachment should be represented with a brief display text such as "Signed Procedure Consent". */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct Attachment(pub Box<AttachmentInner>);
 /** Attachment Type: For referring to data content defined in other formats.
@@ -623,7 +629,7 @@ pub struct Attachment(pub Box<AttachmentInner>);
  For referring to data content defined in other formats.
 
  When providing a summary view (for example with Observation.value[x]) Attachment should be represented with a brief display text such as "Signed Procedure Consent". */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(
@@ -876,7 +882,7 @@ impl Attachment {
  Availability data for an {item}.
 
  */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct Availability(pub Box<AvailabilityInner>);
 /** Availability Type: Availability data for an {item}.
@@ -888,7 +894,7 @@ pub struct Availability(pub Box<AvailabilityInner>);
  Availability data for an {item}.
 
  */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(
@@ -979,7 +985,7 @@ impl Availability {
     }
 }
 /// Sub-fields of the availableTime field in Availability
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(
@@ -1080,7 +1086,7 @@ impl LookupReferences for AvailabilityAvailableTime {
     }
 }
 /// Sub-fields of the notAvailableTime field in Availability
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(
@@ -1163,7 +1169,7 @@ impl LookupReferences for AvailabilityNotAvailableTime {
  A concept that may be defined by a formal reference to a terminology or ontology or may be provided by text.
 
  Not all terminology uses fit this general pattern. In some cases, models should not use CodeableConcept and use Coding directly and provide their own structure for managing text, codings, translations and the relationship between elements and pre- and post-coordination. */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct CodeableConcept(pub Box<CodeableConceptInner>);
 /** CodeableConcept Type: A concept that may be defined by a formal reference to a terminology or ontology or may be provided by text.
@@ -1175,7 +1181,7 @@ pub struct CodeableConcept(pub Box<CodeableConceptInner>);
  A concept that may be defined by a formal reference to a terminology or ontology or may be provided by text.
 
  Not all terminology uses fit this general pattern. In some cases, models should not use CodeableConcept and use Coding directly and provide their own structure for managing text, codings, translations and the relationship between elements and pre- and post-coordination. */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(
@@ -1274,7 +1280,7 @@ impl CodeableConcept {
  A reference to a resource (by instance), or instead, a reference to a concept defined in a terminology or ontology (by class).
 
  */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct CodeableReference(pub Box<CodeableReferenceInner>);
 /** CodeableReference Type: A reference to a resource (by instance), or instead, a reference to a concept defined in a terminology or ontology (by class).
@@ -1286,7 +1292,7 @@ pub struct CodeableReference(pub Box<CodeableReferenceInner>);
  A reference to a resource (by instance), or instead, a reference to a concept defined in a terminology or ontology (by class).
 
  */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(
@@ -1392,6 +1398,11 @@ impl PartialEq for CodeableReferenceReferenceReference {
     }
 }
 impl Eq for CodeableReferenceReferenceReference {}
+impl Hash for CodeableReferenceReferenceReference {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.reference.hash(state);
+    }
+}
 impl From<Reference> for CodeableReferenceReferenceReference {
     fn from(reference: Reference) -> Self {
         Self { target: None, reference }
@@ -1418,7 +1429,7 @@ impl ReferenceField for CodeableReferenceReferenceReference {
  A reference to a code defined by a terminology system.
 
  Codes may be defined very casually in enumerations or code lists, up to very formal definitions such as SNOMED CT - see the HL7 v3 Core Principles for more information. */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct Coding(pub Box<CodingInner>);
 /** Coding Type: A reference to a code defined by a terminology system.
@@ -1430,7 +1441,7 @@ pub struct Coding(pub Box<CodingInner>);
  A reference to a code defined by a terminology system.
 
  Codes may be defined very casually in enumerations or code lists, up to very formal definitions such as SNOMED CT - see the HL7 v3 Core Principles for more information. */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(
@@ -1571,7 +1582,7 @@ impl Coding {
  Specifies contact information for a person or organization.
 
  */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct ContactDetail(pub Box<ContactDetailInner>);
 /** ContactDetail Type: Specifies contact information for a person or organization.
@@ -1583,7 +1594,7 @@ pub struct ContactDetail(pub Box<ContactDetailInner>);
  Specifies contact information for a person or organization.
 
  */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(
@@ -1682,7 +1693,7 @@ impl ContactDetail {
  Details for all kinds of technology mediated contact points for a person or organization, including telephone, email, etc.
 
  */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct ContactPoint(pub Box<ContactPointInner>);
 /** ContactPoint Type: Details for all kinds of technology mediated contact points for a person or organization, including telephone, email, etc.
@@ -1694,7 +1705,7 @@ pub struct ContactPoint(pub Box<ContactPointInner>);
  Details for all kinds of technology mediated contact points for a person or organization, including telephone, email, etc.
 
  */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(
@@ -1839,7 +1850,7 @@ impl ContactPoint {
  A contributor to the content of a knowledge asset, including authors, editors, reviewers, and endorsers.
 
  */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct Contributor(pub Box<ContributorInner>);
 /** Contributor Type: A contributor to the content of a knowledge asset, including authors, editors, reviewers, and endorsers.
@@ -1851,7 +1862,7 @@ pub struct Contributor(pub Box<ContributorInner>);
  A contributor to the content of a knowledge asset, including authors, editors, reviewers, and endorsers.
 
  */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(
@@ -1960,7 +1971,7 @@ impl Contributor {
  A measured amount (or an amount that can potentially be measured). Note that measured amounts include amounts that are not precisely quantified, including amounts involving arbitrary units and floating currencies.
 
  The context of use may frequently define what kind of quantity this is and therefore what kind of units can be used. The context of use may also restrict the values for the comparator. */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct Count(pub Box<CountInner>);
 /** Count Type: A measured amount (or an amount that can potentially be measured). Note that measured amounts include amounts that are not precisely quantified, including amounts involving arbitrary units and floating currencies.
@@ -1972,7 +1983,7 @@ pub struct Count(pub Box<CountInner>);
  A measured amount (or an amount that can potentially be measured). Note that measured amounts include amounts that are not precisely quantified, including amounts involving arbitrary units and floating currencies.
 
  The context of use may frequently define what kind of quantity this is and therefore what kind of units can be used. The context of use may also restrict the values for the comparator. */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(
@@ -2088,7 +2099,7 @@ impl Count {
  Describes a required data item for evaluation in terms of the type of data, and optional code or date-based filters of the data.
 
  */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct DataRequirement(pub Box<DataRequirementInner>);
 /** DataRequirement Type: Describes a required data item for evaluation in terms of the type of data, and optional code or date-based filters of the data.
@@ -2100,7 +2111,7 @@ pub struct DataRequirement(pub Box<DataRequirementInner>);
  Describes a required data item for evaluation in terms of the type of data, and optional code or date-based filters of the data.
 
  */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(
@@ -2289,7 +2300,7 @@ impl DataRequirement {
     }
 }
 /// Choice of types for the subject field in DataRequirement
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum DataRequirementSubject {
     /// Variant accepting the CodeableConcept type.
@@ -2300,7 +2311,7 @@ pub enum DataRequirementSubject {
     Reference(DataRequirementSubjectReference),
 }
 /// Extension value for DataRequirementSubject.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum DataRequirementSubjectExtension {
     /// Variant accepting the CodeableConcept extension.
@@ -2326,6 +2337,11 @@ impl PartialEq for DataRequirementSubjectReference {
     }
 }
 impl Eq for DataRequirementSubjectReference {}
+impl Hash for DataRequirementSubjectReference {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.reference.hash(state);
+    }
+}
 impl From<Reference> for DataRequirementSubjectReference {
     fn from(reference: Reference) -> Self {
         Self { target: None, reference }
@@ -2344,7 +2360,7 @@ impl ReferenceField for DataRequirementSubjectReference {
     }
 }
 /// Sub-fields of the codeFilter field in DataRequirement
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(
@@ -2445,7 +2461,7 @@ impl LookupReferences for DataRequirementCodeFilter {
     }
 }
 /// Sub-fields of the dateFilter field in DataRequirement
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(
@@ -2532,7 +2548,7 @@ impl LookupReferences for DataRequirementDateFilter {
     }
 }
 /// Choice of types for the value field in DataRequirementDateFilter
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum DataRequirementDateFilterValue {
     /// Variant accepting the DateTime type.
@@ -2546,7 +2562,7 @@ pub enum DataRequirementDateFilterValue {
     Duration(Duration),
 }
 /// Extension value for DataRequirementDateFilterValue.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum DataRequirementDateFilterValueExtension {
     /// Variant accepting the DateTime extension.
@@ -2560,7 +2576,7 @@ pub enum DataRequirementDateFilterValueExtension {
     Duration(FieldExtension),
 }
 /// Sub-fields of the valueFilter field in DataRequirement
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(
@@ -2661,7 +2677,7 @@ impl LookupReferences for DataRequirementValueFilter {
     }
 }
 /// Choice of types for the value field in DataRequirementValueFilter
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum DataRequirementValueFilterValue {
     /// Variant accepting the DateTime type.
@@ -2675,7 +2691,7 @@ pub enum DataRequirementValueFilterValue {
     Duration(Duration),
 }
 /// Extension value for DataRequirementValueFilterValue.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum DataRequirementValueFilterValueExtension {
     /// Variant accepting the DateTime extension.
@@ -2689,7 +2705,7 @@ pub enum DataRequirementValueFilterValueExtension {
     Duration(FieldExtension),
 }
 /// Sub-fields of the sort field in DataRequirement
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(
@@ -2766,7 +2782,7 @@ impl LookupReferences for DataRequirementSort {
  A length - a value with a unit that is a physical distance.
 
  The context of use may frequently define what kind of quantity this is and therefore what kind of units can be used. The context of use may also restrict the values for the comparator. */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct Distance(pub Box<DistanceInner>);
 /** Distance Type: A length - a value with a unit that is a physical distance.
@@ -2778,7 +2794,7 @@ pub struct Distance(pub Box<DistanceInner>);
  A length - a value with a unit that is a physical distance.
 
  The context of use may frequently define what kind of quantity this is and therefore what kind of units can be used. The context of use may also restrict the values for the comparator. */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(
@@ -2894,7 +2910,7 @@ impl Distance {
  Indicates how the medication is/was taken or should be taken by the patient.
 
  */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct Dosage(pub Box<DosageInner>);
 /** Dosage Type: Indicates how the medication is/was taken or should be taken by the patient.
@@ -2906,7 +2922,7 @@ pub struct Dosage(pub Box<DosageInner>);
  Indicates how the medication is/was taken or should be taken by the patient.
 
  */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(
@@ -3176,7 +3192,7 @@ impl Dosage {
     }
 }
 /// Sub-fields of the doseAndRate field in Dosage
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(
@@ -3265,7 +3281,7 @@ impl LookupReferences for DosageDoseAndRate {
     }
 }
 /// Choice of types for the dose field in DosageDoseAndRate
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum DosageDoseAndRateDose {
     /// Variant accepting the Range type.
@@ -3276,7 +3292,7 @@ pub enum DosageDoseAndRateDose {
     Quantity(Quantity),
 }
 /// Extension value for DosageDoseAndRateDose.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum DosageDoseAndRateDoseExtension {
     /// Variant accepting the Range extension.
@@ -3287,7 +3303,7 @@ pub enum DosageDoseAndRateDoseExtension {
     Quantity(FieldExtension),
 }
 /// Choice of types for the rate field in DosageDoseAndRate
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum DosageDoseAndRateRate {
     /// Variant accepting the Ratio type.
@@ -3301,7 +3317,7 @@ pub enum DosageDoseAndRateRate {
     Quantity(Quantity),
 }
 /// Extension value for DosageDoseAndRateRate.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum DosageDoseAndRateRateExtension {
     /// Variant accepting the Ratio extension.
@@ -3323,7 +3339,7 @@ pub enum DosageDoseAndRateRateExtension {
  A length of time.
 
  The context of use may frequently define what kind of quantity this is and therefore what kind of units can be used. The context of use may also restrict the values for the comparator. */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct Duration(pub Box<DurationInner>);
 /** Duration Type: A length of time.
@@ -3335,7 +3351,7 @@ pub struct Duration(pub Box<DurationInner>);
  A length of time.
 
  The context of use may frequently define what kind of quantity this is and therefore what kind of units can be used. The context of use may also restrict the values for the comparator. */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(
@@ -3451,7 +3467,7 @@ impl Duration {
  Captures constraints on each element within the resource, profile, or extension.
 
  */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct ElementDefinition(pub Box<ElementDefinitionInner>);
 /** ElementDefinition Type: Captures constraints on each element within the resource, profile, or extension.
@@ -3463,7 +3479,7 @@ pub struct ElementDefinition(pub Box<ElementDefinitionInner>);
  Captures constraints on each element within the resource, profile, or extension.
 
  */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(
@@ -4061,7 +4077,7 @@ impl ElementDefinition {
     }
 }
 /// Sub-fields of the slicing field in ElementDefinition
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(
@@ -4166,7 +4182,7 @@ impl LookupReferences for ElementDefinitionSlicing {
     }
 }
 /// Sub-fields of the discriminator field in ElementDefinitionSlicing
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(
@@ -4235,7 +4251,7 @@ impl LookupReferences for ElementDefinitionSlicingDiscriminator {
     }
 }
 /// Sub-fields of the base field in ElementDefinition
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(
@@ -4316,7 +4332,7 @@ impl LookupReferences for ElementDefinitionBase {
     }
 }
 /// Sub-fields of the type field in ElementDefinition
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(
@@ -4429,7 +4445,7 @@ impl LookupReferences for ElementDefinitionType {
     }
 }
 /// Choice of types for the defaultValue field in ElementDefinition
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum ElementDefinitionDefaultValue {
     /// Variant accepting the Base64Binary type.
@@ -4596,7 +4612,7 @@ pub enum ElementDefinitionDefaultValue {
     Meta(Meta),
 }
 /// Extension value for ElementDefinitionDefaultValue.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum ElementDefinitionDefaultValueExtension {
     /// Variant accepting the Base64Binary extension.
@@ -4778,6 +4794,11 @@ impl PartialEq for ElementDefinitionDefaultValueReference {
     }
 }
 impl Eq for ElementDefinitionDefaultValueReference {}
+impl Hash for ElementDefinitionDefaultValueReference {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.reference.hash(state);
+    }
+}
 impl From<Reference> for ElementDefinitionDefaultValueReference {
     fn from(reference: Reference) -> Self {
         Self { target: None, reference }
@@ -4796,7 +4817,7 @@ impl ReferenceField for ElementDefinitionDefaultValueReference {
     }
 }
 /// Choice of types for the fixed field in ElementDefinition
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum ElementDefinitionFixed {
     /// Variant accepting the Base64Binary type.
@@ -4963,7 +4984,7 @@ pub enum ElementDefinitionFixed {
     Meta(Meta),
 }
 /// Extension value for ElementDefinitionFixed.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum ElementDefinitionFixedExtension {
     /// Variant accepting the Base64Binary extension.
@@ -5145,6 +5166,11 @@ impl PartialEq for ElementDefinitionFixedReference {
     }
 }
 impl Eq for ElementDefinitionFixedReference {}
+impl Hash for ElementDefinitionFixedReference {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.reference.hash(state);
+    }
+}
 impl From<Reference> for ElementDefinitionFixedReference {
     fn from(reference: Reference) -> Self {
         Self { target: None, reference }
@@ -5163,7 +5189,7 @@ impl ReferenceField for ElementDefinitionFixedReference {
     }
 }
 /// Choice of types for the pattern field in ElementDefinition
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum ElementDefinitionPattern {
     /// Variant accepting the Base64Binary type.
@@ -5330,7 +5356,7 @@ pub enum ElementDefinitionPattern {
     Meta(Meta),
 }
 /// Extension value for ElementDefinitionPattern.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum ElementDefinitionPatternExtension {
     /// Variant accepting the Base64Binary extension.
@@ -5512,6 +5538,11 @@ impl PartialEq for ElementDefinitionPatternReference {
     }
 }
 impl Eq for ElementDefinitionPatternReference {}
+impl Hash for ElementDefinitionPatternReference {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.reference.hash(state);
+    }
+}
 impl From<Reference> for ElementDefinitionPatternReference {
     fn from(reference: Reference) -> Self {
         Self { target: None, reference }
@@ -5530,7 +5561,7 @@ impl ReferenceField for ElementDefinitionPatternReference {
     }
 }
 /// Sub-fields of the example field in ElementDefinition
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(
@@ -5603,7 +5634,7 @@ impl LookupReferences for ElementDefinitionExample {
     }
 }
 /// Choice of types for the value field in ElementDefinitionExample
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum ElementDefinitionExampleValue {
     /// Variant accepting the Base64Binary type.
@@ -5770,7 +5801,7 @@ pub enum ElementDefinitionExampleValue {
     Meta(Meta),
 }
 /// Extension value for ElementDefinitionExampleValue.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum ElementDefinitionExampleValueExtension {
     /// Variant accepting the Base64Binary extension.
@@ -5952,6 +5983,11 @@ impl PartialEq for ElementDefinitionExampleValueReference {
     }
 }
 impl Eq for ElementDefinitionExampleValueReference {}
+impl Hash for ElementDefinitionExampleValueReference {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.reference.hash(state);
+    }
+}
 impl From<Reference> for ElementDefinitionExampleValueReference {
     fn from(reference: Reference) -> Self {
         Self { target: None, reference }
@@ -5970,7 +6006,7 @@ impl ReferenceField for ElementDefinitionExampleValueReference {
     }
 }
 /// Choice of types for the minValue field in ElementDefinition
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum ElementDefinitionMinValue {
     /// Variant accepting the Date type.
@@ -6005,7 +6041,7 @@ pub enum ElementDefinitionMinValue {
     Quantity(Quantity),
 }
 /// Extension value for ElementDefinitionMinValue.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum ElementDefinitionMinValueExtension {
     /// Variant accepting the Date extension.
@@ -6040,7 +6076,7 @@ pub enum ElementDefinitionMinValueExtension {
     Quantity(FieldExtension),
 }
 /// Choice of types for the maxValue field in ElementDefinition
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum ElementDefinitionMaxValue {
     /// Variant accepting the Date type.
@@ -6075,7 +6111,7 @@ pub enum ElementDefinitionMaxValue {
     Quantity(Quantity),
 }
 /// Extension value for ElementDefinitionMaxValue.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum ElementDefinitionMaxValueExtension {
     /// Variant accepting the Date extension.
@@ -6110,7 +6146,7 @@ pub enum ElementDefinitionMaxValueExtension {
     Quantity(FieldExtension),
 }
 /// Sub-fields of the constraint field in ElementDefinition
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(
@@ -6247,7 +6283,7 @@ impl LookupReferences for ElementDefinitionConstraint {
     }
 }
 /// Sub-fields of the binding field in ElementDefinition
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(
@@ -6352,7 +6388,7 @@ impl LookupReferences for ElementDefinitionBinding {
     }
 }
 /// Sub-fields of the additional field in ElementDefinitionBinding
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(
@@ -6477,7 +6513,7 @@ impl LookupReferences for ElementDefinitionBindingAdditional {
     }
 }
 /// Sub-fields of the mapping field in ElementDefinition
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(
@@ -6582,7 +6618,7 @@ impl LookupReferences for ElementDefinitionMapping {
  A expression that is evaluated in a specified context and returns a value. The context of use of the expression must specify the context in which the expression is evaluated, and how the result of the expression is used.
 
  */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct Expression(pub Box<ExpressionInner>);
 /** Expression Type: A expression that is evaluated in a specified context and returns a value. The context of use of the expression must specify the context in which the expression is evaluated, and how the result of the expression is used.
@@ -6594,7 +6630,7 @@ pub struct Expression(pub Box<ExpressionInner>);
  A expression that is evaluated in a specified context and returns a value. The context of use of the expression must specify the context in which the expression is evaluated, and how the result of the expression is used.
 
  */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(
@@ -6735,7 +6771,7 @@ impl Expression {
  Specifies contact information for a specific purpose over a period of time, might be handled/monitored by a specific named person or organization.
 
  This datatype may be sparsely populated, i.e. only contain a purpose and phone number or address, but other cases could be completed filled out. */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct ExtendedContactDetail(pub Box<ExtendedContactDetailInner>);
 /** ExtendedContactDetail Type: Specifies contact information for a specific purpose over a period of time, might be handled/monitored by a specific named person or organization.
@@ -6747,7 +6783,7 @@ pub struct ExtendedContactDetail(pub Box<ExtendedContactDetailInner>);
  Specifies contact information for a specific purpose over a period of time, might be handled/monitored by a specific named person or organization.
 
  This datatype may be sparsely populated, i.e. only contain a purpose and phone number or address, but other cases could be completed filled out. */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(
@@ -6909,6 +6945,11 @@ impl PartialEq for ExtendedContactDetailOrganizationReference {
     }
 }
 impl Eq for ExtendedContactDetailOrganizationReference {}
+impl Hash for ExtendedContactDetailOrganizationReference {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.reference.hash(state);
+    }
+}
 impl From<Reference> for ExtendedContactDetailOrganizationReference {
     fn from(reference: Reference) -> Self {
         Self { target: None, reference }
@@ -6935,7 +6976,7 @@ impl ReferenceField for ExtendedContactDetailOrganizationReference {
  Optional Extension Element - found in all resources.
 
  */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct Extension(pub Box<ExtensionInner>);
 /** Extension Type: Optional Extension Element - found in all resources.
@@ -6947,7 +6988,7 @@ pub struct Extension(pub Box<ExtensionInner>);
  Optional Extension Element - found in all resources.
 
  */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(
@@ -7031,7 +7072,7 @@ impl Extension {
     }
 }
 /// Choice of types for the value field in Extension
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum ExtensionValue {
     /// Variant accepting the Base64Binary type.
@@ -7198,7 +7239,7 @@ pub enum ExtensionValue {
     Meta(Meta),
 }
 /// Extension value for ExtensionValue.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum ExtensionValueExtension {
     /// Variant accepting the Base64Binary extension.
@@ -7380,6 +7421,11 @@ impl PartialEq for ExtensionValueReference {
     }
 }
 impl Eq for ExtensionValueReference {}
+impl Hash for ExtensionValueReference {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.reference.hash(state);
+    }
+}
 impl From<Reference> for ExtensionValueReference {
     fn from(reference: Reference) -> Self {
         Self { target: None, reference }
@@ -7406,7 +7452,7 @@ impl ReferenceField for ExtensionValueReference {
  A name, normally of a human, that can be used for other living entities (e.g. animals but not organizations) that have been assigned names by a human and may need the use of name parts or the need for usage information.
 
  Names may be changed, or repudiated, or people may have different names in different contexts. Names may be divided into parts of different type that have variable significance depending on context, though the division into parts does not always matter. With personal names, the different parts might or might not be imbued with some implicit meaning; various cultures associate different importance with the name parts and the degree to which systems must care about name parts around the world varies widely. */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct HumanName(pub Box<HumanNameInner>);
 /** HumanName Type: A name, normally of a human, that can be used for other living entities (e.g. animals but not organizations) that have been assigned names by a human and may need the use of name parts or the need for usage information.
@@ -7418,7 +7464,7 @@ pub struct HumanName(pub Box<HumanNameInner>);
  A name, normally of a human, that can be used for other living entities (e.g. animals but not organizations) that have been assigned names by a human and may need the use of name parts or the need for usage information.
 
  Names may be changed, or repudiated, or people may have different names in different contexts. Names may be divided into parts of different type that have variable significance depending on context, though the division into parts does not always matter. With personal names, the different parts might or might not be imbued with some implicit meaning; various cultures associate different importance with the name parts and the degree to which systems must care about name parts around the world varies widely. */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(
@@ -7587,7 +7633,7 @@ impl HumanName {
  An identifier - identifies some entity uniquely and unambiguously. Typically this is used for business identifiers.
 
  The rules of the identifier.type  determine if a check digit is part of the ID value or sent separately, such as through the checkDigit extension. */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct Identifier(pub Box<IdentifierInner>);
 /** Identifier Type: An identifier - identifies some entity uniquely and unambiguously. Typically this is used for business identifiers.
@@ -7599,7 +7645,7 @@ pub struct Identifier(pub Box<IdentifierInner>);
  An identifier - identifies some entity uniquely and unambiguously. Typically this is used for business identifiers.
 
  The rules of the identifier.type  determine if a check digit is part of the ID value or sent separately, such as through the checkDigit extension. */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(
@@ -7761,6 +7807,11 @@ impl PartialEq for IdentifierAssignerReference {
     }
 }
 impl Eq for IdentifierAssignerReference {}
+impl Hash for IdentifierAssignerReference {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.reference.hash(state);
+    }
+}
 impl From<Reference> for IdentifierAssignerReference {
     fn from(reference: Reference) -> Self {
         Self { target: None, reference }
@@ -7787,7 +7838,7 @@ impl ReferenceField for IdentifierAssignerReference {
  The marketing status describes the date when a medicinal product is actually put on the market or the date as of which it is no longer available.
 
  */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct MarketingStatus(pub Box<MarketingStatusInner>);
 /** MarketingStatus Type: The marketing status describes the date when a medicinal product is actually put on the market or the date as of which it is no longer available.
@@ -7799,7 +7850,7 @@ pub struct MarketingStatus(pub Box<MarketingStatusInner>);
  The marketing status describes the date when a medicinal product is actually put on the market or the date as of which it is no longer available.
 
  */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(
@@ -7949,7 +8000,7 @@ impl MarketingStatus {
  The metadata about a resource. This is content in the resource that is maintained by the infrastructure. Changes to the content might not always be associated with version changes to the resource.
 
  */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct Meta(pub Box<MetaInner>);
 /** Meta Type: The metadata about a resource. This is content in the resource that is maintained by the infrastructure. Changes to the content might not always be associated with version changes to the resource.
@@ -7961,7 +8012,7 @@ pub struct Meta(pub Box<MetaInner>);
  The metadata about a resource. This is content in the resource that is maintained by the infrastructure. Changes to the content might not always be associated with version changes to the resource.
 
  */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(
@@ -8118,7 +8169,7 @@ impl Meta {
  Availability data for an {item}.
 
  */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct MonetaryComponent(pub Box<MonetaryComponentInner>);
 /** MonetaryComponent Type: Availability data for an {item}.
@@ -8130,7 +8181,7 @@ pub struct MonetaryComponent(pub Box<MonetaryComponentInner>);
  Availability data for an {item}.
 
  */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(
@@ -8255,7 +8306,7 @@ impl MonetaryComponent {
  An amount of economic utility in some recognized currency.
 
  */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct Money(pub Box<MoneyInner>);
 /** Money Type: An amount of economic utility in some recognized currency.
@@ -8267,7 +8318,7 @@ pub struct Money(pub Box<MoneyInner>);
  An amount of economic utility in some recognized currency.
 
  */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(
@@ -8366,7 +8417,7 @@ impl Money {
  A human-readable summary of the resource conveying the essential clinical and business information for the resource.
 
  */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct Narrative(pub Box<NarrativeInner>);
 /** Narrative Type: A human-readable summary of the resource conveying the essential clinical and business information for the resource.
@@ -8378,7 +8429,7 @@ pub struct Narrative(pub Box<NarrativeInner>);
  A human-readable summary of the resource conveying the essential clinical and business information for the resource.
 
  */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(
@@ -8473,7 +8524,7 @@ impl Narrative {
  The parameters to the module. This collection specifies both the input and output parameters. Input parameters are provided by the caller as part of the $evaluate operation. Output parameters are included in the GuidanceResponse.
 
  */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct ParameterDefinition(pub Box<ParameterDefinitionInner>);
 /** ParameterDefinition Type: The parameters to the module. This collection specifies both the input and output parameters. Input parameters are provided by the caller as part of the $evaluate operation. Output parameters are included in the GuidanceResponse.
@@ -8485,7 +8536,7 @@ pub struct ParameterDefinition(pub Box<ParameterDefinitionInner>);
  The parameters to the module. This collection specifies both the input and output parameters. Input parameters are provided by the caller as part of the $evaluate operation. Output parameters are included in the GuidanceResponse.
 
  */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(
@@ -8652,7 +8703,7 @@ impl ParameterDefinition {
  A Period specifies a range of time; the context of use will specify whether the entire range applies (e.g. "the patient was an inpatient of the hospital for this time range") or one value from the range applies (e.g. "give to the patient between these two times").
 
 Period is not used for a duration (a measure of elapsed time). See [Duration](datatypes.html#Duration). */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct Period(pub Box<PeriodInner>);
 /** Period Type: A time period defined by a start and end date and optionally time.
@@ -8666,7 +8717,7 @@ pub struct Period(pub Box<PeriodInner>);
  A Period specifies a range of time; the context of use will specify whether the entire range applies (e.g. "the patient was an inpatient of the hospital for this time range") or one value from the range applies (e.g. "give to the patient between these two times").
 
 Period is not used for a duration (a measure of elapsed time). See [Duration](datatypes.html#Duration). */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(
@@ -8765,7 +8816,7 @@ impl Period {
  The shelf-life and storage information for a medicinal product item or container can be described using this class.
 
  */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct ProductShelfLife(pub Box<ProductShelfLifeInner>);
 /** ProductShelfLife Type: The shelf-life and storage information for a medicinal product item or container can be described using this class.
@@ -8777,7 +8828,7 @@ pub struct ProductShelfLife(pub Box<ProductShelfLifeInner>);
  The shelf-life and storage information for a medicinal product item or container can be described using this class.
 
  */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(
@@ -8893,7 +8944,7 @@ impl ProductShelfLife {
     }
 }
 /// Choice of types for the period field in ProductShelfLife
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum ProductShelfLifePeriod {
     /// Variant accepting the Duration type.
@@ -8904,7 +8955,7 @@ pub enum ProductShelfLifePeriod {
     String(String),
 }
 /// Extension value for ProductShelfLifePeriod.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum ProductShelfLifePeriodExtension {
     /// Variant accepting the Duration extension.
@@ -8923,7 +8974,7 @@ pub enum ProductShelfLifePeriodExtension {
  A measured amount (or an amount that can potentially be measured). Note that measured amounts include amounts that are not precisely quantified, including amounts involving arbitrary units and floating currencies.
 
  The context of use may frequently define what kind of quantity this is and therefore what kind of units can be used. The context of use may also restrict the values for the comparator. */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct Quantity(pub Box<QuantityInner>);
 /** Quantity Type: A measured amount (or an amount that can potentially be measured). Note that measured amounts include amounts that are not precisely quantified, including amounts involving arbitrary units and floating currencies.
@@ -8935,7 +8986,7 @@ pub struct Quantity(pub Box<QuantityInner>);
  A measured amount (or an amount that can potentially be measured). Note that measured amounts include amounts that are not precisely quantified, including amounts involving arbitrary units and floating currencies.
 
  The context of use may frequently define what kind of quantity this is and therefore what kind of units can be used. The context of use may also restrict the values for the comparator. */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(
@@ -9076,7 +9127,7 @@ impl Quantity {
  A set of ordered Quantities defined by a low and high limit.
 
  The stated low and high value are assumed to have arbitrarily high precision when it comes to determining which values are in the range. I.e. 1.99 is not in the range 2 -> 3. */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct Range(pub Box<RangeInner>);
 /** Range Type: A set of ordered Quantities defined by a low and high limit.
@@ -9088,7 +9139,7 @@ pub struct Range(pub Box<RangeInner>);
  A set of ordered Quantities defined by a low and high limit.
 
  The stated low and high value are assumed to have arbitrarily high precision when it comes to determining which values are in the range. I.e. 1.99 is not in the range 2 -> 3. */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(
@@ -9187,7 +9238,7 @@ impl Range {
  A relationship of two Quantity values - expressed as a numerator and a denominator.
 
  The Ratio datatype should only be used to express a relationship of two numbers if the relationship cannot be suitably expressed using a Quantity and a common unit.  Where the denominator value is known to be fixed to "1", Quantity should be used instead of Ratio. */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct Ratio(pub Box<RatioInner>);
 /** Ratio Type: A relationship of two Quantity values - expressed as a numerator and a denominator.
@@ -9199,7 +9250,7 @@ pub struct Ratio(pub Box<RatioInner>);
  A relationship of two Quantity values - expressed as a numerator and a denominator.
 
  The Ratio datatype should only be used to express a relationship of two numbers if the relationship cannot be suitably expressed using a Quantity and a common unit.  Where the denominator value is known to be fixed to "1", Quantity should be used instead of Ratio. */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(
@@ -9298,7 +9349,7 @@ impl Ratio {
  A range of ratios expressed as a low and high numerator and a denominator.
 
  The stated low and high value are assumed to have arbitrarily high precision when it comes to determining which values are in the range. I.e. 1.99 is not in the range 2 -> 3. */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct RatioRange(pub Box<RatioRangeInner>);
 /** RatioRange Type: A range of ratios expressed as a low and high numerator and a denominator.
@@ -9310,7 +9361,7 @@ pub struct RatioRange(pub Box<RatioRangeInner>);
  A range of ratios expressed as a low and high numerator and a denominator.
 
  The stated low and high value are assumed to have arbitrarily high precision when it comes to determining which values are in the range. I.e. 1.99 is not in the range 2 -> 3. */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(
@@ -9423,7 +9474,7 @@ impl RatioRange {
  A reference from one resource to another.
 
  References SHALL be a reference to an actual FHIR resource, and SHALL be resolvable (allowing for access control, temporary unavailability, etc.). Resolution can be either by retrieval from the URL, or, where applicable by resource type, by treating an absolute reference as a canonical URL and looking it up in a local registry/repository. */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct Reference(pub Box<ReferenceInner>);
 /** Reference Type: A reference from one resource to another.
@@ -9435,7 +9486,7 @@ pub struct Reference(pub Box<ReferenceInner>);
  A reference from one resource to another.
 
  References SHALL be a reference to an actual FHIR resource, and SHALL be resolvable (allowing for access control, temporary unavailability, etc.). Resolution can be either by retrieval from the URL, or, where applicable by resource type, by treating an absolute reference as a canonical URL and looking it up in a local registry/repository. */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(
@@ -9572,7 +9623,7 @@ impl Reference {
  Related artifacts such as additional documentation, justification, or bibliographic references.
 
  Each related artifact is either an attachment, or a reference to another knowledge resource, but not both. */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct RelatedArtifact(pub Box<RelatedArtifactInner>);
 /** RelatedArtifact Type: Related artifacts such as additional documentation, justification, or bibliographic references.
@@ -9584,7 +9635,7 @@ pub struct RelatedArtifact(pub Box<RelatedArtifactInner>);
  Related artifacts such as additional documentation, justification, or bibliographic references.
 
  Each related artifact is either an attachment, or a reference to another knowledge resource, but not both. */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(
@@ -9800,6 +9851,11 @@ impl PartialEq for RelatedArtifactResourceReferenceReference {
     }
 }
 impl Eq for RelatedArtifactResourceReferenceReference {}
+impl Hash for RelatedArtifactResourceReferenceReference {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.reference.hash(state);
+    }
+}
 impl From<Reference> for RelatedArtifactResourceReferenceReference {
     fn from(reference: Reference) -> Self {
         Self { target: None, reference }
@@ -9826,7 +9882,7 @@ impl ReferenceField for RelatedArtifactResourceReferenceReference {
  A series of measurements taken by a device, with upper and lower limits. There may be more than one dimension in the data.
 
  The data is not interpretable without at least origin, period, and dimensions, but these are optional to allow a separation between the template of measurement and the actual measurement, such as between DeviceCapabilities and DeviceLog.  When providing a summary view (for example with Observation.value[x]) SampledData should be represented with a brief display text such as "Sampled Data". */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct SampledData(pub Box<SampledDataInner>);
 /** SampledData Type: A series of measurements taken by a device, with upper and lower limits. There may be more than one dimension in the data.
@@ -9838,7 +9894,7 @@ pub struct SampledData(pub Box<SampledDataInner>);
  A series of measurements taken by a device, with upper and lower limits. There may be more than one dimension in the data.
 
  The data is not interpretable without at least origin, period, and dimensions, but these are optional to allow a separation between the template of measurement and the actual measurement, such as between DeviceCapabilities and DeviceLog.  When providing a summary view (for example with Observation.value[x]) SampledData should be represented with a brief display text such as "Sampled Data". */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(
@@ -10043,7 +10099,7 @@ impl SampledData {
  A signature along with supporting context. The signature may be a digital signature that is cryptographic in nature, or some other signature acceptable to the domain. This other signature may be as simple as a graphical image representing a hand-written signature, or a signature ceremony Different signature approaches have different utilities.
 
  The elements of the Signature Resource are for ease of access of these elements. For digital signatures (Xml DigSig, JWS), the non-repudiation proof comes from the Signature  validation, which includes validation of the referenced objects (e.g. Resources) (a.k.a., Content) in the XML-Signature Detached form. */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct Signature(pub Box<SignatureInner>);
 /** Signature Type: A signature along with supporting context. The signature may be a digital signature that is cryptographic in nature, or some other signature acceptable to the domain. This other signature may be as simple as a graphical image representing a hand-written signature, or a signature ceremony Different signature approaches have different utilities.
@@ -10055,7 +10111,7 @@ pub struct Signature(pub Box<SignatureInner>);
  A signature along with supporting context. The signature may be a digital signature that is cryptographic in nature, or some other signature acceptable to the domain. This other signature may be as simple as a graphical image representing a hand-written signature, or a signature ceremony Different signature approaches have different utilities.
 
  The elements of the Signature Resource are for ease of access of these elements. For digital signatures (Xml DigSig, JWS), the non-repudiation proof comes from the Signature  validation, which includes validation of the referenced objects (e.g. Resources) (a.k.a., Content) in the XML-Signature Detached form. */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(
@@ -10227,6 +10283,11 @@ impl PartialEq for SignatureWhoReference {
     }
 }
 impl Eq for SignatureWhoReference {}
+impl Hash for SignatureWhoReference {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.reference.hash(state);
+    }
+}
 impl From<Reference> for SignatureWhoReference {
     fn from(reference: Reference) -> Self {
         Self { target: None, reference }
@@ -10245,7 +10306,7 @@ impl ReferenceField for SignatureWhoReference {
     }
 }
 /// Target resources for the who reference field in Signature
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum SignatureWhoReferenceTarget {
     /// Variant for Device target resources
     Device(Device),
@@ -10324,6 +10385,11 @@ impl PartialEq for SignatureOnBehalfOfReference {
     }
 }
 impl Eq for SignatureOnBehalfOfReference {}
+impl Hash for SignatureOnBehalfOfReference {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.reference.hash(state);
+    }
+}
 impl From<Reference> for SignatureOnBehalfOfReference {
     fn from(reference: Reference) -> Self {
         Self { target: None, reference }
@@ -10342,7 +10408,7 @@ impl ReferenceField for SignatureOnBehalfOfReference {
     }
 }
 /// Target resources for the onBehalfOf reference field in Signature
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum SignatureOnBehalfOfReferenceTarget {
     /// Variant for Device target resources
     Device(Device),
@@ -10420,7 +10486,7 @@ impl From<RelatedPerson> for SignatureOnBehalfOfReferenceTarget {
  Describes the occurrence of an event that may occur multiple times. Timing schedules are used for specifying when events are expected or requested to occur, and may also be used to represent the summary of a past or ongoing event.  For simplicity, the definitions of Timing components are expressed as 'future' events, but such components can also be used to describe historic or ongoing events.
 
 A Timing schedule can be a list of events and/or criteria for when the event happens, which can be expressed in a structured form and/or as a code. When both event and a repeating specification are provided, the list of events should be understood as an interpretation of the information in the repeat structure. */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct Timing(pub Box<TimingInner>);
 /** Timing Type: Specifies an event that may occur multiple times. Timing schedules are used to record when things are planned, expected or requested to occur. The most common usage is in dosage instructions for medications. They are also used when planning care of various kinds, and may be used for reporting the schedule to which past regular activities were carried out.
@@ -10434,7 +10500,7 @@ pub struct Timing(pub Box<TimingInner>);
  Describes the occurrence of an event that may occur multiple times. Timing schedules are used for specifying when events are expected or requested to occur, and may also be used to represent the summary of a past or ongoing event.  For simplicity, the definitions of Timing components are expressed as 'future' events, but such components can also be used to describe historic or ongoing events.
 
 A Timing schedule can be a list of events and/or criteria for when the event happens, which can be expressed in a structured form and/or as a code. When both event and a repeating specification are provided, the list of events should be understood as an interpretation of the information in the repeat structure. */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(
@@ -10550,7 +10616,7 @@ impl Timing {
     }
 }
 /// Sub-fields of the repeat field in Timing
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(
@@ -10807,7 +10873,7 @@ impl LookupReferences for TimingRepeat {
     }
 }
 /// Choice of types for the bounds field in TimingRepeat
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum TimingRepeatBounds {
     /// Variant accepting the Duration type.
@@ -10821,7 +10887,7 @@ pub enum TimingRepeatBounds {
     Period(Period),
 }
 /// Extension value for TimingRepeatBounds.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum TimingRepeatBoundsExtension {
     /// Variant accepting the Duration extension.
@@ -10843,7 +10909,7 @@ pub enum TimingRepeatBoundsExtension {
  A description of a triggering event. Triggering events can be named events, data events, or periodic, as determined by the type element.
 
  If an event is a named-event, it means the event is completely pre-coordinated, and no other information can be specified for the event. If the event is one of the data- events, the data and condition elements specify the triggering criteria. The data element specifies the structured component, and the condition element provides additional optional refinement of that structured component. If the event is periodic, the timing element defines when the event is triggered. For both data- and periodic events, a name can be provided as a shorthand for the formal semantics provided by the other elements. */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct TriggerDefinition(pub Box<TriggerDefinitionInner>);
 /** TriggerDefinition Type: A description of a triggering event. Triggering events can be named events, data events, or periodic, as determined by the type element.
@@ -10855,7 +10921,7 @@ pub struct TriggerDefinition(pub Box<TriggerDefinitionInner>);
  A description of a triggering event. Triggering events can be named events, data events, or periodic, as determined by the type element.
 
  If an event is a named-event, it means the event is completely pre-coordinated, and no other information can be specified for the event. If the event is one of the data- events, the data and condition elements specify the triggering criteria. The data element specifies the structured component, and the condition element provides additional optional refinement of that structured component. If the event is periodic, the timing element defines when the event is triggered. For both data- and periodic events, a name can be provided as a shorthand for the formal semantics provided by the other elements. */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(
@@ -11014,7 +11080,7 @@ impl TriggerDefinition {
     }
 }
 /// Choice of types for the timing field in TriggerDefinition
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum TriggerDefinitionTiming {
     /// Variant accepting the Timing type.
@@ -11031,7 +11097,7 @@ pub enum TriggerDefinitionTiming {
     DateTime(DateTime),
 }
 /// Extension value for TriggerDefinitionTiming.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum TriggerDefinitionTimingExtension {
     /// Variant accepting the Timing extension.
@@ -11063,6 +11129,11 @@ impl PartialEq for TriggerDefinitionTimingReference {
     }
 }
 impl Eq for TriggerDefinitionTimingReference {}
+impl Hash for TriggerDefinitionTimingReference {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.reference.hash(state);
+    }
+}
 impl From<Reference> for TriggerDefinitionTimingReference {
     fn from(reference: Reference) -> Self {
         Self { target: None, reference }
@@ -11089,7 +11160,7 @@ impl ReferenceField for TriggerDefinitionTimingReference {
  Specifies clinical/business/etc. metadata that can be used to retrieve, index and/or categorize an artifact. This metadata can either be specific to the applicable population (e.g., age category, DRG) or the specific context of care (e.g., venue, care setting, provider of care).
 
  */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct UsageContext(pub Box<UsageContextInner>);
 /** UsageContext Type: Specifies clinical/business/etc. metadata that can be used to retrieve, index and/or categorize an artifact. This metadata can either be specific to the applicable population (e.g., age category, DRG) or the specific context of care (e.g., venue, care setting, provider of care).
@@ -11101,7 +11172,7 @@ pub struct UsageContext(pub Box<UsageContextInner>);
  Specifies clinical/business/etc. metadata that can be used to retrieve, index and/or categorize an artifact. This metadata can either be specific to the applicable population (e.g., age category, DRG) or the specific context of care (e.g., venue, care setting, provider of care).
 
  */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(
@@ -11188,7 +11259,7 @@ impl UsageContext {
     }
 }
 /// Choice of types for the value field in UsageContext
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum UsageContextValue {
     /// Variant accepting the CodeableConcept type.
@@ -11205,7 +11276,7 @@ pub enum UsageContextValue {
     Reference(UsageContextValueReference),
 }
 /// Extension value for UsageContextValue.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum UsageContextValueExtension {
     /// Variant accepting the CodeableConcept extension.
@@ -11237,6 +11308,11 @@ impl PartialEq for UsageContextValueReference {
     }
 }
 impl Eq for UsageContextValueReference {}
+impl Hash for UsageContextValueReference {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.reference.hash(state);
+    }
+}
 impl From<Reference> for UsageContextValueReference {
     fn from(reference: Reference) -> Self {
         Self { target: None, reference }
@@ -11255,7 +11331,7 @@ impl ReferenceField for UsageContextValueReference {
     }
 }
 /// Target resources for the value reference field in UsageContext
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum UsageContextValueReferenceTarget {
     /// Variant for Group target resources
     Group(Group),
@@ -11341,7 +11417,7 @@ impl From<ResearchStudy> for UsageContextValueReferenceTarget {
  Virtual Service Contact Details.
 
  */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct VirtualServiceDetail(pub Box<VirtualServiceDetailInner>);
 /** VirtualServiceDetail Type: Virtual Service Contact Details.
@@ -11353,7 +11429,7 @@ pub struct VirtualServiceDetail(pub Box<VirtualServiceDetailInner>);
  Virtual Service Contact Details.
 
  */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(
@@ -11492,7 +11568,7 @@ impl VirtualServiceDetail {
     }
 }
 /// Choice of types for the address field in VirtualServiceDetail
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum VirtualServiceDetailAddress {
     /// Variant accepting the Url type.
@@ -11509,7 +11585,7 @@ pub enum VirtualServiceDetailAddress {
     ExtendedContactDetail(ExtendedContactDetail),
 }
 /// Extension value for VirtualServiceDetailAddress.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum VirtualServiceDetailAddressExtension {
     /// Variant accepting the Url extension.
@@ -11534,7 +11610,7 @@ pub enum VirtualServiceDetailAddressExtension {
  There SHALL be a code if there is a value and it SHALL be an expression of currency.  If system is present, it SHALL be ISO 4217 (system = "urn:iso:std:iso:4217" - currency).
 
  The context of use may frequently define what kind of quantity this is and therefore what kind of units can be used. The context of use may also restrict the values for the comparator. */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct MoneyQuantity(pub Box<MoneyQuantityInner>);
 /** An amount of money. With regard to precision, see [Decimal Precision](datatypes.html#precision)
@@ -11546,7 +11622,7 @@ pub struct MoneyQuantity(pub Box<MoneyQuantityInner>);
  There SHALL be a code if there is a value and it SHALL be an expression of currency.  If system is present, it SHALL be ISO 4217 (system = "urn:iso:std:iso:4217" - currency).
 
  The context of use may frequently define what kind of quantity this is and therefore what kind of units can be used. The context of use may also restrict the values for the comparator. */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(
@@ -11687,7 +11763,7 @@ impl MoneyQuantity {
  The comparator is not used on a SimpleQuantity
 
  The context of use may frequently define what kind of quantity this is and therefore what kind of units can be used. The context of use may also restrict the values for the comparator. */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct SimpleQuantity(pub Box<SimpleQuantityInner>);
 /** A fixed quantity (no comparator)
@@ -11699,7 +11775,7 @@ pub struct SimpleQuantity(pub Box<SimpleQuantityInner>);
  The comparator is not used on a SimpleQuantity
 
  The context of use may frequently define what kind of quantity this is and therefore what kind of units can be used. The context of use may also restrict the values for the comparator. */
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(
@@ -11832,7 +11908,7 @@ impl SimpleQuantity {
     }
 }
 /// Extension of a field.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[cfg_attr(feature = "builders", derive(Builder))]
 #[serde(rename_all = "camelCase")]
 #[cfg_attr(

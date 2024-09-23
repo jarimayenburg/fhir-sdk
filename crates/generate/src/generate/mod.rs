@@ -48,6 +48,7 @@ pub fn generate_codes(mut codes: Vec<Code>) -> Result<(TokenStream, HashMap<Stri
 		#![doc = #module_doc]
 		#![allow(clippy::too_many_lines)]
 
+		use std::hash::Hash;
 		use serde::{Serialize, Deserialize};
 		use super::super::types::{Coding, CodingInner, CodeableConcept, CodeableConceptInner};
 
@@ -125,6 +126,7 @@ pub fn generate_types(
 		#![allow(clippy::too_many_lines)]
 
 		use ::core::num::NonZeroU32;
+		use std::hash::Hash;
 		use serde::{Serialize, Deserialize};
 		#[cfg(feature = "builders")]
 		use derive_builder::Builder;
@@ -137,7 +139,7 @@ pub fn generate_types(
 		#(#types)*
 
 		/// Extension of a field.
-		#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+		#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 		#[cfg_attr(feature = "builders", derive(Builder))]
 		#[serde(rename_all = "camelCase")]
 		#[cfg_attr(feature = "builders", builder(
@@ -197,6 +199,7 @@ pub fn generate_resources(
 		#![allow(clippy::too_many_lines)]
 
 		use ::core::num::NonZeroU32;
+		use std::hash::Hash;
 		use serde::{Serialize, Deserialize};
 		#[cfg(feature = "builders")]
 		use derive_builder::Builder;
@@ -210,7 +213,7 @@ pub fn generate_resources(
 		#(#resource_defs)*
 
 		/// Generic resource holding any FHIR resources.
-		#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+		#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 		#[serde(tag = "resourceType")]
 		pub enum Resource {
 			#(
@@ -233,7 +236,7 @@ pub fn generate_resources(
 		}
 
 		/// Resource type field of the FHIR resources.
-		#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+		#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 		pub enum ResourceType {
 			#(
 				#[doc = stringify!(#resource_names)]
@@ -261,7 +264,7 @@ pub fn generate_resources(
 		}
 
 		/// Wrong resource type for conversion to the specified type.
-		#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+		#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 		pub struct WrongResourceType;
 		impl ::core::fmt::Display for WrongResourceType {
 			fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {

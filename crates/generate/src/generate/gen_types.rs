@@ -73,12 +73,12 @@ pub fn generate_type_struct(
 
 	Ok(quote! {
 		#[doc = #doc_comment]
-		#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+		#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 		#[serde(transparent)]
 		pub struct #ident(pub Box<#ident_inner>);
 
 		#[doc = #doc_comment]
-		#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+		#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 		#[cfg_attr(feature = "builders", derive(Builder))]
 		#[serde(rename_all = "camelCase")]
 		#[cfg_attr(feature = "builders", builder(
@@ -418,14 +418,14 @@ fn generate_choice_field(
 
 	let choice_types = quote! {
 		#[doc = #enum_doc]
-		#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+		#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 		#[serde(rename_all = "camelCase")]
 		pub enum #enum_type {
 			#(#variants)*
 		}
 
 		#[doc = #extension_doc]
-		#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+		#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 		#[serde(rename_all = "camelCase")]
 		pub enum #extension_type {
 			#(#extension_variants)*
@@ -473,7 +473,7 @@ fn generate_object_field(
 	let object_struct_builder_name = object_struct_builder.to_string();
 	let object_struct = quote! {
 		#[doc = #struct_doc]
-		#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+		#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 		#[cfg_attr(feature = "builders", derive(Builder))]
 		#[serde(rename_all = "camelCase")]
 		#[cfg_attr(feature = "builders", builder(pattern = "owned", name = #object_struct_builder_name, build_fn(error = "crate::error::BuilderError")))]
@@ -581,7 +581,7 @@ pub fn generate_reference_types(
 
 		let target_defs = quote! {
 			#[doc = #enum_doc]
-			#[derive(Debug, Clone, PartialEq, Eq)]
+			#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 			pub enum #target_type {
 				#(#variants)*
 			}
@@ -628,6 +628,12 @@ pub fn generate_reference_types(
 		}
 
 		impl Eq for #struct_type {}
+
+		impl Hash for #struct_type {
+			fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+				self.reference.hash(state);
+			}
+		}
 
 		impl From<Reference> for #struct_type {
 			fn from(reference: Reference) -> Self {
