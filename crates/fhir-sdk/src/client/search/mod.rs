@@ -85,6 +85,16 @@ where
 		self
 	}
 
+	/// Add a query parameter without consuming `self`
+	pub fn add_query<Q>(&mut self, query: Q)
+	where
+		Q: IntoQuery,
+	{
+		let (key, value) = query.into_query();
+
+		self.params.add_raw(key, value);
+	}
+
 	/// Add a search parameter as a string. Alias of [Search::with_raw].
 	///
 	/// Prefer [Search::and] if possible.
