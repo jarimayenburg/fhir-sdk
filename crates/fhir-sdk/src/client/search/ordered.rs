@@ -26,6 +26,23 @@ where
 	}
 }
 
+impl<S, O> PartialEq for OrderedSearch<S, O>
+where
+	S: PartialEq,
+	O: PartialEq,
+{
+	fn eq(&self, other: &Self) -> bool {
+		self.search == other.search && self.order_by == other.order_by
+	}
+}
+
+impl<S, O> Eq for OrderedSearch<S, O>
+where
+	S: Eq,
+	O: Eq,
+{
+}
+
 #[async_trait]
 impl<E, R> Search<E, R> for OrderedSearch<UnpagedSearch<E, R>, R::Params>
 where

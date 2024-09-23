@@ -15,7 +15,7 @@ use reqwest::Url;
 use super::{Client, Error};
 
 /// A FHIR search that automatically resolves next pages
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone)]
 pub struct UnpagedSearch<E, R> {
 	/// The executor of the search (e.g. the [Client])
 	executor: Option<E>,
@@ -112,6 +112,14 @@ where
 	}
 }
 
+impl<E, R> PartialEq for UnpagedSearch<E, R> {
+	fn eq(&self, other: &Self) -> bool {
+		self.params.eq(&other.params)
+	}
+}
+
+impl<E, R> Eq for UnpagedSearch<E, R> {}
+
 impl<E, R> UnpagedSearch<E, R>
 where
 	E: UnpagedSearchExecutor<R> + PagedSearchExecutor<R>,
@@ -157,6 +165,14 @@ where
 		self.page_size.hash(state);
 	}
 }
+
+impl<E, R> PartialEq for PagedSearch<E, R> {
+	fn eq(&self, other: &Self) -> bool {
+		self.params.eq(&other.params)
+	}
+}
+
+impl<E, R> Eq for PagedSearch<E, R> {}
 
 /// Stream of resources returned by [Search::send].
 pub trait Paged<R>: Stream<Item = Result<R, Error>> + Send + Sized {
