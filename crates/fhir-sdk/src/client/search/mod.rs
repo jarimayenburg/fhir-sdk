@@ -25,10 +25,7 @@ pub struct Search<E, R> {
 	params: SearchParameters<R>,
 }
 
-impl<E, R> Search<E, R>
-where
-	E: SearchExecutor<R>,
-{
+impl<E, R> Search<E, R> {
 	/// Creates a new [Search] without an executor. An executor needs to be set with [Search::with_executor] before calling [Search::send].
 	/// If [Search::send] is called without an executor being set, it will panic.
 	///
@@ -139,10 +136,7 @@ impl<E, R> PartialEq for Search<E, R> {
 
 impl<E, R> Eq for Search<E, R> {}
 
-impl<E, R> Search<E, R>
-where
-	E: SearchExecutor<R> + PagedSearchExecutor<R>,
-{
+impl<E, R> Search<E, R> {
 	/// Transform this search into a paged search
 	pub fn paged(self, page_size: Option<u32>) -> PagedSearch<E, R> {
 		let Self { executor, params } = self;
