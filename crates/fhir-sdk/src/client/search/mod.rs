@@ -3,6 +3,7 @@
 mod ordered;
 mod params;
 
+pub use ordered::*;
 pub use params::*;
 
 use std::hash::Hash;

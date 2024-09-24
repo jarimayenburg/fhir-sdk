@@ -6,6 +6,7 @@ use async_trait::async_trait;
 use fhir_model::{Resolve, ResourceSearchParameterDefinition, SearchableResource};
 use ordered_stream::{FromStream, OrderedStream};
 
+/// An ordered FHIR search
 #[derive(Debug)]
 pub struct OrderedSearch<S, O> {
 	/// The search to execute

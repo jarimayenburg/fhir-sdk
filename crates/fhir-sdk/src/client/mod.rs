@@ -34,8 +34,8 @@ pub use self::{
 	error::Error,
 	request::RequestSettings,
 	search::{
-		ExecutableSearch, Paged, Search, SearchExecutor, SearchParameter, SearchParameterOrList,
-		SearchParameters,
+		ExecutableSearch, OrderedSearch, Paged, Search, SearchExecutor, SearchParameter,
+		SearchParameterOrList, SearchParameters,
 	},
 	write::ResourceWrite,
 };
