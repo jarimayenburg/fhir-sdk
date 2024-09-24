@@ -59,7 +59,7 @@ pub fn generate_search_param_enums(
 
 			quote! {
 				#[doc = #doc_comment]
-				#[derive(Clone, Debug, PartialEq, Eq)]
+				#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 				pub enum #params_ident {
 					#(#variants,)*
 				}

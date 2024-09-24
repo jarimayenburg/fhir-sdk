@@ -3,7 +3,7 @@
 use crate::params::*;
 use super::super::resources;
 /// Search parameters for the Account resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum AccountSearchParameter {
     /// The parties ultimately responsible for balancing the Account
     Guarantor,
@@ -46,7 +46,7 @@ impl ResourceSearchParameterDefinition for AccountSearchParameter {
     }
 }
 /// Search parameters for the ActivityDefinition resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum ActivityDefinitionSearchParameter {
     /// What resource is being referenced
     ComposedOf,
@@ -128,7 +128,7 @@ impl ResourceSearchParameterDefinition for ActivityDefinitionSearchParameter {
     }
 }
 /// Search parameters for the ActorDefinition resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum ActorDefinitionSearchParameter {
     /// A use context assigned to the Actor Definition
     Context,
@@ -186,7 +186,7 @@ impl ResourceSearchParameterDefinition for ActorDefinitionSearchParameter {
     }
 }
 /// Search parameters for the AdministrableProductDefinition resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum AdministrableProductDefinitionSearchParameter {
     /// A device that is integral to the medicinal product, in effect being considered as an "ingredient" of the medicinal product. This is not intended for devices that are just co-packaged
     Device,
@@ -227,7 +227,7 @@ for AdministrableProductDefinitionSearchParameter {
     }
 }
 /// Search parameters for the AdverseEvent resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum AdverseEventSearchParameter {
     /// Business identifier for the event
     Identifier,
@@ -282,7 +282,7 @@ impl ResourceSearchParameterDefinition for AdverseEventSearchParameter {
     }
 }
 /// Search parameters for the AllergyIntolerance resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum AllergyIntoleranceSearchParameter {
     /// External ids for this item
     Identifier,
@@ -340,7 +340,7 @@ impl ResourceSearchParameterDefinition for AllergyIntoleranceSearchParameter {
     }
 }
 /// Search parameters for the Appointment resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum AppointmentSearchParameter {
     /// An Identifier of the Appointment
     Identifier,
@@ -416,7 +416,7 @@ impl ResourceSearchParameterDefinition for AppointmentSearchParameter {
     }
 }
 /// Search parameters for the AppointmentResponse resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum AppointmentResponseSearchParameter {
     /// An Identifier in this appointment response
     Identifier,
@@ -453,7 +453,7 @@ impl ResourceSearchParameterDefinition for AppointmentResponseSearchParameter {
     }
 }
 /// Search parameters for the ArtifactAssessment resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum ArtifactAssessmentSearchParameter {
     /// The artifact assessment publication date
     Date,
@@ -472,7 +472,7 @@ impl ResourceSearchParameterDefinition for ArtifactAssessmentSearchParameter {
     }
 }
 /// Search parameters for the AuditEvent resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum AuditEventSearchParameter {
     /// Where the activity involved patient data
     Patient,
@@ -530,7 +530,7 @@ impl ResourceSearchParameterDefinition for AuditEventSearchParameter {
     }
 }
 /// Search parameters for the Basic resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum BasicSearchParameter {
     /// Business identifier
     Identifier,
@@ -561,7 +561,7 @@ impl ResourceSearchParameterDefinition for BasicSearchParameter {
     }
 }
 /// Search parameters for the BiologicallyDerivedProduct resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum BiologicallyDerivedProductSearchParameter {
     /// The biological source for the biologically derived product
     BiologicalSourceEvent,
@@ -598,7 +598,7 @@ impl ResourceSearchParameterDefinition for BiologicallyDerivedProductSearchParam
     }
 }
 /// Search parameters for the BiologicallyDerivedProductDispense resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum BiologicallyDerivedProductDispenseSearchParameter {
     /// The identifier of the dispense
     Identifier,
@@ -627,7 +627,7 @@ for BiologicallyDerivedProductDispenseSearchParameter {
     }
 }
 /// Search parameters for the BodyStructure resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum BodyStructureSearchParameter {
     /// Bodystructure identifier
     Identifier,
@@ -655,7 +655,7 @@ impl ResourceSearchParameterDefinition for BodyStructureSearchParameter {
     }
 }
 /// Search parameters for the Bundle resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum BundleSearchParameter {
     /// The first resource in the bundle, if the bundle type is "document" - this is a composition, and this parameter provides access to search its contents
     Composition,
@@ -683,7 +683,7 @@ impl ResourceSearchParameterDefinition for BundleSearchParameter {
     }
 }
 /// Search parameters for the CapabilityStatement resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum CapabilityStatementSearchParameter {
     /// A use context assigned to the capability statement
     Context,
@@ -768,7 +768,7 @@ impl ResourceSearchParameterDefinition for CapabilityStatementSearchParameter {
     }
 }
 /// Search parameters for the CarePlan resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum CarePlanSearchParameter {
     /// External Ids for this plan
     Identifier,
@@ -835,7 +835,7 @@ impl ResourceSearchParameterDefinition for CarePlanSearchParameter {
     }
 }
 /// Search parameters for the CareTeam resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum CareTeamSearchParameter {
     /// External Ids for this team
     Identifier,
@@ -872,7 +872,7 @@ impl ResourceSearchParameterDefinition for CareTeamSearchParameter {
     }
 }
 /// Search parameters for the ChargeItem resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum ChargeItemSearchParameter {
     /// Business Identifier for item
     Identifier,
@@ -939,7 +939,7 @@ impl ResourceSearchParameterDefinition for ChargeItemSearchParameter {
     }
 }
 /// Search parameters for the ChargeItemDefinition resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum ChargeItemDefinitionSearchParameter {
     /// A use context assigned to the charge item definition
     Context,
@@ -997,7 +997,7 @@ impl ResourceSearchParameterDefinition for ChargeItemDefinitionSearchParameter {
     }
 }
 /// Search parameters for the Citation resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum CitationSearchParameter {
     /// A use context assigned to the citation
     Context,
@@ -1067,7 +1067,7 @@ impl ResourceSearchParameterDefinition for CitationSearchParameter {
     }
 }
 /// Search parameters for the Claim resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum ClaimSearchParameter {
     /// The primary identifier of the financial resource
     Identifier,
@@ -1131,7 +1131,7 @@ impl ResourceSearchParameterDefinition for ClaimSearchParameter {
     }
 }
 /// Search parameters for the ClaimResponse resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum ClaimResponseSearchParameter {
     /// The identity of the ClaimResponse
     Identifier,
@@ -1177,7 +1177,7 @@ impl ResourceSearchParameterDefinition for ClaimResponseSearchParameter {
     }
 }
 /// Search parameters for the ClinicalImpression resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum ClinicalImpressionSearchParameter {
     /// Business identifier
     Identifier,
@@ -1226,7 +1226,7 @@ impl ResourceSearchParameterDefinition for ClinicalImpressionSearchParameter {
     }
 }
 /// Search parameters for the ClinicalUseDefinition resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum ClinicalUseDefinitionSearchParameter {
     /// The situation that is being documented as contraindicating against this item, as a code
     Contraindication,
@@ -1275,7 +1275,7 @@ impl ResourceSearchParameterDefinition for ClinicalUseDefinitionSearchParameter 
     }
 }
 /// Search parameters for the CodeSystem resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum CodeSystemSearchParameter {
     /// A use context assigned to the code system
     Context,
@@ -1360,7 +1360,7 @@ impl ResourceSearchParameterDefinition for CodeSystemSearchParameter {
     }
 }
 /// Search parameters for the Communication resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum CommunicationSearchParameter {
     /// Unique identifier
     Identifier,
@@ -1421,7 +1421,7 @@ impl ResourceSearchParameterDefinition for CommunicationSearchParameter {
     }
 }
 /// Search parameters for the CommunicationRequest resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum CommunicationRequestSearchParameter {
     /// Unique identifier
     Identifier,
@@ -1482,7 +1482,7 @@ impl ResourceSearchParameterDefinition for CommunicationRequestSearchParameter {
     }
 }
 /// Search parameters for the CompartmentDefinition resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum CompartmentDefinitionSearchParameter {
     /// A use context assigned to the compartment definition
     Context,
@@ -1537,7 +1537,7 @@ impl ResourceSearchParameterDefinition for CompartmentDefinitionSearchParameter 
     }
 }
 /// Search parameters for the Composition resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum CompositionSearchParameter {
     /// Version-independent identifier for the Composition
     Identifier,
@@ -1610,7 +1610,7 @@ impl ResourceSearchParameterDefinition for CompositionSearchParameter {
     }
 }
 /// Search parameters for the ConceptMap resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum ConceptMapSearchParameter {
     /// A use context assigned to the concept map
     Context,
@@ -1710,7 +1710,7 @@ impl ResourceSearchParameterDefinition for ConceptMapSearchParameter {
     }
 }
 /// Search parameters for the Condition resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum ConditionSearchParameter {
     /// A unique identifier of the condition record
     Identifier,
@@ -1789,7 +1789,7 @@ impl ResourceSearchParameterDefinition for ConditionSearchParameter {
     }
 }
 /// Search parameters for the ConditionDefinition resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum ConditionDefinitionSearchParameter {
     /// A use context assigned to the condition definition
     Context,
@@ -1847,7 +1847,7 @@ impl ResourceSearchParameterDefinition for ConditionDefinitionSearchParameter {
     }
 }
 /// Search parameters for the Consent resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum ConsentSearchParameter {
     /// Identifier for this record (external references)
     Identifier,
@@ -1914,7 +1914,7 @@ impl ResourceSearchParameterDefinition for ConsentSearchParameter {
     }
 }
 /// Search parameters for the Contract resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum ContractSearchParameter {
     /// The identity of the contract
     Identifier,
@@ -1957,7 +1957,7 @@ impl ResourceSearchParameterDefinition for ContractSearchParameter {
     }
 }
 /// Search parameters for the Coverage resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum CoverageSearchParameter {
     /// The primary identifier of the insured and the coverage
     Identifier,
@@ -2009,7 +2009,7 @@ impl ResourceSearchParameterDefinition for CoverageSearchParameter {
     }
 }
 /// Search parameters for the CoverageEligibilityRequest resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum CoverageEligibilityRequestSearchParameter {
     /// The business identifier of the Eligibility
     Identifier,
@@ -2043,7 +2043,7 @@ impl ResourceSearchParameterDefinition for CoverageEligibilityRequestSearchParam
     }
 }
 /// Search parameters for the CoverageEligibilityResponse resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum CoverageEligibilityResponseSearchParameter {
     /// The business identifier
     Identifier,
@@ -2083,7 +2083,7 @@ impl ResourceSearchParameterDefinition for CoverageEligibilityResponseSearchPara
     }
 }
 /// Search parameters for the DetectedIssue resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum DetectedIssueSearchParameter {
     /// Unique id for the detected issue
     Identifier,
@@ -2123,7 +2123,7 @@ impl ResourceSearchParameterDefinition for DetectedIssueSearchParameter {
     }
 }
 /// Search parameters for the Device resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum DeviceSearchParameter {
     /// The biological source for the device
     BiologicalSourceEvent,
@@ -2205,7 +2205,7 @@ impl ResourceSearchParameterDefinition for DeviceSearchParameter {
     }
 }
 /// Search parameters for the DeviceAssociation resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum DeviceAssociationSearchParameter {
     /// Search for products that match this code
     Device,
@@ -2236,7 +2236,7 @@ impl ResourceSearchParameterDefinition for DeviceAssociationSearchParameter {
     }
 }
 /// Search parameters for the DeviceDefinition resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum DeviceDefinitionSearchParameter {
     /// A server defined search that may match any of the string fields in DeviceDefinition.name or DeviceDefinition.classification.type - the latter to search for 'generic' devices.
     DeviceName,
@@ -2270,7 +2270,7 @@ impl ResourceSearchParameterDefinition for DeviceDefinitionSearchParameter {
     }
 }
 /// Search parameters for the DeviceDispense resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum DeviceDispenseSearchParameter {
     /// Search for devices that match this code
     Code,
@@ -2298,7 +2298,7 @@ impl ResourceSearchParameterDefinition for DeviceDispenseSearchParameter {
     }
 }
 /// Search parameters for the DeviceMetric resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum DeviceMetricSearchParameter {
     /// The category of the metric
     Category,
@@ -2323,7 +2323,7 @@ impl ResourceSearchParameterDefinition for DeviceMetricSearchParameter {
     }
 }
 /// Search parameters for the DeviceRequest resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum DeviceRequestSearchParameter {
     /// Business identifier for request/order
     Identifier,
@@ -2393,7 +2393,7 @@ impl ResourceSearchParameterDefinition for DeviceRequestSearchParameter {
     }
 }
 /// Search parameters for the DeviceUsage resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum DeviceUsageSearchParameter {
     /// Search by identifier
     Identifier,
@@ -2418,7 +2418,7 @@ impl ResourceSearchParameterDefinition for DeviceUsageSearchParameter {
     }
 }
 /// Search parameters for the DiagnosticReport resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum DiagnosticReportSearchParameter {
     /// An identifier for the report
     Identifier,
@@ -2482,7 +2482,7 @@ impl ResourceSearchParameterDefinition for DiagnosticReportSearchParameter {
     }
 }
 /// Search parameters for the DocumentReference resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum DocumentReferenceSearchParameter {
     /// Identifier of the attachment binary
     Identifier,
@@ -2597,7 +2597,7 @@ impl ResourceSearchParameterDefinition for DocumentReferenceSearchParameter {
     }
 }
 /// Search parameters for the Encounter resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum EncounterSearchParameter {
     /// Identifier(s) by which this encounter is known
     Identifier,
@@ -2694,7 +2694,7 @@ impl ResourceSearchParameterDefinition for EncounterSearchParameter {
     }
 }
 /// Search parameters for the EncounterHistory resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum EncounterHistorySearchParameter {
     /// The Encounter associated with this set of history values
     Encounter,
@@ -2722,7 +2722,7 @@ impl ResourceSearchParameterDefinition for EncounterHistorySearchParameter {
     }
 }
 /// Search parameters for the Endpoint resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum EndpointSearchParameter {
     /// Protocol/Profile/Standard to be used with this endpoint connection
     ConnectionType,
@@ -2753,7 +2753,7 @@ impl ResourceSearchParameterDefinition for EndpointSearchParameter {
     }
 }
 /// Search parameters for the EnrollmentRequest resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum EnrollmentRequestSearchParameter {
     /// The business identifier of the Enrollment
     Identifier,
@@ -2778,7 +2778,7 @@ impl ResourceSearchParameterDefinition for EnrollmentRequestSearchParameter {
     }
 }
 /// Search parameters for the EnrollmentResponse resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum EnrollmentResponseSearchParameter {
     /// The business identifier of the EnrollmentResponse
     Identifier,
@@ -2800,7 +2800,7 @@ impl ResourceSearchParameterDefinition for EnrollmentResponseSearchParameter {
     }
 }
 /// Search parameters for the EpisodeOfCare resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum EpisodeOfCareSearchParameter {
     /// Business Identifier(s) relevant for this EpisodeOfCare
     Identifier,
@@ -2849,7 +2849,7 @@ impl ResourceSearchParameterDefinition for EpisodeOfCareSearchParameter {
     }
 }
 /// Search parameters for the EventDefinition resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum EventDefinitionSearchParameter {
     /// What resource is being referenced
     ComposedOf,
@@ -2928,7 +2928,7 @@ impl ResourceSearchParameterDefinition for EventDefinitionSearchParameter {
     }
 }
 /// Search parameters for the Evidence resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum EvidenceSearchParameter {
     /// A use context assigned to the evidence
     Context,
@@ -2980,7 +2980,7 @@ impl ResourceSearchParameterDefinition for EvidenceSearchParameter {
     }
 }
 /// Search parameters for the EvidenceReport resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum EvidenceReportSearchParameter {
     /// A use context assigned to the evidence report
     Context,
@@ -3020,7 +3020,7 @@ impl ResourceSearchParameterDefinition for EvidenceReportSearchParameter {
     }
 }
 /// Search parameters for the EvidenceVariable resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum EvidenceVariableSearchParameter {
     /// What resource is being referenced
     ComposedOf,
@@ -3093,7 +3093,7 @@ impl ResourceSearchParameterDefinition for EvidenceVariableSearchParameter {
     }
 }
 /// Search parameters for the ExampleScenario resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum ExampleScenarioSearchParameter {
     /// A use context assigned to the example scenario
     Context,
@@ -3145,7 +3145,7 @@ impl ResourceSearchParameterDefinition for ExampleScenarioSearchParameter {
     }
 }
 /// Search parameters for the ExplanationOfBenefit resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum ExplanationOfBenefitSearchParameter {
     /// The business identifier of the Explanation of Benefit
     Identifier,
@@ -3209,7 +3209,7 @@ impl ResourceSearchParameterDefinition for ExplanationOfBenefitSearchParameter {
     }
 }
 /// Search parameters for the FamilyMemberHistory resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum FamilyMemberHistorySearchParameter {
     /// A search by a record identifier
     Identifier,
@@ -3249,7 +3249,7 @@ impl ResourceSearchParameterDefinition for FamilyMemberHistorySearchParameter {
     }
 }
 /// Search parameters for the Flag resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum FlagSearchParameter {
     /// Business identifier
     Identifier,
@@ -3286,7 +3286,7 @@ impl ResourceSearchParameterDefinition for FlagSearchParameter {
     }
 }
 /// Search parameters for the FormularyItem resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum FormularyItemSearchParameter {
     /// Returns formulary items for a specific code
     Code,
@@ -3305,7 +3305,7 @@ impl ResourceSearchParameterDefinition for FormularyItemSearchParameter {
     }
 }
 /// Search parameters for the GenomicStudy resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum GenomicStudySearchParameter {
     /// What the genomic study analysis is about, when it is not about the subject of record
     Focus,
@@ -3333,7 +3333,7 @@ impl ResourceSearchParameterDefinition for GenomicStudySearchParameter {
     }
 }
 /// Search parameters for the Goal resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum GoalSearchParameter {
     /// External Ids for this goal
     Identifier,
@@ -3379,7 +3379,7 @@ impl ResourceSearchParameterDefinition for GoalSearchParameter {
     }
 }
 /// Search parameters for the GraphDefinition resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum GraphDefinitionSearchParameter {
     /// A use context assigned to the graph definition
     Context,
@@ -3437,7 +3437,7 @@ impl ResourceSearchParameterDefinition for GraphDefinitionSearchParameter {
     }
 }
 /// Search parameters for the Group resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum GroupSearchParameter {
     /// Kind of characteristic
     Characteristic,
@@ -3486,7 +3486,7 @@ impl ResourceSearchParameterDefinition for GroupSearchParameter {
     }
 }
 /// Search parameters for the GuidanceResponse resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum GuidanceResponseSearchParameter {
     /// The identifier of the guidance response
     Identifier,
@@ -3514,7 +3514,7 @@ impl ResourceSearchParameterDefinition for GuidanceResponseSearchParameter {
     }
 }
 /// Search parameters for the HealthcareService resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum HealthcareServiceSearchParameter {
     /// The Healthcare Service is currently marked as active
     Active,
@@ -3572,7 +3572,7 @@ impl ResourceSearchParameterDefinition for HealthcareServiceSearchParameter {
     }
 }
 /// Search parameters for the ImagingSelection resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum ImagingSelectionSearchParameter {
     /// Identifiers for the imaging selection
     Identifier,
@@ -3618,7 +3618,7 @@ impl ResourceSearchParameterDefinition for ImagingSelectionSearchParameter {
     }
 }
 /// Search parameters for the ImagingStudy resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum ImagingStudySearchParameter {
     /// Identifiers for the Study, such as DICOM Study Instance UID
     Identifier,
@@ -3679,7 +3679,7 @@ impl ResourceSearchParameterDefinition for ImagingStudySearchParameter {
     }
 }
 /// Search parameters for the Immunization resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum ImmunizationSearchParameter {
     /// Business identifier
     Identifier,
@@ -3740,7 +3740,7 @@ impl ResourceSearchParameterDefinition for ImmunizationSearchParameter {
     }
 }
 /// Search parameters for the ImmunizationEvaluation resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum ImmunizationEvaluationSearchParameter {
     /// ID of the evaluation
     Identifier,
@@ -3774,7 +3774,7 @@ impl ResourceSearchParameterDefinition for ImmunizationEvaluationSearchParameter
     }
 }
 /// Search parameters for the ImmunizationRecommendation resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum ImmunizationRecommendationSearchParameter {
     /// Business identifier
     Identifier,
@@ -3811,7 +3811,7 @@ impl ResourceSearchParameterDefinition for ImmunizationRecommendationSearchParam
     }
 }
 /// Search parameters for the ImplementationGuide resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum ImplementationGuideSearchParameter {
     /// A use context assigned to the implementation guide
     Context,
@@ -3881,7 +3881,7 @@ impl ResourceSearchParameterDefinition for ImplementationGuideSearchParameter {
     }
 }
 /// Search parameters for the Ingredient resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum IngredientSearchParameter {
     /// The product which this ingredient is a constituent part of
     For,
@@ -3933,7 +3933,7 @@ impl ResourceSearchParameterDefinition for IngredientSearchParameter {
     }
 }
 /// Search parameters for the InsurancePlan resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum InsurancePlanSearchParameter {
     /// A server defined search that may match any of the string fields in the Address, including line, city, district, state, country, postalCode, and/or text
     Address,
@@ -3988,7 +3988,7 @@ impl ResourceSearchParameterDefinition for InsurancePlanSearchParameter {
     }
 }
 /// Search parameters for the InventoryItem resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum InventoryItemSearchParameter {
     /// Search for products that match this code
     Code,
@@ -4013,7 +4013,7 @@ impl ResourceSearchParameterDefinition for InventoryItemSearchParameter {
     }
 }
 /// Search parameters for the InventoryReport resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum InventoryReportSearchParameter {
     /// Search by identifier
     Identifier,
@@ -4038,7 +4038,7 @@ impl ResourceSearchParameterDefinition for InventoryReportSearchParameter {
     }
 }
 /// Search parameters for the Invoice resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum InvoiceSearchParameter {
     /// Business Identifier for item
     Identifier,
@@ -4090,7 +4090,7 @@ impl ResourceSearchParameterDefinition for InvoiceSearchParameter {
     }
 }
 /// Search parameters for the Library resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum LibrarySearchParameter {
     /// What resource is being referenced
     ComposedOf,
@@ -4175,7 +4175,7 @@ impl ResourceSearchParameterDefinition for LibrarySearchParameter {
     }
 }
 /// Search parameters for the Linkage resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum LinkageSearchParameter {
     /// Author of the Linkage
     Author,
@@ -4197,7 +4197,7 @@ impl ResourceSearchParameterDefinition for LinkageSearchParameter {
     }
 }
 /// Search parameters for the List resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum ListSearchParameter {
     /// Business identifier
     Identifier,
@@ -4246,7 +4246,7 @@ impl ResourceSearchParameterDefinition for ListSearchParameter {
     }
 }
 /// Search parameters for the Location resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum LocationSearchParameter {
     /// A (part of the) address of the location
     Address,
@@ -4304,7 +4304,7 @@ impl ResourceSearchParameterDefinition for LocationSearchParameter {
     }
 }
 /// Search parameters for the ManufacturedItemDefinition resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum ManufacturedItemDefinitionSearchParameter {
     /// Dose form as manufactured and before any transformation into the pharmaceutical product
     DoseForm,
@@ -4332,7 +4332,7 @@ impl ResourceSearchParameterDefinition for ManufacturedItemDefinitionSearchParam
     }
 }
 /// Search parameters for the Measure resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum MeasureSearchParameter {
     /// What resource is being referenced
     ComposedOf,
@@ -4411,7 +4411,7 @@ impl ResourceSearchParameterDefinition for MeasureSearchParameter {
     }
 }
 /// Search parameters for the MeasureReport resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum MeasureReportSearchParameter {
     /// External identifier of the measure report to be returned
     Identifier,
@@ -4454,7 +4454,7 @@ impl ResourceSearchParameterDefinition for MeasureReportSearchParameter {
     }
 }
 /// Search parameters for the Medication resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum MedicationSearchParameter {
     /// Returns medications with this external identifier
     Identifier,
@@ -4494,7 +4494,7 @@ impl ResourceSearchParameterDefinition for MedicationSearchParameter {
     }
 }
 /// Search parameters for the MedicationAdministration resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum MedicationAdministrationSearchParameter {
     /// Return administrations with this external identifier
     Identifier,
@@ -4552,7 +4552,7 @@ impl ResourceSearchParameterDefinition for MedicationAdministrationSearchParamet
     }
 }
 /// Search parameters for the MedicationDispense resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum MedicationDispenseSearchParameter {
     /// Returns dispenses with this external identifier
     Identifier,
@@ -4616,7 +4616,7 @@ impl ResourceSearchParameterDefinition for MedicationDispenseSearchParameter {
     }
 }
 /// Search parameters for the MedicationKnowledge resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum MedicationKnowledgeSearchParameter {
     /// Business identifier for this medication
     Identifier,
@@ -4671,7 +4671,7 @@ impl ResourceSearchParameterDefinition for MedicationKnowledgeSearchParameter {
     }
 }
 /// Search parameters for the MedicationRequest resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum MedicationRequestSearchParameter {
     /// Return prescriptions with this external identifier
     Identifier,
@@ -4735,7 +4735,7 @@ impl ResourceSearchParameterDefinition for MedicationRequestSearchParameter {
     }
 }
 /// Search parameters for the MedicationStatement resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum MedicationStatementSearchParameter {
     /// Return statements with this external identifier
     Identifier,
@@ -4781,7 +4781,7 @@ impl ResourceSearchParameterDefinition for MedicationStatementSearchParameter {
     }
 }
 /// Search parameters for the MedicinalProductDefinition resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum MedicinalProductDefinitionSearchParameter {
     /// Allows the key product features to be recorded, such as "sugar free", "modified release", "parallel import"
     Characteristic,
@@ -4830,7 +4830,7 @@ impl ResourceSearchParameterDefinition for MedicinalProductDefinitionSearchParam
     }
 }
 /// Search parameters for the MessageDefinition resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum MessageDefinitionSearchParameter {
     /// A use context assigned to the message definition
     Context,
@@ -4900,7 +4900,7 @@ impl ResourceSearchParameterDefinition for MessageDefinitionSearchParameter {
     }
 }
 /// Search parameters for the MessageHeader resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum MessageHeaderSearchParameter {
     /// The source of the decision
     Author,
@@ -4946,7 +4946,7 @@ impl ResourceSearchParameterDefinition for MessageHeaderSearchParameter {
     }
 }
 /// Search parameters for the MolecularSequence resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum MolecularSequenceSearchParameter {
     /// The unique identity for a particular sequence
     Identifier,
@@ -4974,7 +4974,7 @@ impl ResourceSearchParameterDefinition for MolecularSequenceSearchParameter {
     }
 }
 /// Search parameters for the NamingSystem resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum NamingSystemSearchParameter {
     /// A use context assigned to the naming system
     Context,
@@ -5065,7 +5065,7 @@ impl ResourceSearchParameterDefinition for NamingSystemSearchParameter {
     }
 }
 /// Search parameters for the NutritionIntake resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum NutritionIntakeSearchParameter {
     /// Return statements with this external identifier
     Identifier,
@@ -5105,7 +5105,7 @@ impl ResourceSearchParameterDefinition for NutritionIntakeSearchParameter {
     }
 }
 /// Search parameters for the NutritionOrder resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum NutritionOrderSearchParameter {
     /// Return nutrition orders with this external identifier
     Identifier,
@@ -5154,7 +5154,7 @@ impl ResourceSearchParameterDefinition for NutritionOrderSearchParameter {
     }
 }
 /// Search parameters for the NutritionProduct resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum NutritionProductSearchParameter {
     /// The code identifying a specific nutrition product
     Code,
@@ -5182,7 +5182,7 @@ impl ResourceSearchParameterDefinition for NutritionProductSearchParameter {
     }
 }
 /// Search parameters for the Observation resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum ObservationSearchParameter {
     /// The unique id for a particular observation
     Identifier,
@@ -5321,7 +5321,7 @@ impl ResourceSearchParameterDefinition for ObservationSearchParameter {
     }
 }
 /// Search parameters for the ObservationDefinition resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum ObservationDefinitionSearchParameter {
     /// The unique identifier associated with the specimen definition
     Identifier,
@@ -5358,7 +5358,7 @@ impl ResourceSearchParameterDefinition for ObservationDefinitionSearchParameter 
     }
 }
 /// Search parameters for the OperationDefinition resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum OperationDefinitionSearchParameter {
     /// A use context assigned to the operation definition
     Context,
@@ -5440,7 +5440,7 @@ impl ResourceSearchParameterDefinition for OperationDefinitionSearchParameter {
     }
 }
 /// Search parameters for the Organization resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum OrganizationSearchParameter {
     /// Is the Organization record active
     Active,
@@ -5492,7 +5492,7 @@ impl ResourceSearchParameterDefinition for OrganizationSearchParameter {
     }
 }
 /// Search parameters for the OrganizationAffiliation resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum OrganizationAffiliationSearchParameter {
     /// Whether this organization affiliation record is in active use
     Active,
@@ -5547,7 +5547,7 @@ impl ResourceSearchParameterDefinition for OrganizationAffiliationSearchParamete
     }
 }
 /// Search parameters for the PackagedProductDefinition resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum PackagedProductDefinitionSearchParameter {
     /// A biologically derived product within this packaged product
     Biological,
@@ -5593,7 +5593,7 @@ impl ResourceSearchParameterDefinition for PackagedProductDefinitionSearchParame
     }
 }
 /// Search parameters for the Patient resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum PatientSearchParameter {
     /// Whether the patient record is active
     Active,
@@ -5675,7 +5675,7 @@ impl ResourceSearchParameterDefinition for PatientSearchParameter {
     }
 }
 /// Search parameters for the PaymentNotice resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum PaymentNoticeSearchParameter {
     /// Creation date for the notice
     Created,
@@ -5709,7 +5709,7 @@ impl ResourceSearchParameterDefinition for PaymentNoticeSearchParameter {
     }
 }
 /// Search parameters for the PaymentReconciliation resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum PaymentReconciliationSearchParameter {
     /// The account to which payment or adjustment was applied.
     AllocationAccount,
@@ -5752,7 +5752,7 @@ impl ResourceSearchParameterDefinition for PaymentReconciliationSearchParameter 
     }
 }
 /// Search parameters for the Permission resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum PermissionSearchParameter {
     /// active | entered-in-error | draft | rejected
     Status,
@@ -5768,7 +5768,7 @@ impl ResourceSearchParameterDefinition for PermissionSearchParameter {
     }
 }
 /// Search parameters for the Person resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum PersonSearchParameter {
     /// A person Identifier
     Identifier,
@@ -5850,7 +5850,7 @@ impl ResourceSearchParameterDefinition for PersonSearchParameter {
     }
 }
 /// Search parameters for the PlanDefinition resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum PlanDefinitionSearchParameter {
     /// What resource is being referenced
     ComposedOf,
@@ -5935,7 +5935,7 @@ impl ResourceSearchParameterDefinition for PlanDefinitionSearchParameter {
     }
 }
 /// Search parameters for the Practitioner resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum PractitionerSearchParameter {
     /// A server defined search that may match any of the string fields in the Address, including line, city, district, state, country, postalCode, and/or text
     Address,
@@ -6008,7 +6008,7 @@ impl ResourceSearchParameterDefinition for PractitionerSearchParameter {
     }
 }
 /// Search parameters for the PractitionerRole resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum PractitionerRoleSearchParameter {
     /// A value in an email contact
     Email,
@@ -6066,7 +6066,7 @@ impl ResourceSearchParameterDefinition for PractitionerRoleSearchParameter {
     }
 }
 /// Search parameters for the Procedure resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum ProcedureSearchParameter {
     /// A unique identifier for a procedure
     Identifier,
@@ -6130,7 +6130,7 @@ impl ResourceSearchParameterDefinition for ProcedureSearchParameter {
     }
 }
 /// Search parameters for the Provenance resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum ProvenanceSearchParameter {
     /// Where the activity involved patient data
     Patient,
@@ -6182,7 +6182,7 @@ impl ResourceSearchParameterDefinition for ProvenanceSearchParameter {
     }
 }
 /// Search parameters for the Questionnaire resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum QuestionnaireSearchParameter {
     /// A use context assigned to the questionnaire
     Context,
@@ -6258,7 +6258,7 @@ impl ResourceSearchParameterDefinition for QuestionnaireSearchParameter {
     }
 }
 /// Search parameters for the QuestionnaireResponse resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum QuestionnaireResponseSearchParameter {
     /// The unique identifier for the questionnaire response
     Identifier,
@@ -6307,7 +6307,7 @@ impl ResourceSearchParameterDefinition for QuestionnaireResponseSearchParameter 
     }
 }
 /// Search parameters for the RegulatedAuthorization resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum RegulatedAuthorizationSearchParameter {
     /// The case or procedure number
     Case,
@@ -6341,7 +6341,7 @@ impl ResourceSearchParameterDefinition for RegulatedAuthorizationSearchParameter
     }
 }
 /// Search parameters for the RelatedPerson resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum RelatedPersonSearchParameter {
     /// An Identifier of the RelatedPerson
     Identifier,
@@ -6411,7 +6411,7 @@ impl ResourceSearchParameterDefinition for RelatedPersonSearchParameter {
     }
 }
 /// Search parameters for the RequestOrchestration resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum RequestOrchestrationSearchParameter {
     /// External identifiers for the request orchestration
     Identifier,
@@ -6469,7 +6469,7 @@ impl ResourceSearchParameterDefinition for RequestOrchestrationSearchParameter {
     }
 }
 /// Search parameters for the Requirements resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum RequirementsSearchParameter {
     /// A use context assigned to the requirements
     Context,
@@ -6533,7 +6533,7 @@ impl ResourceSearchParameterDefinition for RequirementsSearchParameter {
     }
 }
 /// Search parameters for the ResearchStudy resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum ResearchStudySearchParameter {
     /// Classification for the study
     Classifier,
@@ -6623,7 +6623,7 @@ impl ResourceSearchParameterDefinition for ResearchStudySearchParameter {
     }
 }
 /// Search parameters for the ResearchSubject resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum ResearchSubjectSearchParameter {
     /// Business Identifier for research subject in a study
     Identifier,
@@ -6657,7 +6657,7 @@ impl ResourceSearchParameterDefinition for ResearchSubjectSearchParameter {
     }
 }
 /// Search parameters for the RiskAssessment resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum RiskAssessmentSearchParameter {
     /// Unique identifier for the assessment
     Identifier,
@@ -6700,7 +6700,7 @@ impl ResourceSearchParameterDefinition for RiskAssessmentSearchParameter {
     }
 }
 /// Search parameters for the Schedule resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum ScheduleSearchParameter {
     /// Is the schedule in active use
     Active,
@@ -6740,7 +6740,7 @@ impl ResourceSearchParameterDefinition for ScheduleSearchParameter {
     }
 }
 /// Search parameters for the SearchParameter resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum SearchParameterSearchParameter {
     /// A use context assigned to the search parameter
     Context,
@@ -6813,7 +6813,7 @@ impl ResourceSearchParameterDefinition for SearchParameterSearchParameter {
     }
 }
 /// Search parameters for the ServiceRequest resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum ServiceRequestSearchParameter {
     /// Identifiers assigned to this order
     Identifier,
@@ -6895,7 +6895,7 @@ impl ResourceSearchParameterDefinition for ServiceRequestSearchParameter {
     }
 }
 /// Search parameters for the Slot resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum SlotSearchParameter {
     /// The style of appointment or patient that may be booked in the slot (not service type)
     AppointmentType,
@@ -6935,7 +6935,7 @@ impl ResourceSearchParameterDefinition for SlotSearchParameter {
     }
 }
 /// Search parameters for the Specimen resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum SpecimenSearchParameter {
     /// The unique identifier associated with the specimen
     Identifier,
@@ -6984,7 +6984,7 @@ impl ResourceSearchParameterDefinition for SpecimenSearchParameter {
     }
 }
 /// Search parameters for the SpecimenDefinition resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum SpecimenDefinitionSearchParameter {
     /// The unique identifier associated with the SpecimenDefinition
     Identifier,
@@ -7024,7 +7024,7 @@ impl ResourceSearchParameterDefinition for SpecimenDefinitionSearchParameter {
     }
 }
 /// Search parameters for the StructureDefinition resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum StructureDefinitionSearchParameter {
     /// A use context assigned to the structure definition
     Context,
@@ -7121,7 +7121,7 @@ impl ResourceSearchParameterDefinition for StructureDefinitionSearchParameter {
     }
 }
 /// Search parameters for the StructureMap resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum StructureMapSearchParameter {
     /// A use context assigned to the structure map
     Context,
@@ -7179,7 +7179,7 @@ impl ResourceSearchParameterDefinition for StructureMapSearchParameter {
     }
 }
 /// Search parameters for the Subscription resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum SubscriptionSearchParameter {
     /// Contact details for the subscription
     Contact,
@@ -7225,7 +7225,7 @@ impl ResourceSearchParameterDefinition for SubscriptionSearchParameter {
     }
 }
 /// Search parameters for the SubscriptionTopic resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum SubscriptionTopicSearchParameter {
     /// Date status first applied
     Date,
@@ -7271,7 +7271,7 @@ impl ResourceSearchParameterDefinition for SubscriptionTopicSearchParameter {
     }
 }
 /// Search parameters for the Substance resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum SubstanceSearchParameter {
     /// The category of the substance
     Category,
@@ -7308,7 +7308,7 @@ impl ResourceSearchParameterDefinition for SubstanceSearchParameter {
     }
 }
 /// Search parameters for the SubstanceDefinition resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum SubstanceDefinitionSearchParameter {
     /// High or low level categorization, e.g. polymer vs. nucleic acid or linear vs. branch chain
     Classification,
@@ -7336,7 +7336,7 @@ impl ResourceSearchParameterDefinition for SubstanceDefinitionSearchParameter {
     }
 }
 /// Search parameters for the SupplyDelivery resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum SupplyDeliverySearchParameter {
     /// External identifier
     Identifier,
@@ -7364,7 +7364,7 @@ impl ResourceSearchParameterDefinition for SupplyDeliverySearchParameter {
     }
 }
 /// Search parameters for the SupplyRequest resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum SupplyRequestSearchParameter {
     /// Business Identifier for SupplyRequest
     Identifier,
@@ -7401,7 +7401,7 @@ impl ResourceSearchParameterDefinition for SupplyRequestSearchParameter {
     }
 }
 /// Search parameters for the Task resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum TaskSearchParameter {
     /// Search for a task instance by its business identifier
     Identifier,
@@ -7480,7 +7480,7 @@ impl ResourceSearchParameterDefinition for TaskSearchParameter {
     }
 }
 /// Search parameters for the TerminologyCapabilities resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum TerminologyCapabilitiesSearchParameter {
     /// A use context assigned to the terminology capabilities
     Context,
@@ -7538,7 +7538,7 @@ impl ResourceSearchParameterDefinition for TerminologyCapabilitiesSearchParamete
     }
 }
 /// Search parameters for the TestPlan resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum TestPlanSearchParameter {
     /// An identifier for the test plan
     Identifier,
@@ -7563,7 +7563,7 @@ impl ResourceSearchParameterDefinition for TestPlanSearchParameter {
     }
 }
 /// Search parameters for the TestReport resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum TestReportSearchParameter {
     /// An external identifier for the test report
     Identifier,
@@ -7597,7 +7597,7 @@ impl ResourceSearchParameterDefinition for TestReportSearchParameter {
     }
 }
 /// Search parameters for the TestScript resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum TestScriptSearchParameter {
     /// A use context assigned to the test script
     Context,
@@ -7667,7 +7667,7 @@ impl ResourceSearchParameterDefinition for TestScriptSearchParameter {
     }
 }
 /// Search parameters for the Transport resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum TransportSearchParameter {
     /// External identifier
     Identifier,
@@ -7686,7 +7686,7 @@ impl ResourceSearchParameterDefinition for TransportSearchParameter {
     }
 }
 /// Search parameters for the ValueSet resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum ValueSetSearchParameter {
     /// A use context assigned to the value set
     Context,
@@ -7765,7 +7765,7 @@ impl ResourceSearchParameterDefinition for ValueSetSearchParameter {
     }
 }
 /// Search parameters for the VerificationResult resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum VerificationResultSearchParameter {
     /// Select validation information for data that was attested to using the specified method
     AttestationMethod,
@@ -7808,7 +7808,7 @@ impl ResourceSearchParameterDefinition for VerificationResultSearchParameter {
     }
 }
 /// Search parameters for the VisionPrescription resource
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum VisionPrescriptionSearchParameter {
     /// Return prescriptions with this external identifier
     Identifier,
