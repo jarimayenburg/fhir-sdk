@@ -50,14 +50,16 @@ where
 	R: SearchableResource + Resolve + Clone + Send + Eq + 'static,
 	R::Params: Clone + Eq + Send,
 	E: SearchExecutor<R> + Send,
+	E::Stream: Send,
 {
 	type Value = OrderedResourceStream<
 		FromStream<
 			E::Stream,
 			Box<
 				dyn FnMut(
-					<E::Stream as Stream>::Item,
-				) -> (OrderedSearchResult<R>, <E::Stream as Stream>::Item),
+						<E::Stream as Stream>::Item,
+					) -> (OrderedSearchResult<R>, <E::Stream as Stream>::Item)
+					+ Send,
 			>,
 			OrderedSearchResult<R>,
 		>,
@@ -78,8 +80,9 @@ where
 
 		let split_item: Box<
 			dyn FnMut(
-				<E::Stream as Stream>::Item,
-			) -> (OrderedSearchResult<R>, <E::Stream as Stream>::Item),
+					<E::Stream as Stream>::Item,
+				) -> (OrderedSearchResult<R>, <E::Stream as Stream>::Item)
+				+ Send,
 		> = Box::new(move |data| {
 			let ordering = get_ordering(&data);
 
