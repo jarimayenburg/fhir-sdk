@@ -21,3 +21,12 @@ impl Resolve for resources::Observation {
 		}
 	}
 }
+
+impl Resolve for resources::Immunization {
+	fn resolve(&self, param: &Self::Params) -> Option<impl Ord> {
+		match param {
+			ImmunizationSearchParameter::Date => self.date.as_ref(),
+			_ => unimplemented!("Currently only Immunization:date is implemented"),
+		}
+	}
+}
