@@ -31,6 +31,17 @@ impl Resolve for resources::Immunization {
 	}
 }
 
+impl Resolve for resources::ImmunizationRecommendation {
+	fn resolve(&self, param: &Self::Params) -> Option<impl Ord> {
+		match param {
+			ImmunizationRecommendationSearchParameter::Date => {
+				self.recommendation.iter().flatten().map(|r| &r.date).next()
+			}
+			_ => unimplemented!("Currently only ImmunizationRecommendation:date is implemented"),
+		}
+	}
+}
+
 impl Resolve for resources::EpisodeOfCare {
 	fn resolve(&self, param: &Self::Params) -> Option<impl Ord> {
 		match param {
@@ -73,7 +84,7 @@ impl Resolve for resources::DiagnosticReport {
 impl Resolve for resources::Consent {
 	fn resolve(&self, param: &Self::Params) -> Option<impl Ord> {
 		match param {
-			ConsentSearchParameter::Date => self.date_time.clone(),
+			ConsentSearchParameter::Date => self.date_time.as_ref(),
 			_ => unimplemented!("Currently only Consent:date is implemented"),
 		}
 	}
