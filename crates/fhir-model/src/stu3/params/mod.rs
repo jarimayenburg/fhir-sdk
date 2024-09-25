@@ -89,3 +89,15 @@ impl Resolve for resources::Consent {
 		}
 	}
 }
+
+impl Resolve for resources::Flag {
+	fn resolve(&self, param: &Self::Params) -> Option<impl Ord> {
+		match param {
+			FlagSearchParameter::Date => match self.period.as_ref()? {
+				p if p.start.is_some() => p.start.as_ref(),
+				p => p.end.as_ref(),
+			},
+			_ => unimplemented!("Currently only Flag:date is implemented"),
+		}
+	}
+}
