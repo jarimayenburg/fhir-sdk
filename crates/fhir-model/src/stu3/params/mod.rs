@@ -30,3 +30,15 @@ impl Resolve for resources::Immunization {
 		}
 	}
 }
+
+impl Resolve for resources::EpisodeOfCare {
+	fn resolve(&self, param: &Self::Params) -> Option<impl Ord> {
+		match param {
+			EpisodeOfCareSearchParameter::Date => match self.period.as_ref()? {
+				p if p.start.is_some() => p.start.clone(),
+				p => p.end.clone(),
+			},
+			_ => unimplemented!("Currently only EpisodeOfCare:date is implemented"),
+		}
+	}
+}
