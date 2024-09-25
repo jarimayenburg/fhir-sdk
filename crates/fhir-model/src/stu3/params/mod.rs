@@ -115,3 +115,12 @@ impl Resolve for resources::MedicationRequest {
 		}
 	}
 }
+
+impl Resolve for resources::NutritionOrder {
+	fn resolve(&self, param: &Self::Params) -> Option<impl Ord> {
+		match param {
+			NutritionOrderSearchParameter::Datetime => Some(&self.date_time),
+			_ => unimplemented!("Currently only NutritionOrder:datetime is implemented"),
+		}
+	}
+}
