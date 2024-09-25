@@ -133,3 +133,12 @@ impl Resolve for resources::DocumentReference {
 		}
 	}
 }
+
+impl Resolve for resources::AllergyIntolerance {
+	fn resolve(&self, param: &Self::Params) -> Option<impl Ord> {
+		match param {
+			AllergyIntoleranceSearchParameter::Date => self.asserted_date.as_ref(),
+			_ => unimplemented!("Currently only AllergyIntolerance:date is implemented"),
+		}
+	}
+}
