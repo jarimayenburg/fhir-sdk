@@ -54,3 +54,18 @@ impl Resolve for resources::Encounter {
 		}
 	}
 }
+
+impl Resolve for resources::DiagnosticReport {
+	fn resolve(&self, param: &Self::Params) -> Option<impl Ord> {
+		match param {
+			DiagnosticReportSearchParameter::Date => match self.effective.as_ref()? {
+				resources::DiagnosticReportEffective::DateTime(dt) => Some(dt.clone()),
+				resources::DiagnosticReportEffective::Period(p) if p.start.is_some() => {
+					p.start.clone()
+				}
+				resources::DiagnosticReportEffective::Period(p) => p.end.clone(),
+			},
+			_ => unimplemented!("Currently only DiagnosticReport:date is implemented"),
+		}
+	}
+}
