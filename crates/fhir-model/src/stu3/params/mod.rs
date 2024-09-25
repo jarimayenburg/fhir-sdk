@@ -69,3 +69,12 @@ impl Resolve for resources::DiagnosticReport {
 		}
 	}
 }
+
+impl Resolve for resources::Consent {
+	fn resolve(&self, param: &Self::Params) -> Option<impl Ord> {
+		match param {
+			ConsentSearchParameter::Date => self.date_time.clone(),
+			_ => unimplemented!("Currently only Consent:date is implemented"),
+		}
+	}
+}
