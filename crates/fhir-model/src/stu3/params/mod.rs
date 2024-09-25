@@ -42,3 +42,15 @@ impl Resolve for resources::EpisodeOfCare {
 		}
 	}
 }
+
+impl Resolve for resources::Encounter {
+	fn resolve(&self, param: &Self::Params) -> Option<impl Ord> {
+		match param {
+			EncounterSearchParameter::Date => match self.period.as_ref()? {
+				p if p.start.is_some() => p.start.clone(),
+				p => p.end.clone(),
+			},
+			_ => unimplemented!("Currently only Encounter:date is implemented"),
+		}
+	}
+}
