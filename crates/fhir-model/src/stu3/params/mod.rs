@@ -13,9 +13,9 @@ impl Resolve for resources::Observation {
 	fn resolve(&self, param: &Self::Params) -> Option<impl Ord> {
 		match param {
 			ObservationSearchParameter::Date => match self.effective.as_ref()? {
-				resources::ObservationEffective::DateTime(dt) => Some(dt.clone()),
-				resources::ObservationEffective::Period(p) if p.start.is_some() => p.start.clone(),
-				resources::ObservationEffective::Period(p) => p.end.clone(),
+				resources::ObservationEffective::DateTime(dt) => Some(dt),
+				resources::ObservationEffective::Period(p) if p.start.is_some() => p.start.as_ref(),
+				resources::ObservationEffective::Period(p) => p.end.as_ref(),
 			},
 			_ => unimplemented!("Currently only Observation:date is implemented"),
 		}
@@ -35,8 +35,8 @@ impl Resolve for resources::EpisodeOfCare {
 	fn resolve(&self, param: &Self::Params) -> Option<impl Ord> {
 		match param {
 			EpisodeOfCareSearchParameter::Date => match self.period.as_ref()? {
-				p if p.start.is_some() => p.start.clone(),
-				p => p.end.clone(),
+				p if p.start.is_some() => p.start.as_ref(),
+				p => p.end.as_ref(),
 			},
 			_ => unimplemented!("Currently only EpisodeOfCare:date is implemented"),
 		}
@@ -47,8 +47,8 @@ impl Resolve for resources::Encounter {
 	fn resolve(&self, param: &Self::Params) -> Option<impl Ord> {
 		match param {
 			EncounterSearchParameter::Date => match self.period.as_ref()? {
-				p if p.start.is_some() => p.start.clone(),
-				p => p.end.clone(),
+				p if p.start.is_some() => p.start.as_ref(),
+				p => p.end.as_ref(),
 			},
 			_ => unimplemented!("Currently only Encounter:date is implemented"),
 		}
@@ -59,11 +59,11 @@ impl Resolve for resources::DiagnosticReport {
 	fn resolve(&self, param: &Self::Params) -> Option<impl Ord> {
 		match param {
 			DiagnosticReportSearchParameter::Date => match self.effective.as_ref()? {
-				resources::DiagnosticReportEffective::DateTime(dt) => Some(dt.clone()),
+				resources::DiagnosticReportEffective::DateTime(dt) => Some(dt),
 				resources::DiagnosticReportEffective::Period(p) if p.start.is_some() => {
-					p.start.clone()
+					p.start.as_ref()
 				}
-				resources::DiagnosticReportEffective::Period(p) => p.end.clone(),
+				resources::DiagnosticReportEffective::Period(p) => p.end.as_ref(),
 			},
 			_ => unimplemented!("Currently only DiagnosticReport:date is implemented"),
 		}
