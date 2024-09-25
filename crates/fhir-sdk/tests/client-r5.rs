@@ -29,7 +29,7 @@ use fhir_sdk::{
 		types::{CodeableConcept, HumanName, Identifier, Reference},
 	},
 	time::Month,
-	Date, DateTime,
+	Date, DateTime, Order, ResourceSearchParameterDefinition,
 };
 use futures::TryStreamExt;
 use uuid::Uuid;
@@ -301,7 +301,7 @@ async fn unpaged_ordered_inner() -> Result<()> {
 
 	let observations: Vec<Observation> = client
 		.search()
-		.order_by(ObservationSearchParameter::Date)
+		.order_by(ObservationSearchParameter::Date.order(Order::Ascending))
 		.send()
 		.await?
 		.try_collect()

@@ -3,7 +3,7 @@ use std::cmp::Ordering;
 use super::*;
 
 use async_trait::async_trait;
-use fhir_model::{Resolve, ResourceSearchParameterDefinition, SearchableResource};
+use fhir_model::{Order, OrderedSearchParameter, Resolve, SearchableResource};
 use ordered_stream::{FromStream, OrderedStream};
 
 /// An ordered FHIR search
@@ -13,7 +13,7 @@ pub struct OrderedSearch<S, O> {
 	search: S,
 
 	/// The parameter to order by
-	order_by: O,
+	order_by: OrderedSearchParameter<O>,
 }
 
 impl<S, O> Hash for OrderedSearch<S, O>
@@ -150,8 +150,11 @@ where
 	R: SearchableResource,
 {
 	/// Add an "_order" search parameter to the request. When executed, returns an [OrderedStream].
-	pub fn order_by(mut self, parameter: R::Params) -> OrderedSearch<Self, R::Params> {
-		self.params.add_raw("_sort", parameter.code());
+	pub fn order_by(
+		mut self,
+		parameter: OrderedSearchParameter<R::Params>,
+	) -> OrderedSearch<Self, R::Params> {
+		self.params.add_raw("_sort", parameter.to_string());
 
 		OrderedSearch { search: self, order_by: parameter }
 	}
@@ -161,7 +164,7 @@ where
 pub enum OrderedSearchResult<R: SearchableResource> {
 	/// A successful search result that has a value for the field(s) corresponding
 	/// to the _sort search parameter.
-	Orderable(R, R::Params),
+	Orderable(R, OrderedSearchParameter<R::Params>),
 
 	/// A search error
 	Err,
@@ -178,12 +181,12 @@ where
 	fn cmp(&self, other: &Self) -> Ordering {
 		match (self, other) {
 			(OrderedSearchResult::Orderable(r1, o), OrderedSearchResult::Orderable(r2, _)) => {
-				let Some(f1) = r1.resolve(&o) else {
-					return Ordering::Less;
+				let Some(f1) = r1.resolve(&o.0) else {
+					return flip(Ordering::Less, &o.1);
 				};
 
-				let Some(f2) = r2.resolve(&o) else {
-					return Ordering::Greater;
+				let Some(f2) = r2.resolve(&o.0) else {
+					return flip(Ordering::Greater, &o.1);
 				};
 
 				f1.cmp(&f2)
@@ -192,6 +195,13 @@ where
 			(OrderedSearchResult::Err, OrderedSearchResult::Orderable(_, _)) => Ordering::Less,
 			_ => Ordering::Equal,
 		}
+	}
+}
+
+fn flip(ordering: Ordering, order: &Order) -> Ordering {
+	match order {
+		Order::Ascending => ordering,
+		Order::Descending => ordering.reverse(),
 	}
 }
 
