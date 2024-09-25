@@ -101,3 +101,17 @@ impl Resolve for resources::Flag {
 		}
 	}
 }
+
+impl Resolve for resources::MedicationRequest {
+	fn resolve(&self, param: &Self::Params) -> Option<impl Ord> {
+		match param {
+			MedicationRequestSearchParameter::Date => self
+				.dosage_instruction
+				.iter()
+				.flatten()
+				.find_map(|di| di.timing.as_ref())
+				.map(|t| &t.event),
+			_ => unimplemented!("Currently only MedicationRequest:date is implemented"),
+		}
+	}
+}
