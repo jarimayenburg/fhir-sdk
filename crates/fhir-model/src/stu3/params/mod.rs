@@ -124,3 +124,12 @@ impl Resolve for resources::NutritionOrder {
 		}
 	}
 }
+
+impl Resolve for resources::DocumentReference {
+	fn resolve(&self, param: &Self::Params) -> Option<impl Ord> {
+		match param {
+			DocumentReferenceSearchParameter::Indexed => Some(&self.indexed),
+			_ => unimplemented!("Currently only DocumentReference:indexed is implemented"),
+		}
+	}
+}
