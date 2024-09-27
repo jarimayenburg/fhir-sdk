@@ -105,6 +105,7 @@ impl<E, R> Search<E, R> {
 impl<E, R> ExecutableSearch<E, R> for Search<E, R>
 where
 	E: SearchExecutor<R> + Send,
+	E::Stream: Send,
 	R: Send,
 {
 	type Value = E::Stream;
@@ -263,6 +264,7 @@ impl<V: 'static + Send> Client<V> {
 	pub fn search<R>(&self) -> Search<Self, R>
 	where
 		Self: SearchExecutor<R>,
+		<Self as SearchExecutor<R>>::Stream: Send,
 		R: Send,
 	{
 		Search::new().with_executor(self.clone())
