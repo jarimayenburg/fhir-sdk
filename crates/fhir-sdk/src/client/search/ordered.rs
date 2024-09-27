@@ -48,7 +48,7 @@ where
 impl<E, R> ExecutableSearch<E, R> for OrderedSearch<Search<E, R>, R::Params>
 where
 	R: SearchableResource + Resolve + Clone + Send + Eq + 'static,
-	R::Params: Clone + Eq + Send,
+	R::Params: Clone + Eq + Send + Sync,
 	E: SearchExecutor<R> + Send,
 	E::Stream: Send,
 {
@@ -59,7 +59,8 @@ where
 				dyn FnMut(
 						<E::Stream as Stream>::Item,
 					) -> (OrderedSearchResult<R>, <E::Stream as Stream>::Item)
-					+ Send,
+					+ Send
+					+ Sync,
 			>,
 			OrderedSearchResult<R>,
 		>,
@@ -82,7 +83,8 @@ where
 			dyn FnMut(
 					<E::Stream as Stream>::Item,
 				) -> (OrderedSearchResult<R>, <E::Stream as Stream>::Item)
-				+ Send,
+				+ Send
+				+ Sync,
 		> = Box::new(move |data| {
 			let ordering = get_ordering(&data);
 
