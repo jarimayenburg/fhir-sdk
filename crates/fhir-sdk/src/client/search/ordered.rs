@@ -47,10 +47,11 @@ where
 #[async_trait]
 impl<E, R> ExecutableSearch<E, R> for OrderedSearch<Search<E, R>, R::Params>
 where
-	R: SearchableResource + Resolve + Clone + Send + Eq + 'static,
+	R: SearchableResource + Resolve + Clone + Send + Sync + Eq + 'static,
 	R::Params: Clone + Eq + Send + Sync,
 	E: SearchExecutor<R> + Send,
-	E::Stream: Send,
+	E::Stream: Stream + Send,
+	<E::Stream as Stream>::Item: Clone + Sync,
 {
 	type Value = OrderedResourceStream<
 		FromStream<
