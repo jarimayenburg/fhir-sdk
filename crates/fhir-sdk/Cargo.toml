@@ -42,7 +42,7 @@ docs = []
 async-trait = {version = "0.1.68", optional = true}
 fhir-model = {path = "../fhir-model", version = "0.8.0", default-features = false}
 futures = {version = "0.3.28", optional = true}
-ordered-stream = {version = "0.2.0", optional = true}
+ordered-stream = { git = "https://github.com/formelio/ordered-stream.git", branch = "master", optional = true }
 pin-project-lite = {version = "0.2.14", optional = true}
 reqwest = {version = "0.11.16", features = ["json"], optional = true}
 serde = {version = "1.0.159", optional = true}
