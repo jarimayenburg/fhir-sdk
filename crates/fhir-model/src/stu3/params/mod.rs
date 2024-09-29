@@ -193,3 +193,18 @@ impl Resolve for resources::MedicationDispense {
 		}
 	}
 }
+
+impl Resolve for resources::MedicationStatement {
+	fn resolve(&self, param: &Self::Params) -> Option<impl Ord> {
+		match param {
+			MedicationStatementSearchParameter::Effective => match self.effective.as_ref()? {
+				resources::MedicationStatementEffective::DateTime(dt) => Some(dt),
+				resources::MedicationStatementEffective::Period(p) if p.start.is_some() => {
+					p.start.as_ref()
+				}
+				resources::MedicationStatementEffective::Period(p) => p.end.as_ref(),
+			},
+			_ => unimplemented!("Currently only MedicationStatement:effective is implemented"),
+		}
+	}
+}
