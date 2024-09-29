@@ -179,8 +179,17 @@ impl Resolve for resources::CarePlan {
 impl Resolve for resources::Appointment {
 	fn resolve(&self, param: &Self::Params) -> Option<impl Ord> {
 		match param {
-			ConditionSearchParameter::Date => self.start.as_ref(),
+			AppointmentSearchParameter::Date => self.start.as_ref(),
 			_ => unimplemented!("Currently only Appointment:date is implemented"),
+		}
+	}
+}
+
+impl Resolve for resources::MedicationDispense {
+	fn resolve(&self, param: &Self::Params) -> Option<impl Ord> {
+		match param {
+			MedicationDispenseSearchParameter::Whenhandedover => self.when_handed_over.as_ref(),
+			_ => unimplemented!("Currently only MedicationDispense:whenhandedover is implemented"),
 		}
 	}
 }
