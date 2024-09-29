@@ -230,3 +230,19 @@ impl Resolve for resources::Procedure {
 		}
 	}
 }
+
+impl Resolve for resources::ProcedureRequest {
+	fn resolve(&self, param: &Self::Params) -> Option<impl Ord> {
+		match param {
+			ProcedureRequestSearchParameter::Occurrence => match self.occurrence.as_ref()? {
+				resources::ProcedureRequestOccurrence::DateTime(dt) => Some(dt),
+				resources::ProcedureRequestOccurrence::Period(p) if p.start.is_some() => {
+					p.start.as_ref()
+				}
+				resources::ProcedureRequestOccurrence::Period(p) => p.end.as_ref(),
+				_ => unimplemented!("Currently only ProcedureRequest:occurrence of type dateTime or period are implemented"),
+			},
+			_ => unimplemented!("Currently only ProcedureRequest:occurrence  is implemented"),
+		}
+	}
+}
