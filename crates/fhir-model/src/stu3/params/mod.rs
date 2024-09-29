@@ -142,3 +142,12 @@ impl Resolve for resources::AllergyIntolerance {
 		}
 	}
 }
+
+impl Resolve for resources::Condition {
+	fn resolve(&self, param: &Self::Params) -> Option<impl Ord> {
+		match param {
+			ConditionSearchParameter::AssertedDate => self.asserted_date.as_ref(),
+			_ => unimplemented!("Currently only Condition:asserted-date is implemented"),
+		}
+	}
+}
