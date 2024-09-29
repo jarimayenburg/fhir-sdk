@@ -151,3 +151,27 @@ impl Resolve for resources::Condition {
 		}
 	}
 }
+
+impl Resolve for resources::CareTeam {
+	fn resolve(&self, param: &Self::Params) -> Option<impl Ord> {
+		match param {
+			CareTeamSearchParameter::Date => match self.period.as_ref()? {
+				p if p.start.is_some() => p.start.as_ref(),
+				p => p.end.as_ref(),
+			},
+			_ => unimplemented!("Currently only CareTeam:date is implemented"),
+		}
+	}
+}
+
+impl Resolve for resources::CarePlan {
+	fn resolve(&self, param: &Self::Params) -> Option<impl Ord> {
+		match param {
+			CarePlanSearchParameter::Date => match self.period.as_ref()? {
+				p if p.start.is_some() => p.start.as_ref(),
+				p => p.end.as_ref(),
+			},
+			_ => unimplemented!("Currently only CarePlan:date is implemented"),
+		}
+	}
+}
