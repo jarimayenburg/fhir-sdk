@@ -192,7 +192,7 @@ where
 					return flip(Ordering::Greater, &o.1);
 				};
 
-				f1.cmp(&f2)
+				flip(f1.cmp(&f2), &o.1)
 			}
 			(OrderedSearchResult::Orderable(_, _), _) => Ordering::Greater,
 			(OrderedSearchResult::Err, OrderedSearchResult::Orderable(_, _)) => Ordering::Less,
