@@ -208,3 +208,12 @@ impl Resolve for resources::MedicationStatement {
 		}
 	}
 }
+
+impl Resolve for resources::DeviceRequest {
+	fn resolve(&self, param: &Self::Params) -> Option<impl Ord> {
+		match param {
+			DeviceRequestSearchParameter::AuthoredOn => self.authored_on.as_ref(),
+			_ => unimplemented!("Currently only DeviceRequest:authored-on is implemented"),
+		}
+	}
+}
