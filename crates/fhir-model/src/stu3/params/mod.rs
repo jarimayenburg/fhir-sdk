@@ -217,3 +217,16 @@ impl Resolve for resources::DeviceRequest {
 		}
 	}
 }
+
+impl Resolve for resources::Procedure {
+	fn resolve(&self, param: &Self::Params) -> Option<impl Ord> {
+		match param {
+			ProcedureSearchParameter::Date => match self.performed.as_ref()? {
+				resources::ProcedurePerformed::DateTime(dt) => Some(dt),
+				resources::ProcedurePerformed::Period(p) if p.start.is_some() => p.start.as_ref(),
+				resources::ProcedurePerformed::Period(p) => p.end.as_ref(),
+			},
+			_ => unimplemented!("Currently only Procedure:date is implemented"),
+		}
+	}
+}
