@@ -147,7 +147,15 @@ impl Resolve for resources::Condition {
 	fn resolve(&self, param: &Self::Params) -> Option<impl Ord> {
 		match param {
 			ConditionSearchParameter::AssertedDate => self.asserted_date.as_ref(),
-			_ => unimplemented!("Currently only Condition:asserted-date is implemented"),
+			ConditionSearchParameter::OnsetDate => match self.onset.as_ref()? {
+				resources::ConditionOnset::DateTime(dt) => Some(dt),
+				resources::ConditionOnset::Period(p) if p.start.is_some() => p.start.as_ref(),
+				resources::ConditionOnset::Period(p) => p.end.as_ref(),
+				_ => None,
+			},
+			_ => unimplemented!(
+				"Currently only Condition:asserted-date and Condition:onset-date are implemented"
+			),
 		}
 	}
 }
