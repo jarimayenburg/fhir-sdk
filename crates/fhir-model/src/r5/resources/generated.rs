@@ -1679,7 +1679,7 @@ In some cases, the resource can no longer be found at the stated url, but the ur
 
 See guidance around (not) making local changes to elements [here](canonicalresource.html#localization). */
     #[serde(rename = "status")]
-    pub status: codes::PublicationStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -2069,7 +2069,7 @@ See guidance around (not) making local changes to elements [here](canonicalresou
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "priority")]
-    pub priority: Option<codes::RequestPriority>,
+    pub priority: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_priority")]
@@ -2630,7 +2630,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "type")]
-    pub r#type: Option<codes::ActionParticipantType>,
+    pub r#type: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_type")]
@@ -3354,7 +3354,7 @@ In some cases, the resource can no longer be found at the stated url, but the ur
 
 See guidance around (not) making local changes to elements [here](canonicalresource.html#localization). */
     #[serde(rename = "status")]
-    pub status: codes::PublicationStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -3512,7 +3512,7 @@ DEPRECATION NOTE: For consistency, implementations are encouraged to migrate to 
 
  */
     #[serde(rename = "type")]
-    pub r#type: codes::ExampleScenarioActorType,
+    pub r#type: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_type")]
@@ -3775,7 +3775,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  Allows filtering of administrable products that are appropriate for use versus not. */
     #[serde(rename = "status")]
-    pub status: codes::PublicationStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -4779,7 +4779,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  AllergyIntolerance should be used for the initial capture or recording of the individual's propensity to an adverse reaction to a substance.  If an AllergyIntolerance does not exist, then an adverse reaction should be recorded as an AllergyIntolerance. If an AllergyIntolerance does exist and the substance was given, then an adverse reaction should be recorded as an AdverseEvent due to the aberrant workflow. */
     #[serde(rename = "actuality")]
-    pub actuality: codes::AdverseEventActuality,
+    pub actuality: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_actuality")]
@@ -7440,7 +7440,7 @@ The data type is CodeableConcept because clinicalStatus has some clinical judgme
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "category")]
-    pub category: Vec<Option<codes::AllergyIntoleranceCategory>>,
+    pub category: Vec<Option<String>>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     #[serde(rename = "_category")]
@@ -7454,7 +7454,7 @@ The data type is CodeableConcept because clinicalStatus has some clinical judgme
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "criticality")]
-    pub criticality: Option<codes::AllergyIntoleranceCriticality>,
+    pub criticality: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_criticality")]
@@ -8083,7 +8083,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "severity")]
-    pub severity: Option<codes::AllergyIntoleranceSeverity>,
+    pub severity: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_severity")]
@@ -8268,7 +8268,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
 This element is labeled as a modifier because the status contains the code entered-in-error that mark the Appointment as not currently valid. */
     #[serde(rename = "status")]
-    pub status: codes::AppointmentStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -9288,7 +9288,7 @@ This value SHALL be the same when creating an AppointmentResponse so that they c
 
  */
     #[serde(rename = "status")]
-    pub status: codes::ParticipationStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -10747,7 +10747,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "workflowStatus")]
-    pub workflow_status: Option<codes::ArtifactAssessmentWorkflowStatus>,
+    pub workflow_status: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_workflowStatus")]
@@ -10761,7 +10761,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "disposition")]
-    pub disposition: Option<codes::ArtifactAssessmentDisposition>,
+    pub disposition: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_disposition")]
@@ -11003,7 +11003,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "informationType")]
-    pub information_type: Option<codes::ArtifactAssessmentInformationType>,
+    pub information_type: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_informationType")]
@@ -11409,7 +11409,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "action")]
-    pub action: Option<codes::AuditEventAction>,
+    pub action: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_action")]
@@ -11423,7 +11423,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "severity")]
-    pub severity: Option<codes::AuditEventSeverity>,
+    pub severity: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_severity")]
@@ -14620,7 +14620,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  */
     #[serde(rename = "status")]
-    pub status: codes::BiologicallyDerivedProductDispense,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -16965,7 +16965,7 @@ In some cases, the resource can no longer be found at the stated url, but the ur
 
 See guidance around (not) making local changes to elements [here](canonicalresource.html#localization). */
     #[serde(rename = "status")]
-    pub status: codes::PublicationStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -17121,7 +17121,7 @@ DEPRECATION NOTE: For consistency, implementations are encouraged to migrate to 
 
  */
     #[serde(rename = "kind")]
-    pub kind: codes::CapabilityStatementKind,
+    pub kind: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_kind")]
@@ -17193,7 +17193,7 @@ A capability statement that imports another CapabilityStatement automatically in
 
  Servers may implement multiple versions (see [Managing Multiple Versions](versioning.html), and the [$versions](capabilitystatement-operation-versions.html) operation). If they do, and the CapabilityStatement is requested from the server, then this fhirVersion will be either the version requested, or the server's default version. */
     #[serde(rename = "fhirVersion")]
-    pub fhir_version: codes::FHIRVersion,
+    pub fhir_version: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_fhirVersion")]
@@ -17665,7 +17665,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  */
     #[serde(rename = "mode")]
-    pub mode: codes::RestfulCapabilityMode,
+    pub mode: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_mode")]
@@ -18023,7 +18023,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "versioning")]
-    pub versioning: Option<codes::ResourceVersionPolicy>,
+    pub versioning: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_versioning")]
@@ -18079,7 +18079,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "conditionalRead")]
-    pub conditional_read: Option<codes::ConditionalReadStatus>,
+    pub conditional_read: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_conditionalRead")]
@@ -18121,7 +18121,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "conditionalDelete")]
-    pub conditional_delete: Option<codes::ConditionalDeleteStatus>,
+    pub conditional_delete: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_conditionalDelete")]
@@ -18135,7 +18135,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "referencePolicy")]
-    pub reference_policy: Vec<Option<codes::ReferenceHandlingPolicy>>,
+    pub reference_policy: Vec<Option<String>>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     #[serde(rename = "_referencePolicy")]
@@ -18392,7 +18392,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  While this can be looked up from the definition, it is included here as a convenience for systems that autogenerate a query interface based on the server capability statement.  It SHALL be the same as the type in the search parameter definition. */
     #[serde(rename = "type")]
-    pub r#type: codes::SearchParamType,
+    pub r#type: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_type")]
@@ -18853,7 +18853,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  */
     #[serde(rename = "mode")]
-    pub mode: codes::EventCapabilityMode,
+    pub mode: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_mode")]
@@ -18933,7 +18933,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  */
     #[serde(rename = "mode")]
-    pub mode: codes::DocumentMode,
+    pub mode: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_mode")]
@@ -20595,7 +20595,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "status")]
-    pub status: Option<codes::CareTeamStatus>,
+    pub status: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -21345,7 +21345,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
 This element is labeled as a modifier because the status contains the code entered-in-error that marks the charge item as not currently valid. */
     #[serde(rename = "status")]
-    pub status: codes::ChargeItemStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -22667,7 +22667,7 @@ In some cases, the resource can no longer be found at the stated url, but the ur
 
 See guidance around (not) making local changes to elements [here](canonicalresource.html#localization). */
     #[serde(rename = "status")]
-    pub status: codes::PublicationStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -23507,7 +23507,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
 See guidance around (not) making local changes to elements [here](canonicalresource.html#localization). */
     #[serde(rename = "status")]
-    pub status: codes::PublicationStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -25133,7 +25133,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  */
     #[serde(rename = "type")]
-    pub r#type: codes::RelatedArtifactTypeExpanded,
+    pub r#type: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_type")]
@@ -26817,7 +26817,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  */
     #[serde(rename = "use")]
-    pub r#use: codes::Use,
+    pub r#use: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_use")]
@@ -31126,7 +31126,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  */
     #[serde(rename = "use")]
-    pub r#use: codes::Use,
+    pub r#use: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_use")]
@@ -31204,7 +31204,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  The resource may be used to indicate that the Claim/Preauthorization/Pre-determination has been received but processing has not begun (queued); that it has been processed and one or more errors have been detected (error); no errors were detected and some of the adjudication processing has been performed (partial); or all of the adjudication processing has completed without errors (complete). */
     #[serde(rename = "outcome")]
-    pub outcome: codes::RemittanceOutcome,
+    pub outcome: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_outcome")]
@@ -34701,7 +34701,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  This element is labeled as a modifier because the status contains the code entered-in-error that marks the clinical impression as not currently valid. */
     #[serde(rename = "status")]
-    pub status: codes::EventStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -35619,7 +35619,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  */
     #[serde(rename = "type")]
-    pub r#type: codes::ClinicalUseDefinitionType,
+    pub r#type: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_type")]
@@ -37326,7 +37326,7 @@ In some cases, the resource can no longer be found at the stated url, but the ur
 
 See guidance around (not) making local changes to elements [here](canonicalresource.html#localization). */
     #[serde(rename = "status")]
-    pub status: codes::PublicationStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -37646,7 +37646,7 @@ See guidance around (not) making local changes to elements [here](canonicalresou
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "hierarchyMeaning")]
-    pub hierarchy_meaning: Option<codes::CodeSystemHierarchyMeaning>,
+    pub hierarchy_meaning: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_hierarchyMeaning")]
@@ -37688,7 +37688,7 @@ Most code systems occasionally refine the displays defined for concepts between 
 
  */
     #[serde(rename = "content")]
-    pub content: codes::CodeSystemContentMode,
+    pub content: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_content")]
@@ -37920,7 +37920,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  */
     #[serde(rename = "operator")]
-    pub operator: Vec<Option<codes::FilterOperator>>,
+    pub operator: Vec<Option<String>>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     #[serde(rename = "_operator")]
@@ -38040,7 +38040,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  */
     #[serde(rename = "type")]
-    pub r#type: codes::PropertyType,
+    pub r#type: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_type")]
@@ -38661,7 +38661,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  This element is labeled as a modifier because the status contains the codes aborted and entered-in-error that mark the communication as not currently valid. */
     #[serde(rename = "status")]
-    pub status: codes::EventStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -38703,7 +38703,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "priority")]
-    pub priority: Option<codes::RequestPriority>,
+    pub priority: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_priority")]
@@ -39878,7 +39878,7 @@ One exception to this is that the granularity of CommunicationRequest.intent is 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "priority")]
-    pub priority: Option<codes::RequestPriority>,
+    pub priority: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_priority")]
@@ -41163,7 +41163,7 @@ In some cases, the resource can no longer be found at the stated url, but the ur
 
 See guidance around (not) making local changes to elements [here](canonicalresource.html#localization). */
     #[serde(rename = "status")]
-    pub status: codes::PublicationStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -41277,7 +41277,7 @@ See guidance around (not) making local changes to elements [here](canonicalresou
 
  Only the specification can define the compartments that can exist. Servers can choose to support them. */
     #[serde(rename = "code")]
-    pub code: codes::CompartmentType,
+    pub code: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_code")]
@@ -41670,7 +41670,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
 Some reporting work flows require that the original narrative of a final document never be altered; instead, only new narrative can be added. The composition resource has no explicit status for explicitly noting whether this business rule is in effect. This would be handled by an extension if required. */
     #[serde(rename = "status")]
-    pub status: codes::CompositionStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -43069,7 +43069,7 @@ In some cases, the resource can no longer be found at the stated url, but the ur
 
 See guidance around (not) making local changes to elements [here](canonicalresource.html#localization). */
     #[serde(rename = "status")]
-    pub status: codes::PublicationStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -43593,7 +43593,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  */
     #[serde(rename = "type")]
-    pub r#type: codes::ConceptMapPropertyType,
+    pub r#type: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_type")]
@@ -43715,7 +43715,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  When the source or target is not content defined by FHIR, some additional application logic might be required to map from the FHIR Datatype to the externally defined content */
     #[serde(rename = "type")]
-    pub r#type: codes::ConceptMapAttributeType,
+    pub r#type: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_type")]
@@ -44120,7 +44120,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  This element is labeled as a modifier because it may indicate that there is no mapping. */
     #[serde(rename = "relationship")]
-    pub relationship: codes::ConceptMapRelationship,
+    pub relationship: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_relationship")]
@@ -44528,7 +44528,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  */
     #[serde(rename = "mode")]
-    pub mode: codes::ConceptMapGroupUnmappedMode,
+    pub mode: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_mode")]
@@ -44584,7 +44584,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "relationship")]
-    pub relationship: Option<codes::ConceptMapRelationship>,
+    pub relationship: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_relationship")]
@@ -45811,7 +45811,7 @@ In some cases, the resource can no longer be found at the stated url, but the ur
 
 See guidance around (not) making local changes to elements [here](canonicalresource.html#localization). */
     #[serde(rename = "status")]
-    pub status: codes::PublicationStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -46428,7 +46428,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  */
     #[serde(rename = "type")]
-    pub r#type: codes::ConditionPreconditionType,
+    pub r#type: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_type")]
@@ -46582,7 +46582,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  */
     #[serde(rename = "purpose")]
-    pub purpose: codes::ConditionQuestionnairePurpose,
+    pub purpose: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_purpose")]
@@ -46911,7 +46911,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  This element is labeled as a modifier because the status contains the codes rejected and entered-in-error that mark the Consent as not currently valid. */
     #[serde(rename = "status")]
-    pub status: codes::ConsentState,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -47121,7 +47121,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "decision")]
-    pub decision: Option<codes::ConsentProvisionType>,
+    pub decision: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_decision")]
@@ -48757,7 +48757,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  */
     #[serde(rename = "meaning")]
-    pub meaning: codes::ConsentDataMeaning,
+    pub meaning: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_meaning")]
@@ -48995,7 +48995,7 @@ Comments - There may be different contract instances that have the same identifi
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "status")]
-    pub status: Option<codes::ContractStatus>,
+    pub status: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -49969,7 +49969,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  */
     #[serde(rename = "publicationStatus")]
-    pub publication_status: codes::ContractPublicationStatus,
+    pub publication_status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_publicationStatus")]
@@ -55411,7 +55411,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  */
     #[serde(rename = "purpose")]
-    pub purpose: Vec<Option<codes::EligibilityRequestPurpose>>,
+    pub purpose: Vec<Option<String>>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     #[serde(rename = "_purpose")]
@@ -57008,7 +57008,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  */
     #[serde(rename = "purpose")]
-    pub purpose: Vec<Option<codes::EligibilityResponsePurpose>>,
+    pub purpose: Vec<Option<String>>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     #[serde(rename = "_purpose")]
@@ -57098,7 +57098,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  The resource may be used to indicate that: the request has been held (queued) for processing; that it has been processed and errors found (error); that no errors were found and that some of the adjudication has been undertaken (partial) or that all of the adjudication has been undertaken (complete). */
     #[serde(rename = "outcome")]
-    pub outcome: codes::ClaimProcessingCodes,
+    pub outcome: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_outcome")]
@@ -58460,7 +58460,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  This element is labeled as a modifier because the status contains the code entered-in-error that marks the issue as not currently valid. */
     #[serde(rename = "status")]
-    pub status: codes::DetectedIssueStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -58502,7 +58502,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "severity")]
-    pub severity: Option<codes::DetectedIssueSeverity>,
+    pub severity: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_severity")]
@@ -59542,7 +59542,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "status")]
-    pub status: Option<codes::FHIRDeviceStatus>,
+    pub status: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -60130,7 +60130,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "entryType")]
-    pub entry_type: Option<codes::UDIEntryType>,
+    pub entry_type: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_entryType")]
@@ -60210,7 +60210,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  */
     #[serde(rename = "type")]
-    pub r#type: codes::DeviceNameType,
+    pub r#type: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_type")]
@@ -61817,9 +61817,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "productionIdentifierInUDI")]
-    pub production_identifier_in_udi: Vec<
-        Option<codes::DeviceProductionIdentifierInUDI>,
-    >,
+    pub production_identifier_in_udi: Vec<Option<String>>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     #[serde(rename = "_productionIdentifierInUDI")]
@@ -62226,7 +62224,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  */
     #[serde(rename = "type")]
-    pub r#type: codes::DeviceRegulatoryIdentifierType,
+    pub r#type: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_type")]
@@ -62381,7 +62379,7 @@ RegisteredName | UserFriendlyName | PatientReportedName.
 
  */
     #[serde(rename = "type")]
-    pub r#type: codes::DeviceNameType,
+    pub r#type: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_type")]
@@ -63661,7 +63659,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "scope")]
-    pub scope: Option<codes::DeviceCorrectiveActionScope>,
+    pub scope: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_scope")]
@@ -63964,7 +63962,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  This element is labeled as a modifier because the status contains codes that mark the resource as not currently valid. */
     #[serde(rename = "status")]
-    pub status: codes::DeviceDispenseStatusCodes,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -65132,7 +65130,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "operationalStatus")]
-    pub operational_status: Option<codes::DeviceMetricOperationalStatus>,
+    pub operational_status: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_operationalStatus")]
@@ -65158,7 +65156,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  */
     #[serde(rename = "category")]
-    pub category: codes::DeviceMetricCategory,
+    pub category: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_category")]
@@ -65331,7 +65329,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "type")]
-    pub r#type: Option<codes::DeviceMetricCalibrationType>,
+    pub r#type: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_type")]
@@ -65345,7 +65343,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "state")]
-    pub state: Option<codes::DeviceMetricCalibrationState>,
+    pub state: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_state")]
@@ -65612,7 +65610,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "priority")]
-    pub priority: Option<codes::RequestPriority>,
+    pub priority: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_priority")]
@@ -66663,7 +66661,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
 This element is labeled as a modifier because the status contains the codes that mark the statement as not currently valid. */
     #[serde(rename = "status")]
-    pub status: codes::DeviceUsageStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -67535,7 +67533,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  */
     #[serde(rename = "status")]
-    pub status: codes::DiagnosticReportStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -69036,7 +69034,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
 This element is labeled as a modifier because the status contains the codes that mark the document or reference as not currently valid. */
     #[serde(rename = "status")]
-    pub status: codes::DocumentReferenceStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -69050,7 +69048,7 @@ This element is labeled as a modifier because the status contains the codes that
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "docStatus")]
-    pub doc_status: Option<codes::CompositionStatus>,
+    pub doc_status: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_docStatus")]
@@ -72148,7 +72146,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "status")]
-    pub status: Option<codes::EncounterLocationStatus>,
+    pub status: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -72958,7 +72956,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  This element is labeled as a modifier because the status contains codes that mark the endpoint as not currently valid. Temporary downtimes or other unexpected short-term changes in availability would not be represented in this property. */
     #[serde(rename = "status")]
-    pub status: codes::EndpointStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -74319,7 +74317,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  This element is labeled as a modifier because the status contains codes that mark the episode as not currently valid. */
     #[serde(rename = "status")]
-    pub status: codes::EpisodeOfCareStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -74613,7 +74611,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  */
     #[serde(rename = "status")]
-    pub status: codes::EpisodeOfCareStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -75298,7 +75296,7 @@ In some cases, the resource can no longer be found at the stated url, but the ur
 
 See guidance around (not) making local changes to elements [here](canonicalresource.html#localization). */
     #[serde(rename = "status")]
-    pub status: codes::PublicationStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -75977,7 +75975,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
 See guidance around (not) making local changes to elements [here](canonicalresource.html#localization). */
     #[serde(rename = "status")]
-    pub status: codes::PublicationStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -77436,7 +77434,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "handling")]
-    pub handling: Option<codes::EvidenceVariableHandling>,
+    pub handling: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_handling")]
@@ -77879,7 +77877,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
 See guidance around (not) making local changes to elements [here](canonicalresource.html#localization). */
     #[serde(rename = "status")]
-    pub status: codes::PublicationStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -78563,7 +78561,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  If this document appends another document, then the document cannot be fully understood without also accessing the referenced document. */
     #[serde(rename = "code")]
-    pub code: codes::ReportRelationshipType,
+    pub code: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_code")]
@@ -78873,7 +78871,7 @@ If the section has content (instead of sub-sections), the section.code does not 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "mode")]
-    pub mode: Option<codes::ListMode>,
+    pub mode: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_mode")]
@@ -79413,7 +79411,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
 See guidance around (not) making local changes to elements [here](canonicalresource.html#localization). */
     #[serde(rename = "status")]
-    pub status: codes::PublicationStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -79721,7 +79719,7 @@ See guidance around (not) making local changes to elements [here](canonicalresou
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "handling")]
-    pub handling: Option<codes::EvidenceVariableHandling>,
+    pub handling: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_handling")]
@@ -80566,7 +80564,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  */
     #[serde(rename = "code")]
-    pub code: codes::CharacteristicCombination,
+    pub code: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_code")]
@@ -81190,7 +81188,7 @@ In some cases, the resource can no longer be found at the stated url, but the ur
 
 See guidance around (not) making local changes to elements [here](canonicalresource.html#localization). */
     #[serde(rename = "status")]
-    pub status: codes::PublicationStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -81526,7 +81524,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  */
     #[serde(rename = "type")]
-    pub r#type: codes::ExampleScenarioActorType,
+    pub r#type: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_type")]
@@ -82774,7 +82772,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  This element is labeled as a modifier because the status contains codes that mark the resource as not currently valid. */
     #[serde(rename = "status")]
-    pub status: codes::ExplanationOfBenefitStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -82812,7 +82810,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  */
     #[serde(rename = "use")]
-    pub r#use: codes::Use,
+    pub r#use: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_use")]
@@ -89723,7 +89721,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  This element is labeled as a modifier because the status contains codes that mark the resource as not currently valid. */
     #[serde(rename = "status")]
-    pub status: codes::FamilyHistoryStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -90803,7 +90801,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  This element is labeled as a modifier because the status contains codes that mark the resource as not currently valid. */
     #[serde(rename = "status")]
-    pub status: codes::FlagStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -91366,7 +91364,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "status")]
-    pub status: Option<codes::FormularyItemStatusCodes>,
+    pub status: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -91551,7 +91549,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  */
     #[serde(rename = "status")]
-    pub status: codes::GenomicStudyStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -93579,7 +93577,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  This element is labeled as a modifier because the lifecycleStatus contains codes that mark the resource as not currently valid. */
     #[serde(rename = "lifecycleStatus")]
-    pub lifecycle_status: codes::GoalLifecycleStatus,
+    pub lifecycle_status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_lifecycleStatus")]
@@ -94531,7 +94529,7 @@ In some cases, the resource can no longer be found at the stated url, but the ur
 
 See guidance around (not) making local changes to elements [here](canonicalresource.html#localization). */
     #[serde(rename = "status")]
-    pub status: codes::PublicationStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -94876,7 +94874,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  */
     #[serde(rename = "type")]
-    pub r#type: codes::FHIRTypes,
+    pub r#type: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_type")]
@@ -95142,7 +95140,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  All conditional rules are evaluated; if they are true, then the rules are evaluated. */
     #[serde(rename = "use")]
-    pub r#use: codes::GraphCompartmentUse,
+    pub r#use: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_use")]
@@ -95154,7 +95152,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  */
     #[serde(rename = "rule")]
-    pub rule: codes::GraphCompartmentRule,
+    pub rule: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_rule")]
@@ -95166,7 +95164,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  */
     #[serde(rename = "code")]
-    pub code: codes::CompartmentType,
+    pub code: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_code")]
@@ -95363,7 +95361,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  Group members SHALL be of the appropriate resource type (Patient for person or animal; or Practitioner, PractitionerRole, Device, CareTeam, HealthcareService, Location, Organization, RelatedPerson, or Specimen for the other types.), or a Group of the resources of the appropriate type. */
     #[serde(rename = "type")]
-    pub r#type: codes::GroupType,
+    pub r#type: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_type")]
@@ -95378,7 +95376,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  */
     #[serde(rename = "membership")]
-    pub membership: codes::GroupMembershipBasis,
+    pub membership: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_membership")]
@@ -96225,7 +96223,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  This element is labeled as a modifier because the status contains codes that mark the resource as not currently valid. */
     #[serde(rename = "status")]
-    pub status: codes::GuidanceResponseStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -97829,7 +97827,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  Unknown does not represent "other" - one of the defined statuses must apply.  Unknown is used when the authoring system is not sure what the current status is. */
     #[serde(rename = "status")]
-    pub status: codes::ImagingSelectionStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -98938,7 +98936,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  See [DICOM PS3.3 C.10.5.1.2](https://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.10.5.html#sect_C.10.5.1.2). */
     #[serde(rename = "regionType")]
-    pub region_type: codes::ImagingSelection2DGraphicType,
+    pub region_type: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_regionType")]
@@ -99019,7 +99017,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  See [DICOM PS3.3 C.18.9.1.2](http://dicom.nema.org/medical/dicom/current/output/chtml/part03/sect_C.18.9.html#sect_C.18.9.1.2). */
     #[serde(rename = "regionType")]
-    pub region_type: codes::ImagingSelection3DGraphicType,
+    pub region_type: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_regionType")]
@@ -99186,7 +99184,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  Unknown does not represent "other" - one of the defined statuses must apply.  Unknown is used when the authoring system is not sure what the current status is. */
     #[serde(rename = "status")]
-    pub status: codes::ImagingStudyStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -103334,7 +103332,7 @@ In some cases, the resource can no longer be found at the stated url, but the ur
 
 See guidance around (not) making local changes to elements [here](canonicalresource.html#localization). */
     #[serde(rename = "status")]
-    pub status: codes::PublicationStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -103506,7 +103504,7 @@ DEPRECATION NOTE: For consistency, implementations are encouraged to migrate to 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "license")]
-    pub license: Option<codes::SPDXLicense>,
+    pub license: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_license")]
@@ -103518,7 +103516,7 @@ DEPRECATION NOTE: For consistency, implementations are encouraged to migrate to 
 
  Most implementation guides target a single version - e.g. they describe how to use a particular version, and the profiles and examples etc. are valid for that version. But some implementation guides describe how to use multiple different versions of FHIR to solve the same problem, or in concert with each other. Typically, the requirement to support multiple versions arises as implementation matures and different implementation communities are stuck at different versions by regulation or market dynamics. */
     #[serde(rename = "fhirVersion")]
-    pub fhir_version: Vec<Option<codes::FHIRVersion>>,
+    pub fhir_version: Vec<Option<String>>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     #[serde(rename = "_fhirVersion")]
@@ -104147,7 +104145,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "fhirVersion")]
-    pub fhir_version: Vec<Option<codes::FHIRVersion>>,
+    pub fhir_version: Vec<Option<String>>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     #[serde(rename = "_fhirVersion")]
@@ -104368,7 +104366,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  */
     #[serde(rename = "generation")]
-    pub generation: codes::GuidePageGeneration,
+    pub generation: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_generation")]
@@ -105131,7 +105129,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  Allows filtering of ingredient that are appropriate for use versus not. */
     #[serde(rename = "status")]
-    pub status: codes::PublicationStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -105431,7 +105429,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "role")]
-    pub role: Option<codes::IngredientManufacturerRole>,
+    pub role: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_role")]
@@ -106108,7 +106106,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "status")]
-    pub status: Option<codes::PublicationStatus>,
+    pub status: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -107647,7 +107645,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  */
     #[serde(rename = "status")]
-    pub status: codes::InventoryItemStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -109076,7 +109074,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  */
     #[serde(rename = "status")]
-    pub status: codes::InventoryReportStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -109088,7 +109086,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  */
     #[serde(rename = "countType")]
-    pub count_type: codes::InventoryCountType,
+    pub count_type: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_countType")]
@@ -109719,7 +109717,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  */
     #[serde(rename = "status")]
-    pub status: codes::InvoiceStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -110871,7 +110869,7 @@ In some cases, the resource can no longer be found at the stated url, but the ur
 
 See guidance around (not) making local changes to elements [here](canonicalresource.html#localization). */
     #[serde(rename = "status")]
-    pub status: codes::PublicationStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -111703,7 +111701,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  */
     #[serde(rename = "type")]
-    pub r#type: codes::LinkageType,
+    pub r#type: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_type")]
@@ -111910,7 +111908,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  This element is labeled as a modifier because the status contains codes that mark the resource as not currently valid. */
     #[serde(rename = "status")]
-    pub status: codes::ListStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -111922,7 +111920,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  This element is labeled as a modifier because a change list must not be misunderstood as a complete list. */
     #[serde(rename = "mode")]
-    pub mode: codes::ListMode,
+    pub mode: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_mode")]
@@ -112600,7 +112598,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "status")]
-    pub status: Option<codes::LocationStatus>,
+    pub status: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -112670,7 +112668,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "mode")]
-    pub mode: Option<codes::LocationMode>,
+    pub mode: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_mode")]
@@ -113245,7 +113243,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  Allows filtering of manufactured items that are appropriate for use versus not. */
     #[serde(rename = "status")]
-    pub status: codes::PublicationStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -114131,7 +114129,7 @@ In some cases, the resource can no longer be found at the stated url, but the ur
 
 See guidance around (not) making local changes to elements [here](canonicalresource.html#localization). */
     #[serde(rename = "status")]
-    pub status: codes::PublicationStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -114173,7 +114171,7 @@ See guidance around (not) making local changes to elements [here](canonicalresou
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "basis")]
-    pub basis: Option<codes::FHIRTypes>,
+    pub basis: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_basis")]
@@ -115018,7 +115016,7 @@ LinkIds can have whitespaces and slashes by design. Tooling should not rely on l
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "basis")]
-    pub basis: Option<codes::FHIRTypes>,
+    pub basis: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_basis")]
@@ -116030,7 +116028,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  This element is labeled as a modifier because the status contains codes that mark the resource as not currently valid. */
     #[serde(rename = "status")]
-    pub status: codes::MeasureReportStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -116042,7 +116040,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  Data-exchange reports are used only to communicate data-of-interest for a measure. They do not necessarily include all the data for a particular subject or population, but they may. */
     #[serde(rename = "type")]
-    pub r#type: codes::MeasureReportType,
+    pub r#type: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_type")]
@@ -116056,7 +116054,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "dataUpdateType")]
-    pub data_update_type: Option<codes::SubmitDataUpdateType>,
+    pub data_update_type: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_dataUpdateType")]
@@ -118311,7 +118309,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "status")]
-    pub status: Option<codes::MedicationStatusCodes>,
+    pub status: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -118913,7 +118911,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  This element is labeled as a modifier because the status contains codes that mark the resource as not currently valid. */
     #[serde(rename = "status")]
-    pub status: codes::MedicationAdministrationStatusCodes,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -121529,7 +121527,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "status")]
-    pub status: Option<codes::MedicationKnowledgeStatusCodes>,
+    pub status: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -124294,7 +124292,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
 Clinical decision support systems should take the status into account when determining which medications to include in their algorithms. */
     #[serde(rename = "status")]
-    pub status: codes::MedicationRequestStatusCodes,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -124338,7 +124336,7 @@ An instance-order is an instantiation of a request or order and may be used to p
 
 This element is labeled as a modifier because the intent alters when and how the resource is actually applicable. */
     #[serde(rename = "intent")]
-    pub intent: codes::MedicationRequestIntentCodes,
+    pub intent: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_intent")]
@@ -124366,7 +124364,7 @@ This element is labeled as a modifier because the intent alters when and how the
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "priority")]
-    pub priority: Option<codes::RequestPriority>,
+    pub priority: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_priority")]
@@ -126181,7 +126179,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
 This element is labeled as a modifier because the status contains codes that mark the resource as not currently valid. */
     #[serde(rename = "status")]
-    pub status: codes::MedicationStatementStatusCodes,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -128855,7 +128853,7 @@ In some cases, the resource can no longer be found at the stated url, but the ur
 
 See guidance around (not) making local changes to elements [here](canonicalresource.html#localization). */
     #[serde(rename = "status")]
-    pub status: codes::PublicationStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -129053,7 +129051,7 @@ DEPRECATION NOTE: For consistency, implementations are encouraged to migrate to 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "category")]
-    pub category: Option<codes::MessageSignificanceCategory>,
+    pub category: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_category")]
@@ -129081,7 +129079,7 @@ DEPRECATION NOTE: For consistency, implementations are encouraged to migrate to 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "responseRequired")]
-    pub response_required: Option<codes::MessageheaderResponseRequest>,
+    pub response_required: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_responseRequired")]
@@ -130559,7 +130557,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  This is a generic response to the request message. Specific data for the response will be found in MessageHeader.focus. */
     #[serde(rename = "code")]
-    pub code: codes::ResponseType,
+    pub code: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_code")]
@@ -130810,7 +130808,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "type")]
-    pub r#type: Option<codes::SequenceType>,
+    pub r#type: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_type")]
@@ -131507,7 +131505,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "orientation")]
-    pub orientation: Option<codes::OrientationType>,
+    pub orientation: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_orientation")]
@@ -131521,7 +131519,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "strand")]
-    pub strand: Option<codes::StrandType>,
+    pub strand: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_strand")]
@@ -131935,7 +131933,7 @@ In some cases, the resource can no longer be found at the stated url, but the ur
 
 See guidance around (not) making local changes to elements [here](canonicalresource.html#localization). */
     #[serde(rename = "status")]
-    pub status: codes::PublicationStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -131947,7 +131945,7 @@ See guidance around (not) making local changes to elements [here](canonicalresou
 
  */
     #[serde(rename = "kind")]
-    pub kind: codes::NamingSystemType,
+    pub kind: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_kind")]
@@ -132403,7 +132401,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  Different identifier types may be used in different types of communications (OIDs for v3, URIs for FHIR, etc.).  Other includes RUIDs from v3, standard v2 code name strings, etc. Preferred identifiers for the same identifier type SHOULD NOT overlap by period. */
     #[serde(rename = "type")]
-    pub r#type: codes::NamingSystemIdentifierType,
+    pub r#type: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_type")]
@@ -132686,7 +132684,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
 This element is labeled as a modifier because the status contains codes that mark the resource as not currently valid. */
     #[serde(rename = "status")]
-    pub status: codes::EventStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -134122,7 +134120,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "priority")]
-    pub priority: Option<codes::RequestPriority>,
+    pub priority: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_priority")]
@@ -136026,7 +136024,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  Unknown does not represent "other" - one of the defined statuses must apply.  Unknown is used when the authoring system is not sure what the current status is. */
     #[serde(rename = "status")]
-    pub status: codes::NutritionProductStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -137541,7 +137539,7 @@ Reflex | Repeat | Re-run.
 
  */
     #[serde(rename = "type")]
-    pub r#type: codes::TriggeredBytype,
+    pub r#type: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_type")]
@@ -139230,7 +139228,7 @@ Unknown does not represent "other" - one of the defined statuses must apply. Unk
 
 See guidance around (not) making local changes to elements [here](canonicalresource.html#localization). */
     #[serde(rename = "status")]
-    pub status: codes::PublicationStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -139520,7 +139518,7 @@ See guidance around (not) making local changes to elements [here](canonicalresou
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "permittedDataType")]
-    pub permitted_data_type: Vec<Option<codes::ObservationDataType>>,
+    pub permitted_data_type: Vec<Option<String>>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     #[serde(rename = "_permittedDataType")]
@@ -140002,7 +140000,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "rangeCategory")]
-    pub range_category: Option<codes::ObservationRangeCategory>,
+    pub range_category: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_rangeCategory")]
@@ -140230,7 +140228,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "permittedDataType")]
-    pub permitted_data_type: Vec<Option<codes::ObservationDataType>>,
+    pub permitted_data_type: Vec<Option<String>>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     #[serde(rename = "_permittedDataType")]
@@ -140493,7 +140491,7 @@ In some cases, the resource can no longer be found at the stated url, but the ur
 
 Unknown does not represent 'other' - one of the defined statuses must apply.  Unknown is used when the authoring system is not sure what the current status is. */
     #[serde(rename = "status")]
-    pub status: codes::PublicationStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -140505,7 +140503,7 @@ Unknown does not represent 'other' - one of the defined statuses must apply.  Un
 
  Named queries are invoked differently, and have different capabilities. */
     #[serde(rename = "kind")]
-    pub kind: codes::OperationKind,
+    pub kind: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_kind")]
@@ -140723,7 +140721,7 @@ DEPRECATION NOTE: For consistency, implementations are encouraged to migrate to 
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "resource")]
-    pub resource: Vec<Option<codes::FHIRTypes>>,
+    pub resource: Vec<Option<String>>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     #[serde(rename = "_resource")]
@@ -140958,7 +140956,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  If a parameter name is used for both an input and an output parameter, the parameter should be defined twice. */
     #[serde(rename = "use")]
-    pub r#use: codes::OperationParameterUse,
+    pub r#use: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_use")]
@@ -140972,7 +140970,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "scope")]
-    pub scope: Vec<Option<codes::OperationParameterScope>>,
+    pub scope: Vec<Option<String>>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     #[serde(rename = "_scope")]
@@ -141024,7 +141022,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "type")]
-    pub r#type: Option<codes::FHIRTypes>,
+    pub r#type: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_type")]
@@ -141038,7 +141036,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "allowedType")]
-    pub allowed_type: Vec<Option<codes::FHIRTypes>>,
+    pub allowed_type: Vec<Option<String>>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     #[serde(rename = "_allowedType")]
@@ -141066,7 +141064,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "searchType")]
-    pub search_type: Option<codes::SearchParamType>,
+    pub search_type: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_searchType")]
@@ -141190,7 +141188,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  For further discussion, see [Using Terminologies](terminologies.html). */
     #[serde(rename = "strength")]
-    pub strength: codes::BindingStrength,
+    pub strength: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_strength")]
@@ -141625,7 +141623,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  Code values should align with the severity.  For example, a code of ```textforbidden``` generally wouldn't make sense with a severity of ```textinformation``` or ```textwarning```.  Similarly, a code of ```textinformational``` would generally not make sense with a severity of ```textfatal``` or ```texterror```.  However, there are no strict rules about what severities must be used with which codes.  For example, ```textcode-invalid``` might be a ```textwarning``` or ```texterror```, depending on the context */
     #[serde(rename = "code")]
-    pub code: codes::IssueType,
+    pub code: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_code")]
@@ -145468,7 +145466,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  */
     #[serde(rename = "type")]
-    pub r#type: codes::LinkType,
+    pub r#type: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_type")]
@@ -147903,7 +147901,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "type")]
-    pub r#type: Option<codes::NoteType>,
+    pub r#type: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_type")]
@@ -148058,7 +148056,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  */
     #[serde(rename = "status")]
-    pub status: codes::PermissionStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -148496,7 +148494,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "type")]
-    pub r#type: Option<codes::ConsentProvisionType>,
+    pub r#type: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_type")]
@@ -148735,7 +148733,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  */
     #[serde(rename = "meaning")]
-    pub meaning: codes::ConsentDataMeaning,
+    pub meaning: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_meaning")]
@@ -149602,7 +149600,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "assurance")]
-    pub assurance: Option<codes::IdentityAssuranceLevel>,
+    pub assurance: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_assurance")]
@@ -149949,7 +149947,7 @@ In some cases, the resource can no longer be found at the stated url, but the ur
 
 See guidance around (not) making local changes to elements [here](canonicalresource.html#localization). */
     #[serde(rename = "status")]
-    pub status: codes::PublicationStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -151028,7 +151026,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "type")]
-    pub r#type: Option<codes::ActionParticipantType>,
+    pub r#type: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_type")]
@@ -151428,7 +151426,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "priority")]
-    pub priority: Option<codes::RequestPriority>,
+    pub priority: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_priority")]
@@ -151640,7 +151638,7 @@ In addition, because the subject needs to be resolved during realization, use of
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "groupingBehavior")]
-    pub grouping_behavior: Option<codes::ActionGroupingBehavior>,
+    pub grouping_behavior: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_groupingBehavior")]
@@ -151654,7 +151652,7 @@ In addition, because the subject needs to be resolved during realization, use of
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "selectionBehavior")]
-    pub selection_behavior: Option<codes::ActionSelectionBehavior>,
+    pub selection_behavior: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_selectionBehavior")]
@@ -151668,7 +151666,7 @@ In addition, because the subject needs to be resolved during realization, use of
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "requiredBehavior")]
-    pub required_behavior: Option<codes::ActionRequiredBehavior>,
+    pub required_behavior: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_requiredBehavior")]
@@ -151682,7 +151680,7 @@ In addition, because the subject needs to be resolved during realization, use of
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "precheckBehavior")]
-    pub precheck_behavior: Option<codes::ActionPrecheckBehavior>,
+    pub precheck_behavior: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_precheckBehavior")]
@@ -151696,7 +151694,7 @@ In addition, because the subject needs to be resolved during realization, use of
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "cardinalityBehavior")]
-    pub cardinality_behavior: Option<codes::ActionCardinalityBehavior>,
+    pub cardinality_behavior: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_cardinalityBehavior")]
@@ -151928,7 +151926,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  Applicability criteria are used to determine immediate applicability when a plan definition is applied to a given context. Start and stop criteria are carried through application and used to describe enter/exit criteria for an action. */
     #[serde(rename = "kind")]
-    pub kind: codes::ActionConditionKind,
+    pub kind: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_kind")]
@@ -152218,7 +152216,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  */
     #[serde(rename = "relationship")]
-    pub relationship: codes::ActionRelationshipType,
+    pub relationship: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_relationship")]
@@ -152232,7 +152230,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "endRelationship")]
-    pub end_relationship: Option<codes::ActionRelationshipType>,
+    pub end_relationship: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_endRelationship")]
@@ -152386,7 +152384,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "type")]
-    pub r#type: Option<codes::ActionParticipantType>,
+    pub r#type: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_type")]
@@ -154209,7 +154207,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
 This element is labeled as a modifier because the status contains codes that mark the resource as not currently valid. */
     #[serde(rename = "status")]
-    pub status: codes::EventStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -156869,7 +156867,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  */
     #[serde(rename = "role")]
-    pub role: codes::ProvenanceEntityRole,
+    pub role: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_role")]
@@ -157189,7 +157187,7 @@ Unknown does not represent 'other' - one of the defined statuses must apply.  Un
 
 See guidance around (not) making local changes to elements [here](canonicalresource.html#localization). */
     #[serde(rename = "status")]
-    pub status: codes::PublicationStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -157621,7 +157619,7 @@ LinkIds can have whitespaces and slashes by design. Tooling should not rely on l
 
  Additional constraints on the type of answer can be conveyed by extensions. The value may come from the ElementDefinition referred to by .definition. */
     #[serde(rename = "type")]
-    pub r#type: codes::QuestionnaireItemType,
+    pub r#type: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_type")]
@@ -157649,7 +157647,7 @@ LinkIds can have whitespaces and slashes by design. Tooling should not rely on l
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "enableBehavior")]
-    pub enable_behavior: Option<codes::EnableWhenBehavior>,
+    pub enable_behavior: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_enableBehavior")]
@@ -157737,7 +157735,7 @@ The resulting QuestionnaireResponse will be populated the same way regardless of
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "answerConstraint")]
-    pub answer_constraint: Option<codes::QuestionnaireAnswerConstraint>,
+    pub answer_constraint: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_answerConstraint")]
@@ -157894,7 +157892,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  */
     #[serde(rename = "operator")]
-    pub operator: codes::QuestionnaireItemOperator,
+    pub operator: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_operator")]
@@ -158579,7 +158577,7 @@ Composition of questionnaire responses will be handled using the Assemble operat
 
  Unknown does not represent "other" - one of the defined statuses must apply.  Unknown is used when the authoring system is not sure what the current status is. */
     #[serde(rename = "status")]
-    pub status: codes::QuestionnaireResponseStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -161109,7 +161107,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "priority")]
-    pub priority: Option<codes::RequestPriority>,
+    pub priority: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_priority")]
@@ -161817,7 +161815,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "priority")]
-    pub priority: Option<codes::RequestPriority>,
+    pub priority: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_priority")]
@@ -161985,7 +161983,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "groupingBehavior")]
-    pub grouping_behavior: Option<codes::ActionGroupingBehavior>,
+    pub grouping_behavior: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_groupingBehavior")]
@@ -161999,7 +161997,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "selectionBehavior")]
-    pub selection_behavior: Option<codes::ActionSelectionBehavior>,
+    pub selection_behavior: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_selectionBehavior")]
@@ -162013,7 +162011,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "requiredBehavior")]
-    pub required_behavior: Option<codes::ActionRequiredBehavior>,
+    pub required_behavior: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_requiredBehavior")]
@@ -162027,7 +162025,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "precheckBehavior")]
-    pub precheck_behavior: Option<codes::ActionPrecheckBehavior>,
+    pub precheck_behavior: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_precheckBehavior")]
@@ -162041,7 +162039,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "cardinalityBehavior")]
-    pub cardinality_behavior: Option<codes::ActionCardinalityBehavior>,
+    pub cardinality_behavior: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_cardinalityBehavior")]
@@ -162261,7 +162259,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  Applicability criteria are used to determine immediate applicability when a plan definition is applied to a given context. Start and stop criteria are carried through application and used to describe enter/exit criteria for an action. */
     #[serde(rename = "kind")]
-    pub kind: codes::ActionConditionKind,
+    pub kind: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_kind")]
@@ -162551,7 +162549,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  */
     #[serde(rename = "relationship")]
-    pub relationship: codes::ActionRelationshipType,
+    pub relationship: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_relationship")]
@@ -162565,7 +162563,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "endRelationship")]
-    pub end_relationship: Option<codes::ActionRelationshipType>,
+    pub end_relationship: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_endRelationship")]
@@ -162717,7 +162715,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "type")]
-    pub r#type: Option<codes::ActionParticipantType>,
+    pub r#type: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_type")]
@@ -163716,7 +163714,7 @@ In some cases, the resource can no longer be found at the stated url, but the ur
 
 See guidance around (not) making local changes to elements [here](canonicalresource.html#localization). */
     #[serde(rename = "status")]
-    pub status: codes::PublicationStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -164072,7 +164070,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "conformance")]
-    pub conformance: Vec<Option<codes::ConformanceExpectation>>,
+    pub conformance: Vec<Option<String>>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     #[serde(rename = "_conformance")]
@@ -164595,7 +164593,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  */
     #[serde(rename = "status")]
-    pub status: codes::PublicationStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -166460,7 +166458,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  */
     #[serde(rename = "status")]
-    pub status: codes::PublicationStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -168549,7 +168547,7 @@ In some cases, the resource can no longer be found at the stated url, but the ur
 
 See guidance around (not) making local changes to elements [here](canonicalresource.html#localization). */
     #[serde(rename = "status")]
-    pub status: codes::PublicationStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -168717,7 +168715,7 @@ DEPRECATION NOTE: For consistency, implementations are encouraged to migrate to 
 
  A search parameter must always apply to at least one resource type. When search parameters apply to more than one resource type, they can be used against any of the listed resource types, or in a cross-type search (see [Cross Resource Search](http.html#xres-search)). */
     #[serde(rename = "base")]
-    pub base: Vec<Option<codes::FHIRTypes>>,
+    pub base: Vec<Option<String>>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     #[serde(rename = "_base")]
@@ -168729,7 +168727,7 @@ DEPRECATION NOTE: For consistency, implementations are encouraged to migrate to 
 
  */
     #[serde(rename = "type")]
-    pub r#type: codes::SearchParamType,
+    pub r#type: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_type")]
@@ -168757,7 +168755,7 @@ DEPRECATION NOTE: For consistency, implementations are encouraged to migrate to 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "processingMode")]
-    pub processing_mode: Option<codes::SearchProcessingModeType>,
+    pub processing_mode: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_processingMode")]
@@ -168787,7 +168785,7 @@ However, the list of targets SHOULD cover all targets that might appear that are
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "target")]
-    pub target: Vec<Option<codes::FHIRTypes>>,
+    pub target: Vec<Option<String>>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     #[serde(rename = "_target")]
@@ -169280,7 +169278,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "priority")]
-    pub priority: Option<codes::RequestPriority>,
+    pub priority: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_priority")]
@@ -171044,7 +171042,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  */
     #[serde(rename = "status")]
-    pub status: codes::SlotStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -171337,7 +171335,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "status")]
-    pub status: Option<codes::SpecimenStatus>,
+    pub status: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -171421,7 +171419,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "combined")]
-    pub combined: Option<codes::SpecimenCombined>,
+    pub combined: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_combined")]
@@ -172809,7 +172807,7 @@ Unknown does not represent "other" - one of the defined statuses must apply. Unk
 
 See guidance around (not) making local changes to elements [here](canonicalresource.html#localization). */
     #[serde(rename = "status")]
-    pub status: codes::PublicationStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -173304,7 +173302,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  */
     #[serde(rename = "preference")]
-    pub preference: codes::SpecimenContainedPreference,
+    pub preference: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_preference")]
@@ -174090,7 +174088,7 @@ In some cases, the resource can no longer be found at the stated url, but the ur
 
 See guidance around (not) making local changes to elements [here](canonicalresource.html#localization). */
     #[serde(rename = "status")]
-    pub status: codes::PublicationStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -174264,7 +174262,7 @@ DEPRECATION NOTE: For consistency, implementations are encouraged to migrate to 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "fhirVersion")]
-    pub fhir_version: Option<codes::FHIRVersion>,
+    pub fhir_version: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_fhirVersion")]
@@ -174290,7 +174288,7 @@ DEPRECATION NOTE: For consistency, implementations are encouraged to migrate to 
 
  */
     #[serde(rename = "kind")]
-    pub kind: codes::StructureDefinitionKind,
+    pub kind: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_kind")]
@@ -174372,7 +174370,7 @@ The type must match the elements defined in the differential and the snapshot. F
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "derivation")]
-    pub derivation: Option<codes::TypeDerivationRule>,
+    pub derivation: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_derivation")]
@@ -174647,7 +174645,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  */
     #[serde(rename = "type")]
-    pub r#type: codes::ExtensionContextType,
+    pub r#type: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_type")]
@@ -175022,7 +175020,7 @@ In some cases, the resource can no longer be found at the stated url, but the ur
 
 See guidance around (not) making local changes to elements [here](canonicalresource.html#localization). */
     #[serde(rename = "status")]
-    pub status: codes::PublicationStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -175370,7 +175368,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  */
     #[serde(rename = "mode")]
-    pub mode: codes::StructureMapModelMode,
+    pub mode: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_mode")]
@@ -175578,7 +175576,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "typeMode")]
-    pub type_mode: Option<codes::StructureMapGroupTypeMode>,
+    pub type_mode: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_typeMode")]
@@ -175723,7 +175721,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  */
     #[serde(rename = "mode")]
-    pub mode: codes::StructureMapInputMode,
+    pub mode: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_mode")]
@@ -176048,7 +176046,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "listMode")]
-    pub list_mode: Option<codes::StructureMapSourceListMode>,
+    pub list_mode: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_listMode")]
@@ -176216,7 +176214,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "listMode")]
-    pub list_mode: Vec<Option<codes::StructureMapTargetListMode>>,
+    pub list_mode: Vec<Option<String>>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     #[serde(rename = "_listMode")]
@@ -176244,7 +176242,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "transform")]
-    pub transform: Option<codes::StructureMapTransform>,
+    pub transform: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_transform")]
@@ -177352,7 +177350,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "status")]
-    pub status: Option<codes::SubscriptionStatus>,
+    pub status: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -177364,7 +177362,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  */
     #[serde(rename = "type")]
-    pub r#type: codes::SubscriptionNotificationType,
+    pub r#type: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_type")]
@@ -177955,7 +177953,7 @@ Unknown does not represent "other" - one of the defined statuses must apply.  Un
 
 See guidance around (not) making local changes to elements [here](canonicalresource.html#localization). */
     #[serde(rename = "status")]
-    pub status: codes::PublicationStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -178480,7 +178478,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "resultForCreate")]
-    pub result_for_create: Option<codes::CriteriaNotExistsBehavior>,
+    pub result_for_create: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_resultForCreate")]
@@ -178508,7 +178506,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "resultForDelete")]
-    pub result_for_delete: Option<codes::CriteriaNotExistsBehavior>,
+    pub result_for_delete: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_resultForDelete")]
@@ -179019,7 +179017,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "status")]
-    pub status: Option<codes::FHIRSubstanceStatus>,
+    pub status: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -185883,7 +185881,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "status")]
-    pub status: Option<codes::SupplyDeliveryStatus>,
+    pub status: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -186801,7 +186799,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "status")]
-    pub status: Option<codes::SupplyRequestStatus>,
+    pub status: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -186843,7 +186841,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "priority")]
-    pub priority: Option<codes::RequestPriority>,
+    pub priority: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_priority")]
@@ -187842,7 +187840,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  */
     #[serde(rename = "status")]
-    pub status: codes::TaskStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -187884,7 +187882,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
 In most cases, Tasks will have an intent of "order". */
     #[serde(rename = "intent")]
-    pub intent: codes::TaskIntent,
+    pub intent: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_intent")]
@@ -187898,7 +187896,7 @@ In most cases, Tasks will have an intent of "order". */
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "priority")]
-    pub priority: Option<codes::RequestPriority>,
+    pub priority: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_priority")]
@@ -190384,7 +190382,7 @@ In some cases, the resource can no longer be found at the stated url, but the ur
 
 See guidance around (not) making local changes to elements [here](canonicalresource.html#localization). */
     #[serde(rename = "status")]
-    pub status: codes::PublicationStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -190540,7 +190538,7 @@ DEPRECATION NOTE: For consistency, implementations are encouraged to migrate to 
 
  */
     #[serde(rename = "kind")]
-    pub kind: codes::CapabilityStatementKind,
+    pub kind: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_kind")]
@@ -190624,7 +190622,7 @@ DEPRECATION NOTE: For consistency, implementations are encouraged to migrate to 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "codeSearch")]
-    pub code_search: Option<codes::CodeSearchSupport>,
+    pub code_search: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_codeSearch")]
@@ -191002,7 +191000,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  */
     #[serde(rename = "content")]
-    pub content: codes::CodeSystemContentMode,
+    pub content: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_content")]
@@ -191899,7 +191897,7 @@ In some cases, the resource can no longer be found at the stated url, but the ur
 
 See guidance around (not) making local changes to elements [here](canonicalresource.html#localization). */
     #[serde(rename = "status")]
-    pub status: codes::PublicationStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -193403,7 +193401,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
 This element is labeled as a modifier because the status contains codes that mark the resource as not currently valid. */
     #[serde(rename = "status")]
-    pub status: codes::TestReportStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -193427,7 +193425,7 @@ This element is labeled as a modifier because the status contains codes that mar
 
  The pass and fail result represents a completed test script execution. The pending result represents a test script execution that has not yet started or is currently in progress. */
     #[serde(rename = "result")]
-    pub result: codes::TestReportResult,
+    pub result: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_result")]
@@ -193640,7 +193638,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  */
     #[serde(rename = "type")]
-    pub r#type: codes::TestReportParticipantType,
+    pub r#type: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_type")]
@@ -193899,7 +193897,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  */
     #[serde(rename = "result")]
-    pub result: codes::TestReportActionResult,
+    pub result: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_result")]
@@ -193995,7 +193993,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  */
     #[serde(rename = "result")]
-    pub result: codes::TestReportActionResult,
+    pub result: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_result")]
@@ -194701,7 +194699,7 @@ In some cases, the resource can no longer be found at the stated url, but the ur
 
 See guidance around (not) making local changes to elements [here](canonicalresource.html#localization). */
     #[serde(rename = "status")]
-    pub status: codes::PublicationStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -196341,7 +196339,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "method")]
-    pub method: Option<codes::TestScriptRequestMethodCode>,
+    pub method: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_method")]
@@ -196637,7 +196635,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "direction")]
-    pub direction: Option<codes::AssertionDirectionType>,
+    pub direction: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_direction")]
@@ -196707,7 +196705,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "defaultManualCompletion")]
-    pub default_manual_completion: Option<codes::AssertionManualCompletionType>,
+    pub default_manual_completion: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_defaultManualCompletion")]
@@ -196781,7 +196779,7 @@ See [Testing FHIR Use minimumId](testing.html##minimumId) for a more complete de
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "operator")]
-    pub operator: Option<codes::AssertionOperatorType>,
+    pub operator: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_operator")]
@@ -196809,7 +196807,7 @@ See [Testing FHIR Use minimumId](testing.html##minimumId) for a more complete de
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "requestMethod")]
-    pub request_method: Option<codes::TestScriptRequestMethodCode>,
+    pub request_method: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_requestMethod")]
@@ -196851,7 +196849,7 @@ See [Testing FHIR Use minimumId](testing.html##minimumId) for a more complete de
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "response")]
-    pub response: Option<codes::AssertionResponseTypes>,
+    pub response: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_response")]
@@ -197609,7 +197607,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "status")]
-    pub status: Option<codes::TransportStatus>,
+    pub status: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -197637,7 +197635,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
 In most cases, Transports will have an intent of "order". */
     #[serde(rename = "intent")]
-    pub intent: codes::TransportIntent,
+    pub intent: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_intent")]
@@ -197651,7 +197649,7 @@ In most cases, Transports will have an intent of "order". */
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[cfg_attr(feature = "builders", builder(default, setter(strip_option)))]
     #[serde(rename = "priority")]
-    pub priority: Option<codes::RequestPriority>,
+    pub priority: Option<String>,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_priority")]
@@ -200077,7 +200075,7 @@ In some cases, the resource can no longer be found at the stated url, but the ur
 
 See guidance around (not) making local changes to elements [here](canonicalresource.html#localization). */
     #[serde(rename = "status")]
-    pub status: codes::PublicationStatus,
+    pub status: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_status")]
@@ -201055,7 +201053,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  In case filter.property represents a property of the system, the operation applies to the selected property. In case filter.property represents a filter of the system, the operation SHALL match one of the CodeSystem.filter.operator values. */
     #[serde(rename = "op")]
-    pub op: codes::FilterOperator,
+    pub op: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_op")]
@@ -203678,7 +203676,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  May also appear on the paper claim form or in the Medical Records as as OD (oculus dexter) for the right eye and OS (oculus sinister) for the left eye. */
     #[serde(rename = "eye")]
-    pub eye: codes::VisionEyes,
+    pub eye: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_eye")]
@@ -203933,7 +203931,7 @@ Modifier extensions SHALL NOT change the meaning of any elements on Resource or 
 
  */
     #[serde(rename = "base")]
-    pub base: codes::VisionBase,
+    pub base: String,
     /// Extension field.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     #[serde(rename = "_base")]
